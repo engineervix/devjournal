@@ -1,0 +1,30 @@
+{{-- resources/views/pages/entries/_form.edge --}}
+
+{{-- Entry Type Selector --}}
+@!component('components/entry-type-selector', {
+  entryType: flashMessages.get('entryType', entry?.entryType || request.input('type') || 'daily')
+})
+
+{{-- Title Field --}}
+<div class="mb-6">
+  <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Title (optional)</label>
+  <input
+    type="text"
+    name="title"
+    id="title"
+    value="{{ flashMessages.get('title', entry?.title || '') }}"
+    class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+    placeholder="Give your entry a title (optional for Daily Logs)"
+  >
+</div>
+
+{{-- Content Field --}}
+@!component('components/markdown-editor', {
+  initialContent: flashMessages.get('contentMarkdown', entry?.contentMarkdown || '')
+})
+
+{{-- Tags Input --}}
+@!component('components/tag-input', {
+  existingTags: allTags,
+  selectedTags: flashMessages.get('tags', entry?.tags ? entry.tags.map(tag => tag.name) : [])
+})

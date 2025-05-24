@@ -1,13 +1,10 @@
 @component('layouts/main')
 
 @slot('main')
-  <div class="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-    <div>
-      <h1 class="text-2xl font-bold">All Entries</h1>
-    </div>
-
-    <div class="flex flex-col sm:flex-row gap-3">
-      {{-- Type Filter Dropdown --}}
+  <div class="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">My Entries</h1>
+    <div class="flex items-center space-x-2">
+      {{-- Entry Type Filter --}}
       <div class="relative" x-data="{ open: false }">
         <button
           @click="open = !open"
@@ -180,29 +177,5 @@
       </a>
     </div>
   @end
-@endslot
-
-@push('scripts')
-<script>
-  function range(start, end) {
-    return Array.from({ length: end - start }, (_, i) => start + i);
-  }
-
-  function constructUrl(newParams) {
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    const currentParams = Object.fromEntries(urlSearchParams.entries());
-
-    // Merge current params with new ones
-    const mergedParams = { ...currentParams, ...newParams };
-
-    // Remove null/undefined params
-    Object.keys(mergedParams).forEach(key =>
-      (mergedParams[key] === null || mergedParams[key] === undefined) && delete mergedParams[key]
-    );
-
-    // Build query string
-    const queryString = new URLSearchParams(mergedParams).toString();
-    return `{{ route('entries.index') }}${queryString ? `?${queryString}` : ''}`;
-  }
-</script>
-@endpush
+@end
+@end

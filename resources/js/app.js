@@ -64,6 +64,40 @@ function initializeKeyboardShortcuts() {
   });
 }
 
+// Function to handle Cmd/Ctrl + Enter for form submission
+function initializeFormShortcuts() {
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      // Find the closest form element to the currently focused element or the body
+      const targetElement = e.target;
+      const form = targetElement.closest('form');
+
+      if (form) {
+        // Check if the target is a textarea to prevent submission when adding a newline
+        if (targetElement.tagName === 'TEXTAREA' && !e.shiftKey) {
+          // Allow Shift+Enter for newline in textarea, but Ctrl/Cmd+Enter submits
+          // Or, if it's not a textarea, submit directly
+        } else if (targetElement.tagName !== 'TEXTAREA') {
+          // Allow submission for non-textarea elements
+        } else {
+          // If it is a textarea and shiftKey is pressed, don't submit (allow newline)
+          return;
+        }
+
+        e.preventDefault();
+        // To ensure submit buttons with formaction/formmethod are respected,
+        // we should try to click a primary submit button if one exists.
+        const submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
+        if (submitButton) {
+          submitButton.click(); // Click the button to trigger its specific actions
+        } else {
+          form.submit(); // Fallback to direct form submission
+        }
+      }
+    }
+  });
+}
+
 // Alpine.js components
 document.addEventListener('alpine:init', () => {
   Alpine.data('userMenu', () => ({
@@ -84,6 +118,7 @@ Alpine.start();
 document.addEventListener('DOMContentLoaded', () => {
   initializeThemeToggle();
   initializeKeyboardShortcuts();
+  initializeFormShortcuts();
 });
 
-console.log('DevJournal App Initialized with Alpine, Theme Toggle, and Shortcuts');
+console.log('DevJournal App Initialized with Alpine, Theme Toggle, Shortcuts, and Form Submit');

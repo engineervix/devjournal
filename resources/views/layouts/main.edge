@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -79,6 +79,10 @@
 
   {{-- Main Content --}}
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    {{-- Display Flash Messages --}}
+    @component('components/flash_messages')
+    @end
+
     {{{ await $slots.main() }}}
   </main>
 

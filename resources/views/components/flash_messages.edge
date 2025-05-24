@@ -1,0 +1,17 @@
+@if(session.flashMessages && session.flashMessages.get('success'))
+  <div class="mb-4 p-4 rounded-md bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-200">
+    <div class="flex items-center">
+      <i class="ph ph-check-circle text-xl mr-3"></i>
+      <p>{{ session.flashMessages.get('success') }}</p>
+    </div>
+  </div>
+@endif
+
+@if(session.flashMessages && session.flashMessages.get('error'))
+  <div class="mb-4 p-4 rounded-md bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-200">
+    <div class="flex items-center">
+      <i class="ph ph-x-circle text-xl mr-3"></i>
+      <p>{{ session.flashMessages.get('error') }}</p>
+    </div>
+  </div>
+@endif
