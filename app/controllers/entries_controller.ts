@@ -1,79 +1,66 @@
-import type { HttpContext } from '@adonisjs/core/http'
+import { HttpContext } from '@adonisjs/core/http'
+import vine from '@vinejs/vine'
 import Entry from '#models/entry'
 import Tag from '#models/tag'
+import MarkdownIt from 'markdown-it'
+import { htmlToText } from 'html-to-text'
 import { cuid } from '@adonisjs/core/helpers'
-import vine, { errors } from '@vinejs/vine'
-import { DateTime } from 'luxon'
 
 const entryValidator = vine.compile(
   vine.object({
     entryType: vine.string().trim(),
-    title: vine.string().trim().optional(),
+    title: vine.string().trim().minLength(1).optional(),
     contentMarkdown: vine.string().trim().optional(),
-    tags: vine.array(vine.string()).optional(),
+    tags: vine.array(vine.string().trim().toLowerCase().minLength(1)).optional(),
   })
 )
+
+const md = new MarkdownIt() // Initialize Markdown-it parser
 
 export default class EntriesController {
   /**
    * Display a list of resource
    */
   async index({ view, request }: HttpContext) {
-    // Get query parameters for filtering
-    const { type, period, sort } = request.qs()
+    const { type, period, sort, page } = request.qs()
+    const currentPage = Math.max(1, Number.parseInt(page, 10) || 1)
 
-    // Create query builder
     const query = Entry.query()
 
-    // Apply type filter if provided
     if (type) {
       query.where('entryType', type)
     }
 
-    // Apply period filter if provided
     if (period) {
-      const now = DateTime.now()
-
-      switch (period) {
-        case 'today':
-          query.where('createdAt', '>=', now.startOf('day').toSQL())
-          break
-        case 'this-week':
-          query.where('createdAt', '>=', now.startOf('week').toSQL())
-          break
-        case 'this-month':
-          query.where('createdAt', '>=', now.startOf('month').toSQL())
-          break
-        case 'this-year':
-          query.where('createdAt', '>=', now.startOf('year').toSQL())
-          break
+      const now = new Date()
+      let startDate: Date | undefined
+      if (period === 'today') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      } else if (period === 'week') {
+        const firstDayOfWeek = now.getDate() - now.getDay()
+        startDate = new Date(now.getFullYear(), now.getMonth(), firstDayOfWeek)
+      } else if (period === 'month') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+      }
+      if (startDate) {
+        startDate.setHours(0, 0, 0, 0)
+        query.where('createdAt', '>=', startDate.toISOString())
       }
     }
 
-    // Apply sorting
     if (sort === 'oldest') {
       query.orderBy('createdAt', 'asc')
     } else {
-      query.orderBy('createdAt', 'desc')
+      query.orderBy('createdAt', 'desc') // Default to newest
     }
 
-    // Load relationships
     query.preload('tags')
+    const entries = await query.paginate(currentPage, 10)
 
-    // Paginate results
-    const entries = await query.paginate(request.input('page', 1), 10)
+    const queryParams = new URLSearchParams(request.qs() as Record<string, string>)
+    queryParams.delete('page')
 
-    // Build query params for pagination links
-    let queryParams = ''
-    if (type || period || sort) {
-      const params = []
-      if (type) params.push(`type=${type}`)
-      if (period) params.push(`period=${period}`)
-      if (sort) params.push(`sort=${sort}`)
-      queryParams = `&${params.join('&')}`
-    }
-
-    return view.render('pages/entries/index', { entries, queryParams })
+    return view.render('pages/entries/index', { entries, queryParams: queryParams.toString() })
   }
 
   /**
@@ -86,22 +73,60 @@ export default class EntriesController {
   /**
    * Handle form submission for the create action
    */
-  async store({ request, response, auth }: HttpContext) {
+  async store({ request, response, auth, session }: HttpContext) {
     const user = auth.getUserOrFail()
+    const payload = await request.validateUsing(entryValidator)
+
+    let contentHtml: string | null = null
+    let contentPlain: string | null = null
+
+    if (payload.contentMarkdown) {
+      contentHtml = md.render(payload.contentMarkdown)
+      contentPlain = htmlToText(contentHtml, {
+        wordwrap: false,
+        selectors: [{ selector: 'img', format: 'skip' }],
+      })
+    }
 
     try {
-      const payload = await request.validateUsing(entryValidator)
-      await Entry.create({
-        id: cuid(),
-        userId: user.id,
-        ...payload,
-      })
-      return response.redirect().toRoute('entries.index')
-    } catch (error) {
-      if (error instanceof errors.E_VALIDATION_ERROR) {
-        return response.status(422).send(error.messages)
+      const entry = new Entry()
+      entry.id = cuid() // Ensure ID is set if your model/DB doesn't auto-generate it in a way Lucid expects for relations before save.
+      entry.userId = user.id
+      entry.entryType = payload.entryType
+      entry.title = payload.title || null
+      entry.contentMarkdown = payload.contentMarkdown || null
+      entry.contentHtml = contentHtml
+      entry.contentPlain = contentPlain
+
+      await entry.save() // Save the entry to establish its ID before associating tags
+
+      if (payload.tags && payload.tags.length > 0) {
+        const tagIdsToAttach = []
+        for (const tagName of payload.tags) {
+          if (!tagName) continue
+          const slug = tagName.toLowerCase().replace(/\s+/g, '-')
+          let tag = await Tag.findBy('slug', slug)
+          if (tag) {
+            tag.usageCount += 1
+            await tag.save()
+          } else {
+            tag = await Tag.create({ name: tagName, slug, usageCount: 1 })
+          }
+          tagIdsToAttach.push(tag.id)
+        }
+        if (tagIdsToAttach.length > 0) {
+          await entry.related('tags').attach(tagIdsToAttach)
+        }
       }
-      throw error
+
+      session.flash('success', 'Entry created successfully.')
+      return response.redirect().toRoute('entries.show', { id: entry.id })
+    } catch (error) {
+      console.error('Error creating entry:', error)
+      session.flash('error', `Failed to create entry: ${error.message}`)
+      // Flash input to session for repopulation
+      session.flashAll()
+      return response.redirect().back()
     }
   }
 
@@ -109,7 +134,7 @@ export default class EntriesController {
    * Show individual record
    */
   async show({ params, view }: HttpContext) {
-    const entry = await Entry.findOrFail(params.id)
+    const entry = await Entry.query().where('id', params.id).preload('tags').firstOrFail()
     return view.render('pages/entries/show', { entry })
   }
 
@@ -117,106 +142,165 @@ export default class EntriesController {
    * Edit individual record
    */
   async edit({ params, view }: HttpContext) {
-    const entry = await Entry.findOrFail(params.id)
+    const entry = await Entry.query().where('id', params.id).preload('tags').firstOrFail()
     return view.render('pages/entries/edit', { entry })
   }
 
   /**
    * Handle form submission for the edit action
    */
-  async update({ params, request, response }: HttpContext) {
-    const entry = await Entry.findOrFail(params.id)
+  async update({ params, request, response, session }: HttpContext) {
+    const entry = await Entry.query().where('id', params.id).preload('tags').firstOrFail()
+    const payload = await request.validateUsing(entryValidator)
+
+    let contentHtml: string | null = entry.contentHtml
+    let contentPlain: string | null = entry.contentPlain
+
+    if (payload.contentMarkdown && payload.contentMarkdown !== entry.contentMarkdown) {
+      contentHtml = md.render(payload.contentMarkdown)
+      contentPlain = htmlToText(contentHtml, {
+        wordwrap: false,
+        selectors: [{ selector: 'img', format: 'skip' }],
+      })
+    } else if (!payload.contentMarkdown && entry.contentMarkdown) {
+      contentHtml = null
+      contentPlain = null
+    }
 
     try {
-      const payload = await request.validateUsing(entryValidator)
-      entry.merge(payload)
+      entry.entryType = payload.entryType
+      entry.title = payload.title || null
+      entry.contentMarkdown = payload.contentMarkdown || null
+      entry.contentHtml = contentHtml
+      entry.contentPlain = contentPlain
+
       await entry.save()
+
+      const newTagNames = payload.tags || []
+      const tagIdsToSync = []
+
+      for (const tagName of newTagNames) {
+        if (!tagName) continue
+        const slug = tagName.toLowerCase().replace(/\s+/g, '-')
+        let tag = await Tag.findBy('slug', slug)
+        if (!tag) {
+          tag = await Tag.create({ name: tagName, slug, usageCount: 0 })
+        }
+        tagIdsToSync.push(tag.id)
+      }
+
+      // Correctly handle the return type of sync
+      const syncResult: { attached: number[]; detached: number[]; updated: number[] } = (await entry
+        .related('tags')
+        .sync(tagIdsToSync)) as { attached: number[]; detached: number[]; updated: number[] }
+
+      for (const tagId of syncResult.attached) {
+        const tagInstance = await Tag.findOrFail(tagId)
+        tagInstance.usageCount += 1
+        await tagInstance.save()
+      }
+
+      for (const tagId of syncResult.detached) {
+        const tagInstance = await Tag.findOrFail(tagId)
+        tagInstance.usageCount = Math.max(0, tagInstance.usageCount - 1)
+        await tagInstance.save()
+      }
+
+      session.flash('success', 'Entry updated successfully.')
       return response.redirect().toRoute('entries.show', { id: entry.id })
     } catch (error) {
-      if (error instanceof errors.E_VALIDATION_ERROR) {
-        return response.status(422).send(error.messages)
-      }
-      throw error
+      console.error('Error updating entry:', error)
+      session.flash('error', `Failed to update entry: ${error.message}`)
+      session.flashAll() // Flash input to session
+      return response.redirect().back()
     }
   }
 
   /**
    * Delete record
    */
-  async destroy({ params, response }: HttpContext) {
-    const entry = await Entry.findOrFail(params.id)
-    await entry.delete()
-    return response.redirect().toRoute('entries.index')
+  async destroy({ params, response, session }: HttpContext) {
+    const entry = await Entry.query().where('id', params.id).preload('tags').firstOrFail()
+
+    try {
+      const tagsToUpdate = entry.tags
+      await entry.delete()
+
+      for (const tag of tagsToUpdate) {
+        tag.usageCount = Math.max(0, tag.usageCount - 1)
+        await tag.save()
+      }
+
+      session.flash('success', 'Entry deleted successfully.')
+      return response.redirect().toRoute('entries.index')
+    } catch (error) {
+      console.error('Error deleting entry:', error)
+      session.flash('error', 'Failed to delete entry.')
+      return response.redirect().back()
+    }
   }
 
   /**
    * Search entries
    */
   async search({ view, request }: HttpContext) {
-    const query = request.input('q', '')
+    const searchQuery = request.input('q', '').trim()
+    const { type, period, sort, page } = request.qs()
+    const currentPage = Math.max(1, Number.parseInt(page, 10) || 1)
 
-    if (!query) {
-      return view.render('pages/entries/search', { entries: [], query: '' })
+    if (!searchQuery) {
+      return view.render('pages/entries/search', {
+        entries: await Entry.query().paginate(currentPage, 10), // Provide paginated empty results
+        query: '',
+        queryParams: '',
+      })
     }
 
-    // Get filter parameters
-    const { type, period, sort } = request.qs()
+    const entryQuery = Entry.query().where((builder) => {
+      builder
+        .whereILike('title', `%${searchQuery}%`)
+        .orWhereILike('contentPlain', `%${searchQuery}%`)
+    })
 
-    // Create query builder with full text search
-    const entryQuery = Entry.query()
-      .whereILike('title', `%${query}%`)
-      .orWhereILike('contentPlain', `%${query}%`)
-
-    // Apply type filter if provided
     if (type) {
-      entryQuery.andWhere('entryType', type)
+      entryQuery.where('entryType', type)
     }
 
-    // Apply period filter if provided
     if (period) {
-      const now = DateTime.now()
-
-      switch (period) {
-        case 'today':
-          entryQuery.andWhere('createdAt', '>=', now.startOf('day').toSQL())
-          break
-        case 'this-week':
-          entryQuery.andWhere('createdAt', '>=', now.startOf('week').toSQL())
-          break
-        case 'this-month':
-          entryQuery.andWhere('createdAt', '>=', now.startOf('month').toSQL())
-          break
-        case 'this-year':
-          entryQuery.andWhere('createdAt', '>=', now.startOf('year').toSQL())
-          break
+      const now = new Date()
+      let startDate: Date | undefined
+      if (period === 'today') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      } else if (period === 'week') {
+        const firstDayOfWeek = now.getDate() - now.getDay()
+        startDate = new Date(now.getFullYear(), now.getMonth(), firstDayOfWeek)
+      } else if (period === 'month') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+      }
+      if (startDate) {
+        startDate.setHours(0, 0, 0, 0)
+        entryQuery.where('createdAt', '>=', startDate.toISOString())
       }
     }
 
-    // Apply sorting
-    if (sort === 'newest') {
-      entryQuery.orderBy('createdAt', 'desc')
-    } else if (sort === 'oldest') {
+    if (sort === 'oldest') {
       entryQuery.orderBy('createdAt', 'asc')
+    } else if (sort === 'newest') {
+      entryQuery.orderBy('createdAt', 'desc')
     }
-    // Default sort is by relevance based on search match
 
-    // Load relationships
     entryQuery.preload('tags')
+    const entries = await entryQuery.paginate(currentPage, 10)
 
-    // Paginate results
-    const entries = await entryQuery.paginate(request.input('page', 1), 10)
+    const queryParams = new URLSearchParams(request.qs() as Record<string, string>)
+    queryParams.set('q', searchQuery)
+    queryParams.delete('page')
 
-    // Build query params for pagination links
-    let queryParams = ''
-    if (type || period || sort) {
-      const params = []
-      if (type) params.push(`type=${type}`)
-      if (period) params.push(`period=${period}`)
-      if (sort) params.push(`sort=${sort}`)
-      queryParams = `&${params.join('&')}`
-    }
-
-    return view.render('pages/entries/search', { entries, query, queryParams })
+    return view.render('pages/entries/search', {
+      entries,
+      query: searchQuery,
+      queryParams: queryParams.toString(),
+    })
   }
 
   /**
@@ -224,30 +308,47 @@ export default class EntriesController {
    */
   async byTag({ params, request, view }: HttpContext) {
     const { slug } = params
-
-    // Find the tag or return 404
     const tag = await Tag.findByOrFail('slug', slug)
 
-    // Get entries with this tag
-    const entries = await Entry.query()
-      .whereHas('tags', (query) => {
-        query.where('slug', slug)
-      })
-      .orderBy('createdAt', 'desc')
-      .preload('tags')
-      .paginate(request.input('page', 1), 10)
+    const { period, sort, page } = request.qs()
+    const currentPage = Math.max(1, Number.parseInt(page, 10) || 1)
 
-    // Find related tags
-    const relatedTags = await Tag.query()
-      .whereHas('entries', (query) => {
-        query.whereHas('tags', (subQuery) => {
-          subQuery.where('slug', slug)
-        })
-      })
-      .andWhere('slug', '!=', slug)
-      .orderBy('usageCount', 'desc')
-      .limit(10)
+    const entryQuery = tag.related('entries').query()
 
-    return view.render('pages/entries/by-tag', { tag, entries, relatedTags })
+    if (period) {
+      const now = new Date()
+      let startDate: Date | undefined
+      if (period === 'today') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      } else if (period === 'week') {
+        const firstDayOfWeek = now.getDate() - now.getDay()
+        startDate = new Date(now.getFullYear(), now.getMonth(), firstDayOfWeek)
+      } else if (period === 'month') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+      }
+      if (startDate) {
+        startDate.setHours(0, 0, 0, 0)
+        entryQuery.where('createdAt', '>=', startDate.toISOString())
+      }
+    }
+
+    if (sort === 'oldest') {
+      entryQuery.orderBy('createdAt', 'asc')
+    } else {
+      entryQuery.orderBy('createdAt', 'desc')
+    }
+
+    entryQuery.preload('tags')
+    const entries = await entryQuery.paginate(currentPage, 10)
+
+    const queryParams = new URLSearchParams(request.qs() as Record<string, string>)
+    queryParams.delete('page')
+
+    return view.render('pages/entries/by_tag', {
+      // Ensure this view exists
+      tag,
+      entries,
+      queryParams: queryParams.toString(),
+    })
   }
 }
