@@ -34,7 +34,7 @@ export default class EntriesController {
     if (period) {
       const now = DateTime.now()
 
-      switch(period) {
+      switch (period) {
         case 'today':
           query.where('createdAt', '>=', now.startOf('day').toSQL())
           break
@@ -176,7 +176,7 @@ export default class EntriesController {
     if (period) {
       const now = DateTime.now()
 
-      switch(period) {
+      switch (period) {
         case 'today':
           entryQuery.andWhere('createdAt', '>=', now.startOf('day').toSQL())
           break
