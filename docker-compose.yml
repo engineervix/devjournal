@@ -1,0 +1,19 @@
+services:
+  db:
+    image: pgvector/pgvector:0.8.0-pg16
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: devjournal
+      POSTGRES_USER: devjournal
+      POSTGRES_PASSWORD: password
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'devjournal', '-d', 'devjournal']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
