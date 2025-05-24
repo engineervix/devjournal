@@ -44,7 +44,7 @@ router
       todayCount: 3,
       streak: 7,
       totalCount: 42,
-      topTag: { name: 'javascript', usageCount: 15 }
+      topTag: { name: 'javascript', usageCount: 15 },
     }
 
     const todayEntries = [] // Replace with actual entries query
@@ -58,7 +58,7 @@ router
       todayEntries,
       achievements,
       popularTags,
-      hasDailyLog
+      hasDailyLog,
     })
   })
   .as('home')
@@ -78,9 +78,9 @@ router
     router.resource('entries', EntriesController)
 
     // Search entries
-    router.get('/entries/search', 'EntriesController.search').as('entries.search')
+    router.get('/entries/search', [EntriesController, 'search']).as('entries.search')
 
     // Filter entries by tag
-    router.get('/tags/:slug', 'EntriesController.byTag').as('entries.byTag')
+    router.get('/tags/:slug', [EntriesController, 'byTag']).as('entries.byTag')
   })
   .use(middleware.auth())
