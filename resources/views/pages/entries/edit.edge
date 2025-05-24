@@ -1,0 +1,76 @@
+@layout('layouts/main')
+
+@section('content')
+  <div class="mb-6 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">Edit Entry</h1>
+    <div>
+      <a href="{{ route('entries.show', { id: entry.id }) }}" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+        <i class="ph ph-x"></i> Cancel
+      </a>
+    </div>
+  </div>
+
+  @if(flashMessages.has('errors'))
+    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <i class="ph ph-warning text-red-400"></i>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+            There were errors with your submission
+          </h3>
+          <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+            <ul class="list-disc pl-5 space-y-1">
+              @each(error in flashMessages.get('errors'))
+                <li>{{ error }}</li>
+              @end
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  @endif
+
+  <div class="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg">
+    <form action="{{ route('entries.update', { id: entry.id }) }}?_method=PUT" method="POST">
+      {{ csrfField() }}
+
+      <div class="px-6 py-5">
+        {{-- Entry Type Selector --}}
+        @!component('components/entry-type-selector', { entryType: flashMessages.get('entryType', entry.entryType) })
+
+        {{-- Title Field --}}
+        <div class="mb-6">
+          <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Title (optional)</label>
+          <input
+            type="text"
+            name="title"
+            id="title"
+            value="{{ flashMessages.get('title', entry.title || '') }}"
+            class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="Give your entry a title (optional for Daily Logs)"
+          >
+        </div>
+
+        {{-- Content Field --}}
+        @!component('components/markdown-editor', { initialContent: flashMessages.get('contentMarkdown', entry.contentMarkdown || '') })
+
+        {{-- Tags Input --}}
+        @!component('components/tag-input', {
+          existingTags: allTags,
+          selectedTags: flashMessages.get('tags', entry.tags ? entry.tags.map(tag => tag.name) : [])
+        })
+      </div>
+
+      <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right">
+        <button
+          type="submit"
+          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Update Entry
+        </button>
+      </div>
+    </form>
+  </div>
+@endsection

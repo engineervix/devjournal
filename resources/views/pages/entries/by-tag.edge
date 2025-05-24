@@ -1,0 +1,93 @@
+@layout('layouts/main')
+
+@section('content')
+  <div class="mb-6 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">Entries tagged with <span class="text-indigo-600 dark:text-indigo-400">#{{ tag.name }}</span></h1>
+    <div class="text-sm text-gray-500 dark:text-gray-400">
+      {{ entries.length }} entries
+    </div>
+  </div>
+
+  @if(entries.length > 0)
+    <div class="space-y-4">
+      @each(entry in entries)
+        @!component('components/entry-card', { entry })
+      @end
+
+      {{-- Pagination --}}
+      @if(entries.getMeta && entries.getMeta().lastPage > 1)
+        <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0 my-6 pt-6">
+          <div class="-mt-px flex w-0 flex-1">
+            @if(entries.getMeta().currentPage > 1)
+              <a
+                href="{{ route('entries.byTag', { slug: tag.slug }) }}?page={{ entries.getMeta().currentPage - 1 }}"
+                class="inline-flex items-center border-t-2 border-transparent pr-1 pt-4 text-sm font-medium text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                <i class="ph ph-arrow-left mr-3"></i>
+                Previous
+              </a>
+            @endif
+          </div>
+
+          <div class="hidden md:-mt-px md:flex">
+            @each(page in range(1, entries.getMeta().lastPage + 1))
+              <a
+                href="{{ route('entries.byTag', { slug: tag.slug }) }}?page={{ page }}"
+                class="{{ page === entries.getMeta().currentPage ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300' }} inline-flex items-center border-t-2 px-4 pt-4 text-sm font-medium"
+              >
+                {{ page }}
+              </a>
+            @end
+          </div>
+
+          <div class="-mt-px flex w-0 flex-1 justify-end">
+            @if(entries.getMeta().currentPage < entries.getMeta().lastPage)
+              <a
+                href="{{ route('entries.byTag', { slug: tag.slug }) }}?page={{ entries.getMeta().currentPage + 1 }}"
+                class="inline-flex items-center border-t-2 border-transparent pl-1 pt-4 text-sm font-medium text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                Next
+                <i class="ph ph-arrow-right ml-3"></i>
+              </a>
+            @endif
+          </div>
+        </nav>
+      @endif
+    </div>
+  @else
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-8 text-center">
+      <i class="ph ph-tag text-4xl text-gray-400 dark:text-gray-500 mb-3"></i>
+      <h3 class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-1">No entries found</h3>
+      <p class="text-gray-500 dark:text-gray-400 mb-4">This tag doesn't have any entries yet.</p>
+      <a href="{{ route('home') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        Back to dashboard
+      </a>
+    </div>
+  @end
+
+  {{-- Related Tags --}}
+  @if(relatedTags && relatedTags.length > 0)
+    <div class="mt-8">
+      <h2 class="text-xl font-semibold mb-4">Related Tags</h2>
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
+        <div class="flex flex-wrap gap-2">
+          @each(relatedTag in relatedTags)
+            <a href="{{ route('entries.byTag', { slug: relatedTag.slug }) }}"
+              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 hover:bg-indigo-200 dark:hover:bg-indigo-800">
+              {{ relatedTag.name }}
+              <span class="ml-1 text-indigo-600 dark:text-indigo-300">{{ relatedTag.usageCount }}</span>
+            </a>
+          @end
+        </div>
+      </div>
+    </div>
+  @endif
+@endsection
+
+@section('scripts')
+<script>
+  function range(start, end) {
+    return Array.from({ length: end - start }, (_, i) => start + i);
+  }
+</script>
+@endsection

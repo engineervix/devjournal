@@ -1,0 +1,128 @@
+{{-- Tag input with autocomplete component --}}
+<div x-data="tagInput({{ existingTags ? JSON.stringify(existingTags) : '[]' }}, {{ selectedTags ? JSON.stringify(selectedTags) : '[]' }})" class="mb-6">
+  <label for="tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tags</label>
+
+  <div class="flex flex-wrap items-center gap-2 p-2 border border-gray-300 dark:border-gray-600 rounded-md">
+    {{-- Selected Tags Pills --}}
+    <template x-for="(tag, index) in selected" :key="index">
+      <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+        <span x-text="tag"></span>
+        <button type="button" @click="removeTag(index)" class="ml-1 text-indigo-500 hover:text-indigo-800 dark:hover:text-indigo-300 focus:outline-none">
+          &times;
+        </button>
+        <input type="hidden" name="tags[]" :value="tag">
+      </div>
+    </template>
+
+    {{-- Tag Input --}}
+    <input
+      type="text"
+      x-model="inputValue"
+      @keydown.enter.prevent="addTag"
+      @keydown.tab.prevent="addTag"
+      @keydown.comma.prevent="addTag"
+      @keydown.down="navigateSuggestion(1)"
+      @keydown.up="navigateSuggestion(-1)"
+      @input="filterSuggestions"
+      placeholder="Add tags... (press Enter or Tab)"
+      class="flex-grow min-w-[120px] border-0 p-0 focus:ring-0 text-gray-800 dark:text-gray-200 bg-transparent"
+    />
+  </div>
+
+  {{-- Tag Suggestions Dropdown --}}
+  <div
+    class="relative"
+    x-show="showSuggestions && filteredSuggestions.length > 0"
+    @click.away="showSuggestions = false"
+  >
+    <ul
+      class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+    >
+      <template x-for="(suggestion, index) in filteredSuggestions" :key="index">
+        <li
+          @click="selectSuggestion(suggestion)"
+          @mouseenter="selectedSuggestionIndex = index"
+          :class="{ 'bg-indigo-100 dark:bg-indigo-900/50': selectedSuggestionIndex === index }"
+          class="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900 dark:text-gray-100"
+          x-text="suggestion"
+        ></li>
+      </template>
+    </ul>
+  </div>
+</div>
+
+<script>
+  function tagInput(suggestions = [], initialSelected = []) {
+    return {
+      inputValue: '',
+      suggestions: suggestions,
+      selected: initialSelected,
+      filteredSuggestions: [],
+      showSuggestions: false,
+      selectedSuggestionIndex: 0,
+
+      filterSuggestions() {
+        if (this.inputValue.trim() === '') {
+          this.filteredSuggestions = [];
+          this.showSuggestions = false;
+          return;
+        }
+
+        this.filteredSuggestions = this.suggestions
+          .filter(tag =>
+            tag.toLowerCase().includes(this.inputValue.toLowerCase()) &&
+            !this.selected.includes(tag)
+          )
+          .slice(0, 5);
+
+        this.showSuggestions = this.filteredSuggestions.length > 0;
+        this.selectedSuggestionIndex = 0;
+      },
+
+      addTag() {
+        if (this.inputValue.trim() === '') return;
+
+        if (this.showSuggestions && this.selectedSuggestionIndex >= 0) {
+          this.selectSuggestion(this.filteredSuggestions[this.selectedSuggestionIndex]);
+          return;
+        }
+
+        const newTag = this.inputValue.trim();
+        if (!this.selected.includes(newTag)) {
+          this.selected.push(newTag);
+        }
+
+        this.inputValue = '';
+        this.showSuggestions = false;
+      },
+
+      removeTag(index) {
+        this.selected.splice(index, 1);
+      },
+
+      selectSuggestion(suggestion) {
+        if (!this.selected.includes(suggestion)) {
+          this.selected.push(suggestion);
+        }
+
+        this.inputValue = '';
+        this.showSuggestions = false;
+      },
+
+      navigateSuggestion(step) {
+        if (!this.showSuggestions) return;
+
+        const max = this.filteredSuggestions.length - 1;
+        const next = this.selectedSuggestionIndex + step;
+
+        if (next < 0) {
+          this.selectedSuggestionIndex = max;
+        } else if (next > max) {
+          this.selectedSuggestionIndex = 0;
+        } else {
+          this.selectedSuggestionIndex = next;
+        }
+      }
+    }
+  }
+</script>

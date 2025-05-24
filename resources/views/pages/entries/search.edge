@@ -1,0 +1,135 @@
+@layout('layouts/main')
+
+@section('content')
+  <div class="mb-6 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">Search Results</h1>
+    <div class="text-sm text-gray-500 dark:text-gray-400">
+      {{ entries.length }} result{{ entries.length === 1 ? '' : 's' }} for "{{ query }}"
+    </div>
+  </div>
+
+  @if(entries.length > 0)
+    {{-- Search form for refining search --}}
+    <form action="{{ route('entries.search') }}" method="GET" class="mb-6">
+      <div class="flex gap-2">
+        <div class="relative flex-grow">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <i class="ph ph-magnifying-glass text-gray-400"></i>
+          </div>
+          <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="Search entries..."
+          >
+        </div>
+        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          Search
+        </button>
+      </div>
+
+      {{-- Advanced search filters --}}
+      <div class="mt-2 flex flex-wrap gap-3">
+        {{-- Entry Type Filter --}}
+        <select
+          name="type"
+          class="block w-full sm:w-auto border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        >
+          <option value="">All Types</option>
+          <option value="daily" {{ request.qs().type === 'daily' ? 'selected' : '' }}>Daily Log</option>
+          <option value="til" {{ request.qs().type === 'til' ? 'selected' : '' }}>Today I Learned</option>
+          <option value="snippet" {{ request.qs().type === 'snippet' ? 'selected' : '' }}>Code Snippet</option>
+          <option value="debug" {{ request.qs().type === 'debug' ? 'selected' : '' }}>Debug Session</option>
+          <option value="achievement" {{ request.qs().type === 'achievement' ? 'selected' : '' }}>Achievement</option>
+        </select>
+
+        {{-- Date Range Filter --}}
+        <select
+          name="period"
+          class="block w-full sm:w-auto border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        >
+          <option value="">All Time</option>
+          <option value="today" {{ request.qs().period === 'today' ? 'selected' : '' }}>Today</option>
+          <option value="this-week" {{ request.qs().period === 'this-week' ? 'selected' : '' }}>This Week</option>
+          <option value="this-month" {{ request.qs().period === 'this-month' ? 'selected' : '' }}>This Month</option>
+          <option value="this-year" {{ request.qs().period === 'this-year' ? 'selected' : '' }}>This Year</option>
+        </select>
+
+        {{-- Sort Order --}}
+        <select
+          name="sort"
+          class="block w-full sm:w-auto border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        >
+          <option value="relevance" {{ !request.qs().sort || request.qs().sort === 'relevance' ? 'selected' : '' }}>Most Relevant</option>
+          <option value="newest" {{ request.qs().sort === 'newest' ? 'selected' : '' }}>Newest First</option>
+          <option value="oldest" {{ request.qs().sort === 'oldest' ? 'selected' : '' }}>Oldest First</option>
+        </select>
+      </div>
+    </form>
+
+    {{-- Results --}}
+    <div class="space-y-4">
+      @each(entry in entries)
+        @!component('components/entry-card', { entry })
+      @end
+
+      {{-- Pagination --}}
+      @if(entries.getMeta && entries.getMeta().lastPage > 1)
+        <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0 my-6 pt-6">
+          <div class="-mt-px flex w-0 flex-1">
+            @if(entries.getMeta().currentPage > 1)
+              <a
+                href="{{ route('entries.search') }}?q={{ query }}&page={{ entries.getMeta().currentPage - 1 }}{{ queryParams }}"
+                class="inline-flex items-center border-t-2 border-transparent pr-1 pt-4 text-sm font-medium text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                <i class="ph ph-arrow-left mr-3"></i>
+                Previous
+              </a>
+            @endif
+          </div>
+
+          <div class="hidden md:-mt-px md:flex">
+            @each(page in range(1, entries.getMeta().lastPage + 1))
+              <a
+                href="{{ route('entries.search') }}?q={{ query }}&page={{ page }}{{ queryParams }}"
+                class="{{ page === entries.getMeta().currentPage ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300' }} inline-flex items-center border-t-2 px-4 pt-4 text-sm font-medium"
+              >
+                {{ page }}
+              </a>
+            @end
+          </div>
+
+          <div class="-mt-px flex w-0 flex-1 justify-end">
+            @if(entries.getMeta().currentPage < entries.getMeta().lastPage)
+              <a
+                href="{{ route('entries.search') }}?q={{ query }}&page={{ entries.getMeta().currentPage + 1 }}{{ queryParams }}"
+                class="inline-flex items-center border-t-2 border-transparent pl-1 pt-4 text-sm font-medium text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                Next
+                <i class="ph ph-arrow-right ml-3"></i>
+              </a>
+            @endif
+          </div>
+        </nav>
+      @endif
+    </div>
+  @else
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-8 text-center">
+      <i class="ph ph-magnifying-glass text-4xl text-gray-400 dark:text-gray-500 mb-3"></i>
+      <h3 class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-1">No results found</h3>
+      <p class="text-gray-500 dark:text-gray-400 mb-4">Try adjusting your search terms or filters.</p>
+      <a href="{{ route('home') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        Back to dashboard
+      </a>
+    </div>
+  @end
+@endsection
+
+@section('scripts')
+<script>
+  function range(start, end) {
+    return Array.from({ length: end - start }, (_, i) => start + i);
+  }
+</script>
+@endsection
