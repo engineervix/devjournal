@@ -4,7 +4,7 @@ import { compose } from '@adonisjs/core/helpers'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 
-const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
+const AuthFinder = withAuthFinder(() => hash.use('argon'), {
   uids: ['email'],
   passwordColumnName: 'password',
 })
