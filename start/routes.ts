@@ -10,6 +10,7 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 import User from '#models/user'
+const EntriesController = () => import('#controllers/entries_controller')
 
 router
   .get('/', async ({ view }) => {
@@ -34,9 +35,33 @@ router
   .use(middleware.guest())
 
 router
-  .get('/home', async ({ view }) => {
-    return view.render('pages/home')
+  .get('/home', async ({ view, auth }) => {
+    const { DateTime } = await import('luxon')
+    const currentDate = DateTime.now().toFormat('MMMM d, yyyy')
+
+    // Sample data - you'll need to implement the actual queries
+    const stats = {
+      todayCount: 3,
+      streak: 7,
+      totalCount: 42,
+      topTag: { name: 'javascript', usageCount: 15 }
+    }
+
+    const todayEntries = [] // Replace with actual entries query
+    const achievements = [] // Replace with actual achievements query
+    const popularTags = [] // Replace with actual popular tags query
+    const hasDailyLog = false // Replace with check for daily log
+
+    return view.render('pages/dashboard', {
+      currentDate,
+      stats,
+      todayEntries,
+      achievements,
+      popularTags,
+      hasDailyLog
+    })
   })
+  .as('home')
   .use(middleware.auth())
 
 router
@@ -45,4 +70,17 @@ router
     return response.redirect('/')
   })
   .as('auth.logout')
+  .use(middleware.auth())
+
+// Entry routes
+router
+  .group(() => {
+    router.resource('entries', EntriesController)
+
+    // Search entries
+    router.get('/entries/search', 'EntriesController.search').as('entries.search')
+
+    // Filter entries by tag
+    router.get('/tags/:slug', 'EntriesController.byTag').as('entries.byTag')
+  })
   .use(middleware.auth())
