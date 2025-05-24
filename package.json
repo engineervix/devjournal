@@ -65,6 +65,7 @@
     "@adonisjs/vite": "^4.0.0",
     "@phosphor-icons/web": "^2.1.2",
     "@vinejs/vine": "^3.0.1",
+    "alpinejs": "^3.14.9",
     "argon2": "^0.43.0",
     "edge.js": "^6.2.1",
     "luxon": "^3.6.1",
