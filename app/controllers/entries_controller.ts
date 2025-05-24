@@ -4,7 +4,6 @@ import Entry from '#models/entry'
 import Tag from '#models/tag'
 import MarkdownIt from 'markdown-it'
 import { htmlToText } from 'html-to-text'
-import { cuid } from '@adonisjs/core/helpers'
 
 const entryValidator = vine.compile(
   vine.object({
@@ -90,7 +89,7 @@ export default class EntriesController {
 
     try {
       const entry = new Entry()
-      entry.id = cuid() // Ensure ID is set if your model/DB doesn't auto-generate it in a way Lucid expects for relations before save.
+      // entry.id = cuid() // Remove this line to let Postgres handle UUID
       entry.userId = user.id
       entry.entryType = payload.entryType
       entry.title = payload.title || null
@@ -149,8 +148,14 @@ export default class EntriesController {
   /**
    * Handle form submission for the edit action
    */
-  async update({ params, request, response, session }: HttpContext) {
+  async update({ params, request, response, session, auth }: HttpContext) {
+    const user = await auth.getUserOrFail()
     const entry = await Entry.query().where('id', params.id).preload('tags').firstOrFail()
+    if (entry.userId !== user.id) {
+      session.flash('error', 'You are not authorized to update this entry.')
+      return response.redirect().toRoute('entries.index')
+    }
+
     const payload = await request.validateUsing(entryValidator)
 
     let contentHtml: string | null = entry.contentHtml
@@ -219,8 +224,13 @@ export default class EntriesController {
   /**
    * Delete record
    */
-  async destroy({ params, response, session }: HttpContext) {
+  async destroy({ params, response, session, auth }: HttpContext) {
+    const user = await auth.getUserOrFail()
     const entry = await Entry.query().where('id', params.id).preload('tags').firstOrFail()
+    if (entry.userId !== user.id) {
+      session.flash('error', 'You are not authorized to delete this entry.')
+      return response.redirect().toRoute('entries.index')
+    }
 
     try {
       const tagsToUpdate = entry.tags
