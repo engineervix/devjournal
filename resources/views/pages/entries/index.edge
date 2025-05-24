@@ -1,6 +1,6 @@
-@layout('layouts/main')
+@component('layouts/main')
 
-@section('content')
+@slot('main')
   <div class="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
     <div>
       <h1 class="text-2xl font-bold">All Entries</h1>
@@ -180,9 +180,9 @@
       </a>
     </div>
   @end
-@endsection
+@endslot
 
-@section('scripts')
+@push('scripts')
 <script>
   function range(start, end) {
     return Array.from({ length: end - start }, (_, i) => start + i);
@@ -205,4 +205,4 @@
     return `{{ route('entries.index') }}${queryString ? `?${queryString}` : ''}`;
   }
 </script>
-@endsection
+@endpush

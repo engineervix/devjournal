@@ -13,7 +13,7 @@
   {{-- Vite CSS and JS --}}
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col" data-new-entry-route="{{ route('entries.create') }}">
   {{-- Header --}}
   <header class="bg-white dark:bg-gray-800 shadow">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
@@ -38,8 +38,8 @@
         </form>
 
         {{-- User menu/settings --}}
-        <div class="relative" x-data="{ open: false }">
-          <button @click="open = !open" class="flex items-center focus:outline-none">
+        <div class="relative" x-data="userMenu">
+          <button @click="toggle" class="flex items-center focus:outline-none">
             <span class="hidden md:block mr-2">{{ auth.user.fullName ?? auth.user.email }}</span>
             <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white">
               {{ auth.user.email.charAt(0).toUpperCase() }}
@@ -47,14 +47,16 @@
           </button>
 
           <div x-show="open"
-               @click.away="open = false"
+               @click.away="close"
                x-transition:enter="transition ease-out duration-100"
                x-transition:enter-start="transform opacity-0 scale-95"
                x-transition:enter-end="transform opacity-100 scale-100"
                x-transition:leave="transition ease-in duration-75"
                x-transition:leave-start="transform opacity-100 scale-100"
                x-transition:leave-end="transform opacity-0 scale-95"
-               class="absolute right-0 mt-2 w-48 py-2 bg-white dark:bg-gray-800 rounded-md shadow-lg z-50">
+               class="absolute right-0 mt-2 w-48 py-2 bg-white dark:bg-gray-800 rounded-md shadow-lg z-50"
+               style="display: none;" {{-- Add style="display: none;" to prevent flash of unstyled content --}}
+               >
             <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
             <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
             <form action="{{ route('auth.logout') }}" method="POST">
@@ -68,8 +70,8 @@
 
         {{-- Theme toggle --}}
         <button id="theme-toggle" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
-          <i class="ph ph-moon dark:hidden"></i>
-          <i class="ph ph-sun hidden dark:block"></i>
+          <i class="ph ph-moon theme-icon-light"></i>
+          <i class="ph ph-sun theme-icon-dark"></i>
         </button>
       </div>
     </div>
@@ -77,7 +79,7 @@
 
   {{-- Main Content --}}
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    @!section('content')
+    {{{ await $slots.main() }}}
   </main>
 
   {{-- Quick Entry Button --}}
@@ -97,47 +99,7 @@
     </div>
   </footer>
 
-  {{-- Phosphor Icons --}}
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-  {{-- Alpine.js --}}
-  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-  {{-- Theme Toggle Script --}}
-  <script>
-    document.getElementById('theme-toggle').addEventListener('click', function() {
-      if (document.documentElement.classList.contains('dark')) {
-        document.documentElement.classList.remove('dark');
-        localStorage.theme = 'light';
-      } else {
-        document.documentElement.classList.add('dark');
-        localStorage.theme = 'dark';
-      }
-    });
-
-    // Initialize theme based on user preference
-    if (localStorage.theme === 'light' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-    }
-
-    // Setup keyboard shortcuts
-    document.addEventListener('keydown', function(e) {
-      // Cmd/Ctrl + N for new entry
-      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
-        e.preventDefault();
-        window.location.href = "{{ route('entries.create') }}";
-      }
-
-      // Cmd/Ctrl + / for search focus
-      if ((e.ctrlKey || e.metaKey) && e.key === '/') {
-        e.preventDefault();
-        document.querySelector('input[name="q"]')?.focus();
-      }
-    });
-  </script>
-
-  @!section('scripts')
+  {{-- Page specific scripts --}}
+  @stack('scripts')
 </body>
 </html>

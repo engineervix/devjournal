@@ -1,6 +1,6 @@
-@layout('layouts/main')
+@component('layouts/main')
 
-@section('content')
+@slot('main')
   <div class="min-h-full flex items-center justify-center">
     <div class="max-w-lg w-full">
       <div class="text-center mb-8">
@@ -17,4 +17,4 @@
       </div>
     </div>
   </div>
-@endsection
+@endslot
