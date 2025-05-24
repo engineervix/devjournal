@@ -43,6 +43,7 @@
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
     "@types/luxon": "^3.6.2",
+    "@types/markdown-it": "^14.1.2",
     "@types/node": "^22.15.18",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.26.0",
@@ -69,6 +70,7 @@
     "argon2": "^0.43.0",
     "edge.js": "^6.2.1",
     "luxon": "^3.6.1",
+    "markdown-it": "^14.1.0",
     "pg": "^8.16.0",
     "pgvector": "^0.2.1",
     "reflect-metadata": "^0.2.2"
