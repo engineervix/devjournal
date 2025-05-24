@@ -1,6 +1,14 @@
 @component('layouts/main')
 
 @slot('main')
+  @let(entryTypeClasses = {
+    daily: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+    til: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    snippet: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+    debug: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+    achievement: 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200'
+  })
+
   <div class="mb-6 flex justify-between items-center">
     <h1 class="text-2xl font-bold">{{ entry.title || 'Untitled Entry' }}</h1>
     <div class="flex space-x-2">
@@ -72,16 +80,4 @@
     </div>
   </div>
 @end
-
-@push('scripts')
-<script>
-  // Define entry type classes for consistency
-  const entryTypeClasses = {
-    'daily': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-    'til': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-    'snippet': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-    'debug': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-    'achievement': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200'
-  };
-</script>
-@endpush
+@end
