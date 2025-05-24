@@ -366,7 +366,7 @@ export default class EntriesController {
     const queryParams = new URLSearchParams(request.qs() as Record<string, string>)
     queryParams.delete('page')
 
-    return view.render('pages/entries/by_tag', {
+    return view.render('pages/entries/by-tag', {
       // Ensure this view exists
       tag,
       entries,

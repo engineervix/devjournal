@@ -123,10 +123,10 @@ router
 // Entry routes
 router
   .group(() => {
-    router.resource('entries', EntriesController)
-
     // Search entries
     router.get('/entries/search', [EntriesController, 'search']).as('entries.search')
+
+    router.resource('entries', EntriesController)
 
     // Filter entries by tag
     router.get('/tags/:slug', [EntriesController, 'byTag']).as('entries.byTag')
