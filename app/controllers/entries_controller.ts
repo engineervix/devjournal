@@ -65,8 +65,9 @@ export default class EntriesController {
   /**
    * Display form to create a new record
    */
-  async create({ view }: HttpContext) {
-    return view.render('pages/entries/create')
+  async create({ view, request }: HttpContext) {
+    const allTags = await Tag.query().orderBy('name', 'asc')
+    return view.render('pages/entries/create', { allTags, request })
   }
 
   /**
@@ -87,12 +88,18 @@ export default class EntriesController {
       })
     }
 
+    // Enhancement for Daily Logs: Auto-set title if not provided
+    let entryTitle = payload.title || null
+    if (payload.entryType === 'daily' && !entryTitle) {
+      const { DateTime } = await import('luxon')
+      entryTitle = `Daily Log - ${DateTime.now().toISODate()}`
+    }
+
     try {
       const entry = new Entry()
-      // entry.id = cuid() // Remove this line to let Postgres handle UUID
       entry.userId = user.id
       entry.entryType = payload.entryType
-      entry.title = payload.title || null
+      entry.title = entryTitle // Use the potentially auto-generated title
       entry.contentMarkdown = payload.contentMarkdown || null
       entry.contentHtml = contentHtml
       entry.contentPlain = contentPlain
@@ -140,9 +147,10 @@ export default class EntriesController {
   /**
    * Edit individual record
    */
-  async edit({ params, view }: HttpContext) {
+  async edit({ params, view, request }: HttpContext) {
     const entry = await Entry.query().where('id', params.id).preload('tags').firstOrFail()
-    return view.render('pages/entries/edit', { entry })
+    const allTags = await Tag.query().orderBy('name', 'asc')
+    return view.render('pages/entries/edit', { entry, allTags, request })
   }
 
   /**
@@ -195,9 +203,11 @@ export default class EntriesController {
       }
 
       // Correctly handle the return type of sync
-      const syncResult: { attached: number[]; detached: number[]; updated: number[] } = (await entry
-        .related('tags')
-        .sync(tagIdsToSync)) as { attached: number[]; detached: number[]; updated: number[] }
+      const syncResult = (await entry.related('tags').sync(tagIdsToSync)) as unknown as {
+        attached: number[]
+        detached: number[]
+        updated: number[]
+      }
 
       for (const tagId of syncResult.attached) {
         const tagInstance = await Tag.findOrFail(tagId)
@@ -266,11 +276,13 @@ export default class EntriesController {
       })
     }
 
-    const entryQuery = Entry.query().where((builder) => {
-      builder
-        .whereILike('title', `%${searchQuery}%`)
-        .orWhereILike('contentPlain', `%${searchQuery}%`)
-    })
+    const entryQuery = Entry.query()
+
+    // Use full-text search with websearch_to_tsquery
+    entryQuery.whereRaw(
+      `to_tsvector('english', COALESCE(title, '') || ' ' || COALESCE(content_plain, '')) @@ websearch_to_tsquery('english', ?)`,
+      [searchQuery]
+    )
 
     if (type) {
       entryQuery.where('entryType', type)
