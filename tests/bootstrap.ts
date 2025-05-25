@@ -16,13 +16,6 @@ import testUtils from '@adonisjs/core/services/test_utils'
 export const plugins: Config['plugins'] = [assert(), apiClient(), pluginAdonisJS(app)]
 
 /**
- * Configure reporters to print test reports
- */
-export const reporters: Config['reporters'] = {
-  activated: ['spec'],
-}
-
-/**
  * Configure lifecycle function to run before and after all the
  * tests.
  *
