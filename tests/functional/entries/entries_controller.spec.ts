@@ -113,6 +113,9 @@ test.group('Entries Controller', (group) => {
         tags: ['javascript', 'coding'],
       })
 
+    // Check if the request was successful (either redirect or success)
+    assert.isTrue([200, 302].includes(response.status()))
+
     // Check if entry was created regardless of redirect status
     const entry = await Entry.query().where('title', 'New Entry').first()
     assert.isNotNull(entry)
