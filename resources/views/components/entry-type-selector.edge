@@ -105,7 +105,7 @@
 ## Blockers/Issues
 -
 </pre>
-      <button type="button" @click="document.querySelector('#content').value = document.querySelector('pre').textContent.trim()" class="mt-2 text-sm text-blue-700 dark:text-blue-300 hover:underline">
+      <button type="button" @click="window.insertTemplate($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-blue-700 dark:text-blue-300 hover:underline">
         Use Template
       </button>
     </div>
@@ -127,7 +127,7 @@
 code here
 ```
 </pre>
-      <button type="button" @click="document.querySelector('#content').value = document.querySelector('[x-show=\'selected === \'til\'\'] pre').textContent.trim()" class="mt-2 text-sm text-green-700 dark:text-green-300 hover:underline">
+      <button type="button" @click="window.insertTemplate($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-green-700 dark:text-green-300 hover:underline">
         Use Template
       </button>
     </div>
@@ -151,7 +151,7 @@ code here
 
 ## Explanation
 </pre>
-      <button type="button" @click="document.querySelector('#content').value = document.querySelector('[x-show=\'selected === \'snippet\'\'] pre').textContent.trim()" class="mt-2 text-sm text-purple-700 dark:text-purple-300 hover:underline">
+      <button type="button" @click="window.insertTemplate($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-purple-700 dark:text-purple-300 hover:underline">
         Use Template
       </button>
     </div>
@@ -174,7 +174,7 @@ code here
 
 ## Lessons learned
 </pre>
-      <button type="button" @click="document.querySelector('#content').value = document.querySelector('[x-show=\'selected === \'debug\'\'] pre').textContent.trim()" class="mt-2 text-sm text-orange-700 dark:text-orange-300 hover:underline">
+      <button type="button" @click="window.insertTemplate($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-orange-700 dark:text-orange-300 hover:underline">
         Use Template
       </button>
     </div>
@@ -195,7 +195,7 @@ code here
 
 ## Link to PR/ticket (optional)
 </pre>
-      <button type="button" @click="document.querySelector('#content').value = document.querySelector('[x-show=\'selected === \'achievement\'\'] pre').textContent.trim()" class="mt-2 text-sm text-pink-700 dark:text-pink-300 hover:underline">
+      <button type="button" @click="window.insertTemplate($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-pink-700 dark:text-pink-300 hover:underline">
         Use Template
       </button>
     </div>

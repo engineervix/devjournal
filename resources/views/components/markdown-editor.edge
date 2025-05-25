@@ -1,5 +1,5 @@
 {{-- Markdown Editor Component --}}
-<div x-data="markdownEditor('{{ initialContent || '' }}')" class="mb-6">
+<div x-data="markdownEditor" x-init="init({{ JSON.stringify(initialContent || '') }})" class="mb-6">
   <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content</label>
 
   {{-- Tabs --}}
@@ -10,6 +10,7 @@
           @click="activeTab = 'write'"
           :class="activeTab === 'write' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
           class="inline-flex items-center py-2 px-4 text-sm font-medium border-b-2 focus:outline-none"
+          type="button"
         >
           Write
         </button>
@@ -19,6 +20,7 @@
           @click="activeTab = 'preview'; renderPreview()"
           :class="activeTab === 'preview' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
           class="inline-flex items-center py-2 px-4 text-sm font-medium border-b-2 focus:outline-none"
+          type="button"
         >
           Preview
         </button>
@@ -27,82 +29,28 @@
   </div>
 
   {{-- Editor --}}
-  <div class="relative rounded-md border border-gray-300 dark:border-gray-600">
+  <div class="relative rounded-md border border-gray-300 dark:border-gray-600 min-h-64">
     {{-- Write Tab --}}
-    <textarea
-      id="content"
-      name="contentMarkdown"
-      x-model="content"
-      x-show="activeTab === 'write'"
-      class="h-64 w-full p-3 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500 overflow-auto"
-      placeholder="Start writing..."
-    ></textarea>
+    <div x-show="activeTab === 'write'">
+      <textarea
+        id="content"
+        name="contentMarkdown"
+        x-model="content"
+        class="h-64 w-full p-3 border-0 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500 resize-none overflow-auto"
+        placeholder="Start writing..."
+      ></textarea>
+    </div>
 
     {{-- Preview Tab --}}
     <div
       x-show="activeTab === 'preview'"
       x-html="preview"
       class="h-64 w-full p-3 overflow-auto prose dark:prose-invert max-w-none"
-    >Loading preview...</div>
+    ></div>
 
     {{-- Keyboard shortcuts --}}
-    <div class="absolute bottom-2 right-2 text-xs text-gray-500 dark:text-gray-400">
+    <div class="absolute bottom-2 right-2 text-xs text-gray-500 dark:text-gray-400 pointer-events-none">
       <span>Cmd/Ctrl + Enter to save</span>
     </div>
   </div>
 </div>
-
-<script>
-  function markdownEditor(initialContent = '') {
-    return {
-      content: initialContent,
-      activeTab: 'write',
-      preview: 'Loading preview...',
-
-      renderPreview() {
-        // In a real implementation we would make an AJAX call to a server-side markdown renderer
-        // but for simplicity, let's use a basic client-side markdown renderer
-        // In production, replace this with a proper markdown-to-html conversion
-
-        if (this.content.trim() === '') {
-          this.preview = '<p class="text-gray-500">Nothing to preview</p>';
-          return;
-        }
-
-        // Simple markdown formatting (this is just a basic example)
-        let html = this.content
-          // Headers
-          .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-          .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-          .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-          // Bold
-          .replace(/\*\*(.*)\*\*/g, '<strong>$1</strong>')
-          // Italic
-          .replace(/\*(.*)\*/g, '<em>$1</em>')
-          // Lists
-          .replace(/^\- (.*$)/gm, '<li>$1</li>')
-          // Code blocks
-          .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-          // Line breaks
-          .replace(/\n/g, '<br>');
-
-        // Wrap lists
-        html = html.replace(/<li>.*<\/li><br><li>/g, (match) => {
-          return '<ul>' + match;
-        });
-        html = html.replace(/<\/li><br>/g, '</li></ul><br>');
-
-        this.preview = html;
-      }
-    };
-  }
-
-  // Setup keyboard shortcuts
-  document.addEventListener('keydown', function(e) {
-    // Cmd/Ctrl + Enter to save form
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      e.preventDefault();
-      document.querySelector('form').submit();
-    }
-  });
-</script>
