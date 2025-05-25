@@ -36,7 +36,7 @@ test.group('Commands / CreateUserCommand', (group) => {
     await truncateTables()
   })
 
-  test('Successful User Creation: with email, password, and full name', async ({ assert }) => {
+  test('Successful User Creation: with email, password, and full name', async () => {
     const inputs = [
       'test@example.com', // Email
       'Password123', // Password
@@ -62,9 +62,7 @@ test.group('Commands / CreateUserCommand', (group) => {
     assert.equal(credentialsVerified.id, user!.id)
   })
 
-  test('Successful User Creation: with email and password only (full name optional)', async ({
-    assert,
-  }) => {
+  test('Successful User Creation: with email and password only (full name optional)', async () => {
     const inputs = [
       'test2@example.com', // Email
       'Password123', // Password
@@ -89,9 +87,7 @@ test.group('Commands / CreateUserCommand', (group) => {
     assert.isNotNull(credentialsVerified)
   })
 
-  test('Validation: Attempt to create a user with an already existing email', async ({
-    assert,
-  }) => {
+  test('Validation: Attempt to create a user with an already existing email', async () => {
     await createUserHelper({ email: 'existing@example.com', password: 'OldPassword' })
 
     const inputs = [
@@ -114,7 +110,7 @@ test.group('Commands / CreateUserCommand', (group) => {
     assert.isNotNull(await User.verifyCredentials('existing@example.com', 'OldPassword'))
   })
 
-  test('Validation: Passwords do not match', async ({ assert }) => {
+  test('Validation: Passwords do not match', async () => {
     const inputs = [
       'nomatch@example.com', // Email
       'Password123', // Password
@@ -132,7 +128,7 @@ test.group('Commands / CreateUserCommand', (group) => {
     assert.isNull(user)
   })
 
-  test('Validation: Email is required', async ({ assert }) => {
+  test('Validation: Email is required', async () => {
     const inputs = [
       '', // Empty Email
       // Other prompts might not be reached or might use defaults if not handled
@@ -166,7 +162,7 @@ test.group('Commands / CreateUserCommand', (group) => {
     assert.lengthOf(users, 0, 'No user should be created with an empty email')
   })
 
-  test('Validation: Invalid email format', async ({ assert }) => {
+  test('Validation: Invalid email format', async () => {
     const inputs = [
       'invalidemail', // Invalid Email
       'Password123',
@@ -187,7 +183,7 @@ test.group('Commands / CreateUserCommand', (group) => {
     // or the command should exit on X failed attempts.
   })
 
-  test('Validation: Password is required', async ({ assert }) => {
+  test('Validation: Password is required', async () => {
     const inputs = [
       'nopass@example.com',
       '', // Empty Password
@@ -198,7 +194,7 @@ test.group('Commands / CreateUserCommand', (group) => {
     assert.isNull(user, 'User should not be created if password prompt is not properly answered.')
   })
 
-  test('Validation: Password too short', async ({ assert }) => {
+  test('Validation: Password too short', async () => {
     const inputs = [
       'shortpass@example.com',
       'short', // Password too short

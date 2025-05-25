@@ -7,10 +7,10 @@ import { getAuthenticatedClient } from '#tests/helpers/api'
 import app from '@adonisjs/core/services/app'
 
 test.group('Auth', (group) => {
-  let client: ApiClient
+  let apiClient: ApiClient
 
   group.setup(async () => {
-    client = new ApiClient(await app.handle(null))
+    apiClient = new ApiClient(await app.handle(null))
   })
 
   group.each.setup(async () => {
@@ -22,7 +22,7 @@ test.group('Auth', (group) => {
       // Any specific setup for login tests
     })
 
-    test('Successful login with valid credentials', async ({ client, assert }) => {
+    test('Successful login with valid credentials', async () => {
       const plainPassword = 'password123'
       const user = await createUser({
         email: 'loginuser@example.com',
@@ -30,7 +30,7 @@ test.group('Auth', (group) => {
         fullName: 'Login User',
       })
 
-      const response = await client.post('/').form({
+      const response = await apiClient.post('/').form({
         email: user.email,
         password: plainPassword,
       })
@@ -49,8 +49,8 @@ test.group('Auth', (group) => {
       homeResponse.assertTextIncludes('Dashboard') // Or some text specific to the home page
     })
 
-    test('Failed login with invalid email', async ({ client, assert }) => {
-      const response = await client.post('/').form({
+    test('Failed login with invalid email', async () => {
+      const response = await apiClient.post('/').form({
         email: 'nonexistent@example.com',
         password: 'anypassword',
       })
@@ -60,19 +60,19 @@ test.group('Auth', (group) => {
       response.assertSessionHas('flash.error', 'Invalid credentials') // Or specific error key
 
       // Verify not authenticated (optional: try accessing an auth route)
-      const homeResponse = await client.get('/home')
+      const homeResponse = await apiClient.get('/home')
       homeResponse.assertStatus(302) // Should redirect to login
       homeResponse.assertRedirectsToPath('/')
     })
 
-    test('Failed login with incorrect password', async ({ client, assert }) => {
+    test('Failed login with incorrect password', async () => {
       const plainPassword = 'password123'
       const user = await createUser({
         email: 'wrongpass@example.com',
         password: plainPassword,
       })
 
-      const response = await client.post('/').form({
+      const response = await apiClient.post('/').form({
         email: user.email,
         password: 'incorrectpassword',
       })
@@ -82,12 +82,12 @@ test.group('Auth', (group) => {
       response.assertSessionHas('flash.error', 'Invalid credentials')
     })
 
-    test('Login with empty credentials', async ({ client, assert }) => {
+    test('Login with empty credentials', async () => {
       // AdonisJS built-in User.verifyCredentials throws an error for empty email/password
       // which is caught and results in 'Invalid credentials' flash message.
       // Specific validation errors for empty fields usually happen at the validator level
       // before hitting verifyCredentials. If a validator is added, this test needs adjustment.
-      const response = await client.post('/').form({
+      const response = await apiClient.post('/').form({
         email: '',
         password: '',
       })
@@ -102,7 +102,7 @@ test.group('Auth', (group) => {
   })
 
   test.group('Logout Test', (logoutGroup) => {
-    test('Successful logout', async ({ client, assert }) => {
+    test('Successful logout', async () => {
       const plainPassword = 'logoutpassword'
       const user = await createUser({
         email: 'logoutuser@example.com',
@@ -110,7 +110,7 @@ test.group('Auth', (group) => {
       })
 
       // Log the user in first
-      await client.post('/').form({ email: user.email, password: plainPassword })
+      await apiClient.post('/').form({ email: user.email, password: plainPassword })
 
       // Now get an authenticated client to perform logout
       const authClient = getAuthenticatedClient(user)
@@ -122,14 +122,14 @@ test.group('Auth', (group) => {
       // response.assertSessionHas('flash_messages.success', 'Logged out successfully.')
 
       // Verify user is logged out by trying to access an authenticated route
-      const homeResponse = await client.get('/home') // Use the non-authenticated client
+      const homeResponse = await apiClient.get('/home') // Use the non-authenticated client
       homeResponse.assertStatus(302)
       homeResponse.assertRedirectsToPath('/')
     })
   })
 
   test.group('Guest Middleware Test', (guestGroup) => {
-    test('Authenticated user trying to access guest-only page (login page)', async ({ assert }) => {
+    test('Authenticated user trying to access guest-only page (login page)', async () => {
       const plainPassword = 'guesttestpassword'
       const user = await createUser({
         email: 'guestuser@example.com',
