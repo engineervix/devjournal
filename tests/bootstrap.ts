@@ -33,8 +33,16 @@ export const plugins: Config['plugins'] = [
  * The teardown functions are executed after all the tests
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-  setup: [],
-  teardown: [],
+  setup: [
+    // Run migrations before all tests to ensure test database has the latest schema
+    () => testUtils.db().migrate(),
+  ],
+  teardown: [
+    // Empty teardown array allows AdonisJS to gracefully terminate the app
+    // and close database connections automatically. Previously, calling
+    // testUtils.db().migrate() here was causing tests to hang because
+    // database connections weren't being properly closed.
+  ],
 }
 
 /**
