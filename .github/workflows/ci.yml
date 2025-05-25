@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15 # Using a common PostgreSQL version
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password 
+          POSTGRES_DB: test_db # Default test database name often used
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Copy .env.example to .env for CI
+        run: cp .env.example .env
+
+      - name: Update .env for PostgreSQL service
+        run: |
+          echo "DB_HOST=localhost" >> .env
+          echo "DB_PORT=5432" >> .env
+          echo "DB_USER=postgres" >> .env
+          echo "DB_PASSWORD=password" >> .env
+          echo "DB_DATABASE=test_db" >> .env
+          echo "SESSION_DRIVER=memory" >> .env # Ensure sessions are in memory for tests
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+          echo "PostgreSQL is ready."
+
+      - name: Run database migrations
+        # Ensure environment variables are loaded for ace commands if necessary
+        # For AdonisJS 6, .env should be loaded automatically by ace
+        run: node ace migration:run --force
+
+      - name: Run linters
+        run: npm run lint
+
+      - name: Run type checking
+        run: npm run typecheck
+
+      - name: Run tests
+        # Pass the PostgreSQL connection details if not picked from .env by the test runner
+        # However, Japa/AdonisJS typically uses the .env variables set up above
+        run: npm run test
+        env:
+          # These might be redundant if the .env file is correctly sourced by the test runner
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: password
+          DB_DATABASE: test_db
+          NODE_ENV: test # Ensure test environment is set
+          SESSION_DRIVER: memory
+```
