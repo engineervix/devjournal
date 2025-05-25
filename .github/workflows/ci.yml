@@ -69,7 +69,7 @@ jobs:
       LOG_LEVEL: info
       SESSION_DRIVER: memory
       TZ: Europe/London
-      DATABASE_URL: postgres://user:password@postgres/test
+      DATABASE_URL: postgres://user:password@localhost:5432/test
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
