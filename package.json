@@ -50,6 +50,7 @@
     "alpinejs": "^3.14.9",
     "archiver": "^7.0.1",
     "argon2": "^0.43.0",
+    "easymde": "^2.20.0",
     "edge.js": "^6.2.1",
     "highlight.js": "^11.11.1",
     "html-to-text": "^9.0.5",
@@ -57,7 +58,8 @@
     "markdown-it": "^14.1.0",
     "pg": "^8.16.0",
     "pgvector": "^0.2.1",
-    "reflect-metadata": "^0.2.2"
+    "reflect-metadata": "^0.2.2",
+    "turndown": "^7.2.0"
   },
   "devDependencies": {
     "@adonisjs/assembler": "^7.8.2",

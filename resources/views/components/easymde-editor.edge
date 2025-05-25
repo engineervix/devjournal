@@ -1,0 +1,18 @@
+{{-- EasyMDE Editor Component --}}
+<div x-data="easyMDEEditor" x-init="init({{ JSON.stringify(initialContent || '') }})" class="mb-6" x-cloak>
+  <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content</label>
+
+  <div class="easymde-wrapper">
+    <textarea
+      x-ref="textarea"
+      id="content"
+      name="contentMarkdown"
+    ></textarea>
+  </div>
+
+  {{-- Keyboard shortcuts hint --}}
+  <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+    <i class="ph ph-info mr-1"></i>
+    <span>Cmd/Ctrl + Enter to save • Cmd/Ctrl + P for preview • F11 for fullscreen</span>
+  </div>
+</div>

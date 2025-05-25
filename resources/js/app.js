@@ -14,7 +14,7 @@ import { initializeCodeFeatures } from './modules/code-features.js';
 // Import Alpine.js components
 import { userMenuComponent } from './components/user-menu.js';
 import { mobileMenuComponent } from './components/mobile-menu.js';
-import { markdownEditorComponent } from './components/markdown-editor.js';
+import { easyMDEEditorComponent } from './components/easymde-editor.js';
 import { tagInputComponent } from './components/tag-input.js';
 
 // Import global utilities
@@ -24,7 +24,7 @@ import './utils/globals.js';
 document.addEventListener('alpine:init', () => {
   Alpine.data('userMenu', userMenuComponent);
   Alpine.data('mobileMenu', mobileMenuComponent);
-  Alpine.data('markdownEditor', markdownEditorComponent);
+  Alpine.data('easyMDEEditor', easyMDEEditorComponent);
   Alpine.data('tagInput', tagInputComponent);
 });
 

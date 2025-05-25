@@ -5,6 +5,9 @@
 /* Import highlight.js theme for code syntax highlighting */
 @import url('highlight.js/styles/github.css');
 
+/* Import EasyMDE editor styles */
+@import './easymde.css';
+
 /* Prevent flash of unstyled content */
 @layer base {
   /* Ensure smooth transitions for theme changes */

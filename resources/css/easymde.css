@@ -1,0 +1,130 @@
+/* EasyMDE Editor Styles */
+
+/* Import EasyMDE base styles */
+@import 'easymde/dist/easymde.min.css';
+
+/* Light mode styles (default) */
+.EasyMDEContainer {
+  @apply border border-gray-300 rounded-md;
+}
+
+.EasyMDEContainer .CodeMirror {
+  @apply bg-white text-gray-900;
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.EasyMDEContainer .editor-toolbar {
+  @apply bg-gray-50 border-b border-gray-300;
+}
+
+.EasyMDEContainer .editor-toolbar button {
+  @apply text-gray-600 hover:text-gray-900 hover:bg-gray-100;
+}
+
+.EasyMDEContainer .editor-toolbar button.active {
+  @apply text-indigo-600 bg-indigo-50;
+}
+
+.EasyMDEContainer .editor-statusbar {
+  @apply bg-gray-50 border-t border-gray-300 text-gray-600;
+  font-size: 12px;
+}
+
+.EasyMDEContainer .editor-preview {
+  @apply bg-gray-50 text-gray-900;
+}
+
+/* Dark mode styles */
+.dark .EasyMDEContainer {
+  @apply border-gray-600;
+}
+
+.dark .EasyMDEContainer .CodeMirror {
+  @apply bg-gray-800 text-gray-200;
+}
+
+.dark .EasyMDEContainer .CodeMirror-cursor {
+  border-left-color: theme('colors.gray.200');
+}
+
+.dark .EasyMDEContainer .CodeMirror-selected {
+  @apply bg-gray-700;
+}
+
+.dark .EasyMDEContainer .editor-toolbar {
+  @apply bg-gray-700 border-gray-600;
+}
+
+.dark .EasyMDEContainer .editor-toolbar button {
+  @apply text-gray-300 hover:text-gray-100 hover:bg-gray-600;
+}
+
+.dark .EasyMDEContainer .editor-toolbar button.active {
+  @apply text-indigo-400 bg-indigo-900;
+}
+
+.dark .EasyMDEContainer .editor-toolbar button:hover {
+  @apply bg-gray-600;
+}
+
+.dark .EasyMDEContainer .editor-statusbar {
+  @apply bg-gray-700 border-gray-600 text-gray-400;
+}
+
+.dark .EasyMDEContainer .editor-preview {
+  @apply bg-gray-900 text-gray-200;
+}
+
+/* Syntax highlighting in preview for dark mode */
+.dark .EasyMDEContainer .editor-preview .hljs {
+  @apply bg-gray-800;
+}
+
+/* Focus styles */
+.EasyMDEContainer .CodeMirror-focused {
+  @apply ring-2 ring-indigo-500 ring-opacity-50;
+}
+
+.dark .EasyMDEContainer .CodeMirror-focused {
+  @apply ring-indigo-400;
+}
+
+/* Fullscreen mode adjustments */
+.editor-preview-active-side .editor-preview,
+.editor-preview-active .editor-preview {
+  @apply prose dark:prose-invert max-w-none;
+}
+
+/* Custom scrollbar for better integration */
+.EasyMDEContainer .CodeMirror-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.EasyMDEContainer .CodeMirror-scroll::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-700;
+}
+
+.EasyMDEContainer .CodeMirror-scroll::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-500 rounded;
+}
+
+.EasyMDEContainer .CodeMirror-scroll::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-400;
+}
+
+/* Ensure proper height and responsiveness */
+.easymde-wrapper {
+  @apply w-full;
+}
+
+.EasyMDEContainer {
+  @apply w-full;
+}
+
+/* Style the original textarea before EasyMDE transforms it */
+.easymde-wrapper textarea {
+  @apply w-full min-h-64 p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200;
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+}
