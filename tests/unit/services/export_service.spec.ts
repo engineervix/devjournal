@@ -60,7 +60,7 @@ test.group('ExportService', () => {
     assert.include(result[0].content, 'type: daily')
     assert.include(result[0].content, 'title: Test Entry')
     assert.include(result[0].content, 'date: 2024-01-01')
-    assert.include(result[0].content, 'tags: [test]')
+    assert.include(result[0].content, 'tags: ["test"]')
     assert.include(result[0].content, '# Content')
   })
 

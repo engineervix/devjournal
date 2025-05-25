@@ -46,7 +46,7 @@ export default class ExportService {
 
       // Add tags line if tags exist
       if (entry.tags && entry.tags.length > 0) {
-        frontMatterLines.push(`tags: [${entry.tags.map((t) => t.name).join(', ')}]`)
+        frontMatterLines.push(`tags: [${entry.tags.map((t) => `"${t.name}"`).join(', ')}]`)
       }
 
       // Close front matter and add empty line
