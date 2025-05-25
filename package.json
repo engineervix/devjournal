@@ -7,10 +7,12 @@
   "scripts": {
     "start": "node bin/server.js",
     "build": "node ace build",
+    "commit": "git-cz",
     "dev": "node ace serve --hmr",
-    "test": "node ace test",
-    "lint": "eslint .",
     "format": "prettier --write .",
+    "lint": "eslint .",
+    "release": "commit-and-tag-version",
+    "test": "node ace test",
     "typecheck": "tsc --noEmit"
   },
   "imports": {
@@ -30,31 +32,6 @@
     "#tests/*": "./tests/*.js",
     "#start/*": "./start/*.js",
     "#config/*": "./config/*.js"
-  },
-  "devDependencies": {
-    "@adonisjs/assembler": "^7.8.2",
-    "@adonisjs/eslint-config": "^2.0.0",
-    "@adonisjs/prettier-config": "^1.4.4",
-    "@adonisjs/tsconfig": "^1.4.0",
-    "@japa/assert": "^4.0.1",
-    "@japa/runner": "^4.2.0",
-    "@swc/core": "1.11.24",
-    "@tailwindcss/forms": "^0.5.10",
-    "@tailwindcss/typography": "^0.5.16",
-    "@types/html-to-text": "^9.0.4",
-    "@types/luxon": "^3.6.2",
-    "@types/markdown-it": "^14.1.2",
-    "@types/node": "^22.15.18",
-    "autoprefixer": "^10.4.21",
-    "eslint": "^9.26.0",
-    "hot-hook": "^0.4.0",
-    "pino-pretty": "^13.0.0",
-    "postcss": "^8.5.3",
-    "prettier": "^3.5.3",
-    "tailwindcss": "^3.4.17",
-    "ts-node-maintained": "^10.9.5",
-    "typescript": "~5.8",
-    "vite": "^6.3.5"
   },
   "dependencies": {
     "@adonisjs/auth": "^9.4.0",
@@ -78,11 +55,119 @@
     "pgvector": "^0.2.1",
     "reflect-metadata": "^0.2.2"
   },
+  "devDependencies": {
+    "@adonisjs/assembler": "^7.8.2",
+    "@adonisjs/eslint-config": "^2.0.0",
+    "@adonisjs/prettier-config": "^1.4.4",
+    "@adonisjs/tsconfig": "^1.4.0",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@commitlint/cz-commitlint": "^19.8.1",
+    "@commitlint/prompt-cli": "^19.8.1",
+    "@japa/assert": "^4.0.1",
+    "@japa/runner": "^4.2.0",
+    "@swc/core": "1.11.24",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/html-to-text": "^9.0.4",
+    "@types/luxon": "^3.6.2",
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^22.15.18",
+    "autoprefixer": "^10.4.21",
+    "commit-and-tag-version": "^12.5.1",
+    "commitizen": "^4.3.1",
+    "conventional-changelog-atom": "^5.0.0",
+    "eslint": "^9.26.0",
+    "hot-hook": "^0.4.0",
+    "pino-pretty": "^13.0.0",
+    "postcss": "^8.5.3",
+    "prettier": "^3.5.3",
+    "tailwindcss": "^3.4.17",
+    "ts-node-maintained": "^10.9.5",
+    "typescript": "~5.8",
+    "vite": "^6.3.5"
+  },
   "hotHook": {
     "boundaries": [
       "./app/controllers/**/*.ts",
       "./app/middleware/*.ts"
     ]
   },
-  "prettier": "@adonisjs/prettier-config"
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "parserPreset": "conventional-changelog-atom"
+  },
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
+  },
+  "prettier": "@adonisjs/prettier-config",
+  "commit-and-tag-version": {
+    "header": "# Changelog\n\nAll notable changes to this project will be documented here.\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).\n",
+    "types": [
+      {
+        "type": "feat",
+        "section": "🚀 Features"
+      },
+      {
+        "type": "fix",
+        "section": "🐛 Bug Fixes"
+      },
+      {
+        "type": "docs",
+        "section": "📝 Docs",
+        "hidden": false
+      },
+      {
+        "type": "style",
+        "section": "💄 Styling",
+        "hidden": false
+      },
+      {
+        "type": "refactor",
+        "hidden": false,
+        "section": "♻️ Code Refactoring"
+      },
+      {
+        "type": "perf",
+        "section": "⚡️ Performance Improvements",
+        "hidden": false
+      },
+      {
+        "type": "test",
+        "section": "✅ Tests",
+        "hidden": false
+      },
+      {
+        "type": "build",
+        "section": "⚙️ Build System",
+        "hidden": false
+      },
+      {
+        "type": "ci",
+        "section": "👷 CI/CD",
+        "hidden": false
+      },
+      {
+        "type": "chore",
+        "section": "🚧 Others",
+        "hidden": true
+      },
+      {
+        "type": "revert",
+        "section": "⏪️ Reverts",
+        "hidden": true
+      }
+    ],
+    "scripts": {
+      "prechangelog": "sed -e '1,6d' -i CHANGELOG.md",
+      "postchangelog": "sed -e 's/###\\ \\[/##\\ \\[v/g' -i CHANGELOG.md && sed -re 's/##\\ \\[([0-9])/##\\ \\[v\\1/g' -i CHANGELOG.md"
+    }
+  },
+  "engines": {
+    "node": "^22 <23"
+  }
 }
