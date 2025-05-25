@@ -1,26 +1,22 @@
 import edge from 'edge.js'
-import { HttpContext } from '@adonisjs/core/http' // Import HttpContext for request type
 
 /**
  * Defines a global 'constructUrl' function for Edge templates.
  * This function takes newParams object, merges it with existing
  * query parameters from the current request, and returns a new URL string.
  */
-edge.global('constructUrl', (newParams: Record<string, any>) => {
-  // HttpContext.get() is a way to get the current HTTP context
-  // if it's not directly available in the scope.
-  // However, 'request' is typically globally available in Edge via AdonisJS.
-  const ctx = HttpContext.get()
-  if (!ctx) {
-    // Fallback or error handling if context is not available
-    // This might indicate the helper is used outside a request lifecycle
-    console.error('HttpContext not available in constructUrl helper')
-    const currentBaseUrl = edge.globals.route('entries.index')
+edge.global('constructUrl', function (this: any, newParams: Record<string, any>) {
+  // In Edge templates, 'request' is available as a global property
+  // when the template is rendered via ctx.view.render
+  const request = this.request
+
+  if (!request) {
+    // Fallback when request is not available (shouldn't happen in normal request lifecycle)
+    const baseUrl = this.route('entries.index')
     const queryString = new URLSearchParams(newParams).toString()
-    return `${currentBaseUrl}${queryString ? `?${queryString}` : ''}`
+    return `${baseUrl}${queryString ? `?${queryString}` : ''}`
   }
 
-  const request = ctx.request
   const currentParams = request.qs()
 
   // Merge current params with new ones
@@ -36,7 +32,7 @@ edge.global('constructUrl', (newParams: Record<string, any>) => {
   // Build query string
   const queryString = new URLSearchParams(mergedParams).toString()
   // Use Edge's route global to construct the base URL
-  const baseUrl = edge.globals.route('entries.index')
+  const baseUrl = this.route('entries.index')
   return `${baseUrl}${queryString ? `?${queryString}` : ''}`
 })
 
