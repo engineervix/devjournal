@@ -1,9 +1,11 @@
 import { HttpContext } from '@adonisjs/core/http'
+import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
 import Entry from '#models/entry'
-import Tag from '#models/tag'
-import MarkdownIt from 'markdown-it'
-import { htmlToText } from 'html-to-text'
+import EntryService from '#services/entry_service'
+import ContentProcessorService from '#services/content_processor_service'
+import ExportService from '#services/export_service'
+import TagService from '#services/tag_service'
 
 const entryValidator = vine.compile(
   vine.object({
@@ -17,9 +19,14 @@ const entryValidator = vine.compile(
   })
 )
 
-const md = new MarkdownIt() // Initialize Markdown-it parser
-
+@inject()
 export default class EntriesController {
+  constructor(
+    private entryService: EntryService,
+    private contentProcessor: ContentProcessorService,
+    private exportService: ExportService,
+    private tagService: TagService
+  ) {}
   /**
    * Display a list of resource
    */
@@ -27,37 +34,10 @@ export default class EntriesController {
     const { type, period, sort, page } = request.qs()
     const currentPage = Math.max(1, Number.parseInt(page, 10) || 1)
 
-    const query = Entry.query()
+    const filters = { type, period, sort }
+    const pagination = { page: currentPage, perPage: 10 }
 
-    if (type) {
-      query.where('entryType', type)
-    }
-
-    if (period) {
-      const now = new Date()
-      let startDate: Date | undefined
-      if (period === 'today') {
-        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-      } else if (period === 'week') {
-        const firstDayOfWeek = now.getDate() - now.getDay()
-        startDate = new Date(now.getFullYear(), now.getMonth(), firstDayOfWeek)
-      } else if (period === 'month') {
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1)
-      }
-      if (startDate) {
-        startDate.setHours(0, 0, 0, 0)
-        query.where('createdAt', '>=', startDate.toISOString())
-      }
-    }
-
-    if (sort === 'oldest') {
-      query.orderBy('createdAt', 'asc')
-    } else {
-      query.orderBy('createdAt', 'desc') // Default to newest
-    }
-
-    query.preload('tags')
-    const entries = await query.paginate(currentPage, 10)
+    const entries = await this.entryService.getEntries(filters, pagination)
 
     const queryParams = new URLSearchParams(request.qs() as Record<string, string>)
     queryParams.delete('page')
@@ -69,7 +49,7 @@ export default class EntriesController {
    * Display form to create a new record
    */
   async create({ view, request }: HttpContext) {
-    const allTags = await Tag.query().orderBy('name', 'asc')
+    const allTags = await this.tagService.getAllTags()
     return view.render('pages/entries/create', { allTags, request })
   }
 
@@ -80,63 +60,19 @@ export default class EntriesController {
     const user = auth.getUserOrFail()
     const payload = await request.validateUsing(entryValidator)
 
-    let contentHtml: string | null = null
-    let contentPlain: string | null = null
+    const entry = await this.entryService.createEntry(user.id, {
+      entryType: payload.entryType,
+      title: payload.title || undefined,
+      contentMarkdown: payload.contentMarkdown || undefined,
+      tags: payload.tags || undefined,
+    })
 
-    if (payload.contentMarkdown) {
-      contentHtml = md.render(payload.contentMarkdown)
-      contentPlain = htmlToText(contentHtml, {
-        wordwrap: false,
-        selectors: [{ selector: 'img', format: 'skip' }],
-      })
-    }
+    // Process content using ContentProcessorService
+    this.contentProcessor.updateEntryContent(entry, payload.contentMarkdown || null)
+    await entry.save()
 
-    // Enhancement for Daily Logs: Auto-set title if not provided
-    let entryTitle = payload.title || null
-    if (payload.entryType === 'daily' && !entryTitle) {
-      const { DateTime } = await import('luxon')
-      entryTitle = `Daily Log - ${DateTime.now().toISODate()}`
-    }
-
-    try {
-      const entry = new Entry()
-      entry.userId = user.id
-      entry.entryType = payload.entryType
-      entry.title = entryTitle // Use the potentially auto-generated title
-      entry.contentMarkdown = payload.contentMarkdown || null
-      entry.contentHtml = contentHtml
-      entry.contentPlain = contentPlain
-
-      await entry.save() // Save the entry to establish its ID before associating tags
-
-      if (payload.tags && payload.tags.length > 0) {
-        const tagIdsToAttach = []
-        for (const tagName of payload.tags) {
-          if (!tagName) continue
-          const slug = tagName.toLowerCase().replace(/\s+/g, '-')
-          let tag = await Tag.findBy('slug', slug)
-          if (tag) {
-            tag.usageCount += 1
-            await tag.save()
-          } else {
-            tag = await Tag.create({ name: tagName, slug, usageCount: 1 })
-          }
-          tagIdsToAttach.push(tag.id)
-        }
-        if (tagIdsToAttach.length > 0) {
-          await entry.related('tags').attach(tagIdsToAttach)
-        }
-      }
-
-      session.flash('success', 'Entry created successfully.')
-      return response.redirect().toRoute('entries.show', { id: entry.id })
-    } catch (error) {
-      console.error('Error creating entry:', error)
-      session.flash('error', `Failed to create entry: ${error.message}`)
-      // Flash input to session for repopulation
-      session.flashAll()
-      return response.redirect().back()
-    }
+    session.flash('success', 'Entry created successfully.')
+    return response.redirect().toRoute('entries.show', { id: entry.id })
   }
 
   /**
@@ -152,7 +88,7 @@ export default class EntriesController {
    */
   async edit({ params, view, request }: HttpContext) {
     const entry = await Entry.query().where('id', params.id).preload('tags').firstOrFail()
-    const allTags = await Tag.query().orderBy('name', 'asc')
+    const allTags = await this.tagService.getAllTags()
     return view.render('pages/entries/edit', { entry, allTags, request })
   }
 
@@ -169,69 +105,19 @@ export default class EntriesController {
 
     const payload = await request.validateUsing(entryValidator)
 
-    let contentHtml: string | null = entry.contentHtml
-    let contentPlain: string | null = entry.contentPlain
+    const updatedEntry = await this.entryService.updateEntry(params.id, {
+      entryType: payload.entryType,
+      title: payload.title || undefined,
+      contentMarkdown: payload.contentMarkdown || undefined,
+      tags: payload.tags || undefined,
+    })
 
-    if (payload.contentMarkdown && payload.contentMarkdown !== entry.contentMarkdown) {
-      contentHtml = md.render(payload.contentMarkdown)
-      contentPlain = htmlToText(contentHtml, {
-        wordwrap: false,
-        selectors: [{ selector: 'img', format: 'skip' }],
-      })
-    } else if (!payload.contentMarkdown && entry.contentMarkdown) {
-      contentHtml = null
-      contentPlain = null
-    }
+    // Process content using ContentProcessorService
+    this.contentProcessor.updateEntryContent(updatedEntry, payload.contentMarkdown || null)
+    await updatedEntry.save()
 
-    try {
-      entry.entryType = payload.entryType
-      entry.title = payload.title || null
-      entry.contentMarkdown = payload.contentMarkdown || null
-      entry.contentHtml = contentHtml
-      entry.contentPlain = contentPlain
-
-      await entry.save()
-
-      const newTagNames = payload.tags || []
-      const tagIdsToSync = []
-
-      for (const tagName of newTagNames) {
-        if (!tagName) continue
-        const slug = tagName.toLowerCase().replace(/\s+/g, '-')
-        let tag = await Tag.findBy('slug', slug)
-        if (!tag) {
-          tag = await Tag.create({ name: tagName, slug, usageCount: 0 })
-        }
-        tagIdsToSync.push(tag.id)
-      }
-
-      // Correctly handle the return type of sync
-      const syncResult = (await entry.related('tags').sync(tagIdsToSync)) as unknown as {
-        attached: number[]
-        detached: number[]
-        updated: number[]
-      }
-
-      for (const tagId of syncResult.attached) {
-        const tagInstance = await Tag.findOrFail(tagId)
-        tagInstance.usageCount += 1
-        await tagInstance.save()
-      }
-
-      for (const tagId of syncResult.detached) {
-        const tagInstance = await Tag.findOrFail(tagId)
-        tagInstance.usageCount = Math.max(0, tagInstance.usageCount - 1)
-        await tagInstance.save()
-      }
-
-      session.flash('success', 'Entry updated successfully.')
-      return response.redirect().toRoute('entries.show', { id: entry.id })
-    } catch (error) {
-      console.error('Error updating entry:', error)
-      session.flash('error', `Failed to update entry: ${error.message}`)
-      session.flashAll() // Flash input to session
-      return response.redirect().back()
-    }
+    session.flash('success', 'Entry updated successfully.')
+    return response.redirect().toRoute('entries.show', { id: updatedEntry.id })
   }
 
   /**
@@ -245,22 +131,9 @@ export default class EntriesController {
       return response.redirect().toRoute('entries.index')
     }
 
-    try {
-      const tagsToUpdate = entry.tags
-      await entry.delete()
-
-      for (const tag of tagsToUpdate) {
-        tag.usageCount = Math.max(0, tag.usageCount - 1)
-        await tag.save()
-      }
-
-      session.flash('success', 'Entry deleted successfully.')
-      return response.redirect().toRoute('entries.index')
-    } catch (error) {
-      console.error('Error deleting entry:', error)
-      session.flash('error', 'Failed to delete entry.')
-      return response.redirect().back()
-    }
+    await this.entryService.deleteEntry(params.id)
+    session.flash('success', 'Entry deleted successfully.')
+    return response.redirect().toRoute('entries.index')
   }
 
   /**
@@ -271,51 +144,10 @@ export default class EntriesController {
     const { type, period, sort, page } = request.qs()
     const currentPage = Math.max(1, Number.parseInt(page, 10) || 1)
 
-    if (!searchQuery) {
-      return view.render('pages/entries/search', {
-        entries: await Entry.query().paginate(currentPage, 10), // Provide paginated empty results
-        query: '',
-        queryParams: '',
-      })
-    }
+    const filters = { type, period, sort }
+    const pagination = { page: currentPage, perPage: 10 }
 
-    const entryQuery = Entry.query()
-
-    // Use full-text search with websearch_to_tsquery
-    entryQuery.whereRaw(
-      `to_tsvector('english', COALESCE(title, '') || ' ' || COALESCE(content_plain, '')) @@ websearch_to_tsquery('english', ?)`,
-      [searchQuery]
-    )
-
-    if (type) {
-      entryQuery.where('entryType', type)
-    }
-
-    if (period) {
-      const now = new Date()
-      let startDate: Date | undefined
-      if (period === 'today') {
-        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-      } else if (period === 'week') {
-        const firstDayOfWeek = now.getDate() - now.getDay()
-        startDate = new Date(now.getFullYear(), now.getMonth(), firstDayOfWeek)
-      } else if (period === 'month') {
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1)
-      }
-      if (startDate) {
-        startDate.setHours(0, 0, 0, 0)
-        entryQuery.where('createdAt', '>=', startDate.toISOString())
-      }
-    }
-
-    if (sort === 'oldest') {
-      entryQuery.orderBy('createdAt', 'asc')
-    } else if (sort === 'newest') {
-      entryQuery.orderBy('createdAt', 'desc')
-    }
-
-    entryQuery.preload('tags')
-    const entries = await entryQuery.paginate(currentPage, 10)
+    const entries = await this.entryService.searchEntries(searchQuery, filters, pagination)
 
     const queryParams = new URLSearchParams(request.qs() as Record<string, string>)
     queryParams.set('q', searchQuery)
@@ -333,44 +165,18 @@ export default class EntriesController {
    */
   async byTag({ params, request, view }: HttpContext) {
     const { slug } = params
-    const tag = await Tag.findByOrFail('slug', slug)
-
     const { period, sort, page } = request.qs()
     const currentPage = Math.max(1, Number.parseInt(page, 10) || 1)
 
-    const entryQuery = tag.related('entries').query()
+    const filters = { period, sort }
+    const pagination = { page: currentPage, perPage: 10 }
 
-    if (period) {
-      const now = new Date()
-      let startDate: Date | undefined
-      if (period === 'today') {
-        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-      } else if (period === 'week') {
-        const firstDayOfWeek = now.getDate() - now.getDay()
-        startDate = new Date(now.getFullYear(), now.getMonth(), firstDayOfWeek)
-      } else if (period === 'month') {
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1)
-      }
-      if (startDate) {
-        startDate.setHours(0, 0, 0, 0)
-        entryQuery.where('createdAt', '>=', startDate.toISOString())
-      }
-    }
-
-    if (sort === 'oldest') {
-      entryQuery.orderBy('createdAt', 'asc')
-    } else {
-      entryQuery.orderBy('createdAt', 'desc')
-    }
-
-    entryQuery.preload('tags')
-    const entries = await entryQuery.paginate(currentPage, 10)
+    const { tag, entries } = await this.entryService.getEntriesByTag(slug, filters, pagination)
 
     const queryParams = new URLSearchParams(request.qs() as Record<string, string>)
     queryParams.delete('page')
 
     return view.render('pages/entries/by-tag', {
-      // Ensure this view exists
       tag,
       entries,
       queryParams: queryParams.toString(),
@@ -384,96 +190,19 @@ export default class EntriesController {
     const user = await auth.getUserOrFail()
     const { type, period, tag, format = 'zip' } = request.qs()
 
-    const query = Entry.query().where('user_id', user.id)
-
-    // Apply filters
-    if (type) {
-      query.where('entryType', type)
-    }
-
-    if (period) {
-      const now = new Date()
-      let startDate: Date | undefined
-      if (period === 'today') {
-        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-      } else if (period === 'week') {
-        const firstDayOfWeek = now.getDate() - now.getDay()
-        startDate = new Date(now.getFullYear(), now.getMonth(), firstDayOfWeek)
-      } else if (period === 'month') {
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1)
-      }
-      if (startDate) {
-        startDate.setHours(0, 0, 0, 0)
-        query.where('createdAt', '>=', startDate.toISOString())
-      }
-    }
-
-    if (tag) {
-      const tagRecord = await Tag.findBy('slug', tag)
-      if (tagRecord) {
-        query.whereHas('tags', (tagQuery) => {
-          tagQuery.where('tags.id', tagRecord.id)
-        })
-      }
-    }
-
-    query.orderBy('createdAt', 'desc').preload('tags')
-    const entries = await query
+    const filters = { type, period, tag }
+    const entries = await this.entryService.getEntriesForExport(user.id, filters)
 
     if (format === 'single') {
-      // Export as single markdown file
-      let content = '# DevJournal Export\n\n'
-      content += `Generated on: ${new Date().toISOString()}\n\n`
-
-      for (const entry of entries) {
-        content += '---\n\n'
-        content += `## ${entry.title || 'Untitled Entry'}\n\n`
-        content += `**Type:** ${entry.entryType}\n`
-        content += `**Date:** ${entry.createdAt.toFormat('yyyy-MM-dd HH:mm')}\n`
-        if (entry.tags && entry.tags.length > 0) {
-          content += `**Tags:** ${entry.tags.map((t) => t.name).join(', ')}\n`
-        }
-        content += '\n'
-        content += entry.contentMarkdown || 'No content'
-        content += '\n\n'
-      }
-
+      const content = this.exportService.generateSingleMarkdownFile(entries)
       response.header('Content-Type', 'text/markdown')
       response.header('Content-Disposition', 'attachment; filename="devjournal-export.md"')
       return response.send(content)
     } else {
-      // Export as ZIP file with individual markdown files
-      const archiver = await import('archiver')
-      const archive = archiver.default('zip', { zlib: { level: 9 } })
-
+      const archive = await this.exportService.createZipArchive(entries)
       response.header('Content-Type', 'application/zip')
       response.header('Content-Disposition', 'attachment; filename="devjournal-export.zip"')
-
       archive.pipe(response.response)
-
-      for (const entry of entries) {
-        const frontMatter = [
-          '---',
-          `id: ${entry.id}`,
-          `type: ${entry.entryType}`,
-          `title: ${entry.title || 'Untitled Entry'}`,
-          `date: ${entry.createdAt.toISODate()}`,
-          `datetime: ${entry.createdAt.toISO()}`,
-          entry.tags && entry.tags.length > 0
-            ? `tags: [${entry.tags.map((t) => t.name).join(', ')}]`
-            : '',
-          '---',
-          '',
-        ]
-          .filter(Boolean)
-          .join('\n')
-
-        const content = frontMatter + (entry.contentMarkdown || 'No content')
-        const filename = `${entry.createdAt.toFormat('yyyy-MM-dd')}-${entry.entryType}-${entry.id.slice(0, 8)}.md`
-
-        archive.append(content, { name: filename })
-      }
-
       await archive.finalize()
     }
   }
@@ -482,15 +211,7 @@ export default class EntriesController {
    * Show tag cloud view
    */
   async tags({ view }: HttpContext) {
-    const tags = await Tag.query().orderBy('usage_count', 'desc')
-
-    // Calculate tag sizes for cloud effect
-    const maxUsage = tags.length > 0 ? tags[0].usageCount : 1
-    const tagsWithSizes = tags.map((tag) => ({
-      ...tag.serialize(),
-      size: Math.max(1, Math.min(5, Math.ceil((tag.usageCount / maxUsage) * 5))),
-    }))
-
+    const tagsWithSizes = await this.tagService.getTagsWithSizes()
     return view.render('pages/tags/index', { tags: tagsWithSizes })
   }
 }

@@ -9,8 +9,12 @@ import type { Authenticators } from '@adonisjs/auth/types'
 export default class AuthMiddleware {
   /**
    * The URL to redirect to, when authentication fails
+   *
+   * Note: This is set to '/' because our login route is at the root path,
+   * not '/login'. This ensures unauthenticated users are redirected to
+   * the correct login page.
    */
-  redirectTo = '/login'
+  redirectTo = '/'
 
   async handle(
     ctx: HttpContext,
