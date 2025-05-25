@@ -67,7 +67,7 @@ jobs:
       PORT: 80
       APP_KEY: this-is-a-fake-secret-key
       LOG_LEVEL: info
-      SESSION_DRIVER: cookie
+      SESSION_DRIVER: memory
       TZ: Europe/London
       DATABASE_URL: postgres://user:password@postgres/test
     steps:
