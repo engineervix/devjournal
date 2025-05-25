@@ -137,7 +137,12 @@ router
     // Tags cloud view
     router.get('/tags', [EntriesController, 'tags']).as('tags.index')
 
-    router.resource('entries', EntriesController)
+    // Restrict entry ID parameter to valid UUIDs only
+    // This prevents static files (like installHook.js.map from browser extensions)
+    // from being incorrectly routed to the entries controller
+    router
+      .resource('entries', EntriesController)
+      .where('id', /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
 
     // Filter entries by tag
     router.get('/tags/:slug', [EntriesController, 'byTag']).as('entries.byTag')
