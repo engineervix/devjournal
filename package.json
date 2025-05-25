@@ -51,6 +51,7 @@
     "archiver": "^7.0.1",
     "argon2": "^0.43.0",
     "edge.js": "^6.2.1",
+    "highlight.js": "^11.11.1",
     "html-to-text": "^9.0.5",
     "luxon": "^3.6.1",
     "markdown-it": "^14.1.0",
@@ -113,7 +114,11 @@
   },
   "prettier": "@adonisjs/prettier-config",
   "c8": {
-    "reporter": ["text", "text-summary", "html"],
+    "reporter": [
+      "text",
+      "text-summary",
+      "html"
+    ],
     "reports-dir": "coverage",
     "exclude": [
       "build/**",

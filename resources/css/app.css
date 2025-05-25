@@ -2,6 +2,9 @@
 @import url('tailwindcss/components');
 @import url('tailwindcss/utilities');
 
+/* Import highlight.js theme for code syntax highlighting */
+@import url('highlight.js/styles/github.css');
+
 /* Prevent flash of unstyled content */
 @layer base {
   /* Ensure smooth transitions for theme changes */
@@ -14,6 +17,50 @@
     display: none !important;
   }
 
+  /* Dark mode overrides for highlight.js */
+  .dark .hljs {
+    background: #1f2937 !important; /* gray-800 */
+    color: #f9fafb !important; /* gray-50 */
+  }
+
+  .dark .hljs-keyword,
+  .dark .hljs-selector-tag,
+  .dark .hljs-literal,
+  .dark .hljs-section,
+  .dark .hljs-link {
+    color: #60a5fa !important; /* blue-400 */
+  }
+
+  .dark .hljs-string {
+    color: #34d399 !important; /* emerald-400 */
+  }
+
+  .dark .hljs-number,
+  .dark .hljs-regexp,
+  .dark .hljs-addition {
+    color: #fbbf24 !important; /* amber-400 */
+  }
+
+  .dark .hljs-comment,
+  .dark .hljs-quote,
+  .dark .hljs-meta {
+    color: #9ca3af !important; /* gray-400 */
+  }
+
+  .dark .hljs-variable,
+  .dark .hljs-template-variable,
+  .dark .hljs-attribute,
+  .dark .hljs-tag,
+  .dark .hljs-name,
+  .dark .hljs-selector-id,
+  .dark .hljs-selector-class {
+    color: #f472b6 !important; /* pink-400 */
+  }
+
+  .dark .hljs-function,
+  .dark .hljs-title {
+    color: #a78bfa !important; /* violet-400 */
+  }
 }
 
 /* Enhanced components and utilities */

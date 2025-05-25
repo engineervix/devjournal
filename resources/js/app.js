@@ -1,5 +1,6 @@
 import Alpine from 'alpinejs';
 import "@phosphor-icons/web/regular";
+import hljs from 'highlight.js';
 
 // Theme toggle functionality
 function initializeThemeToggle() {
@@ -149,8 +150,18 @@ document.addEventListener('alpine:init', () => {
         .replace(/\*(.*)\*/g, '<em>$1</em>')
         // Lists
         .replace(/^\- (.*$)/gm, '<li>$1</li>')
-        // Code blocks
-        .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+        // Code blocks with language detection
+        .replace(/```(\w+)?\n?([\s\S]*?)```/g, (match, lang, code) => {
+          if (lang && hljs.getLanguage(lang)) {
+            try {
+              const highlighted = hljs.highlight(code.trim(), { language: lang }).value;
+              return `<pre class="hljs"><code>${highlighted}</code></pre>`;
+            } catch (e) {
+              // Fall back to plain code if highlighting fails
+            }
+          }
+          return `<pre class="hljs"><code>${code.trim()}</code></pre>`;
+        })
         // Line breaks
         .replace(/\n/g, '<br>');
 
@@ -257,6 +268,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeThemeToggle();
   initializeKeyboardShortcuts();
   initializeFormShortcuts();
+
+  // Initialize syntax highlighting for any existing code blocks
+  hljs.highlightAll();
 });
 
 console.log('DevJournal App Initialized with Alpine, Theme Toggle, Shortcuts, and Form Submit');
