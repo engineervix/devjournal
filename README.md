@@ -75,8 +75,9 @@ A modern developer journal application built with AdonisJS, designed to help dev
 
 3. **Set up environment**
    ```bash
-   cp .env.example .env
-   # Check .env to see if there's anything you need to edit
+   cp -v .env.example .env
+   cp -v .env.test.example .env.test
+   # Check `.env` & `.env.test` to see if there's anything you need to edit
    ```
 
 4. **Start the postgres container**
@@ -109,6 +110,7 @@ A modern developer journal application built with AdonisJS, designed to help dev
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm test` - Run tests
+- `npm test:coverage` - Run tests and show test coverage
 - `npm run lint` - Run ESLint
 - `npm run format` - Format code with Prettier
 - `npm run typecheck` - Run TypeScript type checking
