@@ -65,8 +65,8 @@ jobs:
           --health-retries 5
     env:
       NODE_ENV: test
-      HOST: example.com
-      PORT: 80
+      HOST: localhost
+      PORT: 3333
       APP_KEY: this-is-a-fake-secret-key
       LOG_LEVEL: info
       SESSION_DRIVER: memory
