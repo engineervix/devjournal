@@ -11,10 +11,15 @@ function initializeThemeToggle() {
   function applyTheme(theme) {
     if (theme === 'dark') {
       htmlElement.classList.add('dark');
+      // Show sun icon, hide moon icon
+      if (lightIcon) lightIcon.classList.add('hidden');
+      if (darkIcon) darkIcon.classList.remove('hidden');
     } else {
       htmlElement.classList.remove('dark');
+      // Show moon icon, hide sun icon
+      if (lightIcon) lightIcon.classList.remove('hidden');
+      if (darkIcon) darkIcon.classList.add('hidden');
     }
-    // Icons are now handled by CSS classes, no need to manually toggle
   }
 
   // Theme is already initialized in the head, just sync the icons

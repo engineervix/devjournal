@@ -77,12 +77,6 @@
             <i class="ph ph-tag mr-1"></i>
             Tags
           </a>
-
-          <a href="{{ route('entries.export') }}"
-             class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-            <i class="ph ph-download mr-1"></i>
-            Export
-          </a>
         </nav>
 
         <div class="flex items-center gap-4">
@@ -113,9 +107,6 @@
               </a>
               <a href="{{ route('tags.index') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                 <i class="ph ph-tag mr-2"></i>Tags
-              </a>
-              <a href="{{ route('entries.export') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="ph ph-download mr-2"></i>Export
               </a>
               <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
               <div class="px-4 py-2">
@@ -182,9 +173,9 @@
           </div>
 
           {{-- Theme toggle --}}
-          <button id="theme-toggle" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
-            <i class="ph ph-moon theme-icon-light dark:hidden"></i>
-            <i class="ph ph-sun theme-icon-dark hidden dark:block"></i>
+          <button id="theme-toggle" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center justify-center">
+            <i class="ph ph-moon theme-icon-light text-gray-700 text-lg"></i>
+            <i class="ph ph-sun theme-icon-dark text-gray-300 text-lg hidden"></i>
           </button>
         </div>
       </div>
