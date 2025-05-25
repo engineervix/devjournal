@@ -22,10 +22,10 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    */
   protected statusPages: Record<StatusPageRange, StatusPageRenderer> = {
     '404': (error, { view }) => {
-      return view.render('pages/errors/not_found', { error })
+      return view.render('pages/errors/not-found', { error })
     },
     '500..599': (error, { view }) => {
-      return view.render('pages/errors/server_error', { error })
+      return view.render('pages/errors/server-error', { error })
     },
   }
 

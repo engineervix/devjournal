@@ -7,10 +7,13 @@ import { htmlToText } from 'html-to-text'
 
 const entryValidator = vine.compile(
   vine.object({
-    entryType: vine.string().trim(),
-    title: vine.string().trim().minLength(1).optional(),
-    contentMarkdown: vine.string().trim().optional(),
-    tags: vine.array(vine.string().trim().toLowerCase().minLength(1)).optional(),
+    entryType: vine.string().trim().in(['daily', 'til', 'snippet', 'debug', 'achievement']),
+    title: vine.string().trim().minLength(1).maxLength(255).optional(),
+    contentMarkdown: vine.string().trim().maxLength(50000).optional(),
+    tags: vine
+      .array(vine.string().trim().toLowerCase().minLength(1).maxLength(50))
+      .maxLength(10)
+      .optional(),
   })
 )
 

@@ -12,6 +12,7 @@
           class="inline-flex items-center py-2 px-4 text-sm font-medium border-b-2 focus:outline-none"
           type="button"
         >
+          <i class="ph ph-pencil mr-1"></i>
           Write
         </button>
       </li>
@@ -22,6 +23,7 @@
           class="inline-flex items-center py-2 px-4 text-sm font-medium border-b-2 focus:outline-none"
           type="button"
         >
+          <i class="ph ph-eye mr-1"></i>
           Preview
         </button>
       </li>
@@ -36,20 +38,25 @@
         id="content"
         name="contentMarkdown"
         x-model="content"
-        class="h-64 w-full p-3 border-0 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500 resize-none overflow-auto"
-        placeholder="Start writing..."
+        class="h-64 w-full p-3 border-0 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500 resize-none overflow-auto font-mono text-sm"
+        placeholder="Start writing in Markdown..."
       ></textarea>
     </div>
 
     {{-- Preview Tab --}}
     <div
       x-show="activeTab === 'preview'"
-      x-html="preview"
-      class="h-64 w-full p-3 overflow-auto prose dark:prose-invert max-w-none"
-    ></div>
+      class="h-64 w-full p-3 overflow-auto bg-gray-50 dark:bg-gray-900 rounded-md"
+    >
+      <div x-html="preview" class="prose dark:prose-invert max-w-none prose-sm"></div>
+      <div class="mt-4 p-2 bg-blue-50 dark:bg-blue-900/30 rounded text-xs text-blue-700 dark:text-blue-300">
+        <i class="ph ph-info mr-1"></i>
+        Note: This is a basic preview. The final rendering may differ slightly.
+      </div>
+    </div>
 
     {{-- Keyboard shortcuts --}}
-    <div class="absolute bottom-2 right-2 text-xs text-gray-500 dark:text-gray-400 pointer-events-none">
+    <div class="absolute bottom-2 right-2 text-xs text-gray-500 dark:text-gray-400 pointer-events-none bg-white dark:bg-gray-800 px-2 py-1 rounded">
       <span>Cmd/Ctrl + Enter to save</span>
     </div>
   </div>
