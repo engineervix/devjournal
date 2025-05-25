@@ -65,7 +65,7 @@ jobs:
       NODE_ENV: test
       HOST: example.com
       PORT: 80
-      APP_KEY: secret
+      APP_KEY: this-is-a-fake-secret-key
       LOG_LEVEL: info
       SESSION_DRIVER: cookie
       TZ: Europe/London
