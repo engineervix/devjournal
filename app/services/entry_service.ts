@@ -222,11 +222,19 @@ export default class EntryService {
    * Generate default title for entry type
    */
   private async generateDefaultTitle(entryType: string): Promise<string | null> {
-    if (entryType === 'daily') {
-      const { DateTime } = await import('luxon')
-      return `Daily Log - ${DateTime.now().toISODate()}`
+    const { DateTime } = await import('luxon')
+    const date = DateTime.now().toISODate()
+
+    switch (entryType) {
+      case 'daily':
+        return `Daily Log - ${date}`
+      case 'til':
+        return `TIL - ${date}`
+      case 'snippet':
+        return `Code Snippet - ${date}`
+      default:
+        return null
     }
-    return null
   }
 
   /**
@@ -269,20 +277,28 @@ export default class EntryService {
       tagIdsToSync.push(tag.id)
     }
 
-    const syncResult = (await entry.related('tags').sync(tagIdsToSync)) as unknown as {
-      attached: number[]
-      detached: number[]
-      updated: number[]
-    }
+    // Get current tags before sync
+    const currentTagIds = entry.tags.map((tag) => tag.id)
+
+    // Sync tags
+    await entry.related('tags').sync(tagIdsToSync)
+
+    // Reload entry with new tags
+    await entry.load('tags')
+    const newTagIds = entry.tags.map((tag) => tag.id)
+
+    // Calculate attached and detached tags
+    const attached = tagIdsToSync.filter((id) => !currentTagIds.includes(id))
+    const detached = currentTagIds.filter((id) => !newTagIds.includes(id))
 
     // Update usage counts
-    for (const tagId of syncResult.attached) {
+    for (const tagId of attached) {
       const tagInstance = await Tag.findOrFail(tagId)
       tagInstance.usageCount += 1
       await tagInstance.save()
     }
 
-    for (const tagId of syncResult.detached) {
+    for (const tagId of detached) {
       const tagInstance = await Tag.findOrFail(tagId)
       tagInstance.usageCount = Math.max(0, tagInstance.usageCount - 1)
       await tagInstance.save()
