@@ -130,6 +130,22 @@
   .scale-hover:hover {
     transform: scale(1.05);
   }
+
+  /* Code copy button styles */
+  .hljs {
+    position: relative;
+  }
+
+  .copy-button {
+    font-family: system-ui, sans-serif;
+    z-index: 10;
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* Ensure copy button is visible on focus for accessibility */
+  .copy-button:focus {
+    opacity: 1 !important;
+  }
 }
 
 /* Custom animations */
