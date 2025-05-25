@@ -88,7 +88,7 @@
                 <h3 class="font-medium">{{ achievement.title || 'Untitled Achievement' }}</h3>
               </div>
               <p class="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
-                {{ achievement.createdAt.toFormat('LLL dd, yyyy') }}
+                {{ achievement.createdAt.toFormat('LLL dd, yyyy \'at\' h:mm a') }}
               </p>
               <a href="{{ route('entries.show', { id: achievement.id }) }}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
                 View details

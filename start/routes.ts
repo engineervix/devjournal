@@ -50,7 +50,7 @@ router
       .where('user_id', user.id)
       .where('created_at', '>=', today.toISO())
       .where('created_at', '<', tomorrow.toISO())
-      .orderBy('created_at', 'asc')
+      .orderBy('created_at', 'desc')
       .preload('tags')
 
     // Has daily log today?
