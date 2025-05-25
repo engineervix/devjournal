@@ -39,13 +39,16 @@ test.group('Commands / CreateUserCommand', (group) => {
   test('Successful User Creation: with email, password, and full name', async ({ assert }) => {
     const inputs = [
       'test@example.com', // Email
-      'Password123',      // Password
-      'Password123',      // Confirm Password
-      'Test User',        // Full Name
+      'Password123', // Password
+      'Password123', // Confirm Password
+      'Test User', // Full Name
     ]
     const { kernel } = await runCommand(inputs)
-    
-    const output = kernel.ui.logger.getLogs().map(log => log.message).join('\n')
+
+    const output = kernel.ui.logger
+      .getLogs()
+      .map((log) => log.message)
+      .join('\n')
     assert.include(output, 'User created successfully')
     assert.include(output, 'Email: test@example.com')
     assert.include(output, 'Full Name: Test User')
@@ -59,16 +62,21 @@ test.group('Commands / CreateUserCommand', (group) => {
     assert.equal(credentialsVerified.id, user!.id)
   })
 
-  test('Successful User Creation: with email and password only (full name optional)', async ({ assert }) => {
+  test('Successful User Creation: with email and password only (full name optional)', async ({
+    assert,
+  }) => {
     const inputs = [
       'test2@example.com', // Email
-      'Password123',       // Password
-      'Password123',       // Confirm Password
-      undefined,             // Full Name (simulating pressing Enter for optional)
+      'Password123', // Password
+      'Password123', // Confirm Password
+      undefined, // Full Name (simulating pressing Enter for optional)
     ]
     const { kernel } = await runCommand(inputs)
 
-    const output = kernel.ui.logger.getLogs().map(log => log.message).join('\n')
+    const output = kernel.ui.logger
+      .getLogs()
+      .map((log) => log.message)
+      .join('\n')
     assert.include(output, 'User created successfully')
     assert.include(output, 'Email: test2@example.com')
     assert.include(output, 'Full Name: Not provided') // As per command output
@@ -81,18 +89,23 @@ test.group('Commands / CreateUserCommand', (group) => {
     assert.isNotNull(credentialsVerified)
   })
 
-  test('Validation: Attempt to create a user with an already existing email', async ({ assert }) => {
+  test('Validation: Attempt to create a user with an already existing email', async ({
+    assert,
+  }) => {
     await createUserHelper({ email: 'existing@example.com', password: 'OldPassword' })
 
     const inputs = [
       'existing@example.com', // Email
-      'NewPassword123',       // Password
-      'NewPassword123',       // Confirm Password
-      'New User',             // Full Name
+      'NewPassword123', // Password
+      'NewPassword123', // Confirm Password
+      'New User', // Full Name
     ]
     const { kernel } = await runCommand(inputs)
 
-    const output = kernel.ui.logger.getLogs().map(log => log.message).join('\n')
+    const output = kernel.ui.logger
+      .getLogs()
+      .map((log) => log.message)
+      .join('\n')
     assert.include(output, 'User with this email already exists')
 
     const users = await User.query().where('email', 'existing@example.com')
@@ -104,12 +117,15 @@ test.group('Commands / CreateUserCommand', (group) => {
   test('Validation: Passwords do not match', async ({ assert }) => {
     const inputs = [
       'nomatch@example.com', // Email
-      'Password123',         // Password
-      'Password456',         // Confirm Password (different)
+      'Password123', // Password
+      'Password456', // Confirm Password (different)
       // Full name prompt won't be reached
     ]
     const { kernel } = await runCommand(inputs)
-    const output = kernel.ui.logger.getLogs().map(log => log.message).join('\n')
+    const output = kernel.ui.logger
+      .getLogs()
+      .map((log) => log.message)
+      .join('\n')
     assert.include(output, 'Passwords do not match')
 
     const user = await User.findBy('email', 'nomatch@example.com')
@@ -130,7 +146,10 @@ test.group('Commands / CreateUserCommand', (group) => {
       // The command might exit early or log an error.
       // Japa's prompt testing might not surface prompt validation errors directly as thrown exceptions.
       // We check logger output.
-      const output = kernel.ui.logger.getLogs().map(log => log.message).join('\n')
+      const output = kernel.ui.logger
+        .getLogs()
+        .map((log) => log.message)
+        .join('\n')
       // This assertion depends on how the prompt handles validation failure.
       // If it re-prompts, this test structure won't work without more complex input simulation.
       // Based on the command, it seems it re-prompts.
@@ -144,23 +163,26 @@ test.group('Commands / CreateUserCommand', (group) => {
     }
     // As a fallback, check that no user was created.
     const users = await User.query().where('email', '').orWhereNull('email')
-    assert.lengthOf(users, 0, "No user should be created with an empty email")
+    assert.lengthOf(users, 0, 'No user should be created with an empty email')
   })
-  
+
   test('Validation: Invalid email format', async ({ assert }) => {
     const inputs = [
       'invalidemail', // Invalid Email
       'Password123',
       'Password123',
-      'Test User'
-    ];
+      'Test User',
+    ]
     // Similar to the 'Email is required' test, the command re-prompts on validation failure.
     // This test structure is not ideal for interactive prompt validation loops.
     // We'll check if a user was created with the invalid email, which it shouldn't.
     await runCommand(inputs) // Run the command, it will loop on the email prompt
 
     const user = await User.findBy('email', 'invalidemail')
-    assert.isNull(user, "User should not be created with an invalid email format if validation is strict and prevents proceeding.")
+    assert.isNull(
+      user,
+      'User should not be created with an invalid email format if validation is strict and prevents proceeding.'
+    )
     // To properly test this, one would need to simulate multiple invalid inputs then a valid one,
     // or the command should exit on X failed attempts.
   })
@@ -173,7 +195,7 @@ test.group('Commands / CreateUserCommand', (group) => {
     // Similar limitations as email validation tests.
     await runCommand(inputs)
     const user = await User.findBy('email', 'nopass@example.com')
-    assert.isNull(user, "User should not be created if password prompt is not properly answered.")
+    assert.isNull(user, 'User should not be created if password prompt is not properly answered.')
   })
 
   test('Validation: Password too short', async ({ assert }) => {
@@ -181,11 +203,11 @@ test.group('Commands / CreateUserCommand', (group) => {
       'shortpass@example.com',
       'short', // Password too short
       'short',
-      'Test User'
+      'Test User',
     ]
     // Similar limitations as email validation tests.
     await runCommand(inputs)
     const user = await User.findBy('email', 'shortpass@example.com')
-    assert.isNull(user, "User should not be created with a short password if validation is strict.")
+    assert.isNull(user, 'User should not be created with a short password if validation is strict.')
   })
 })

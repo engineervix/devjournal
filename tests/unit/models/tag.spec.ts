@@ -44,7 +44,9 @@ test.group('Models / Tag', (group) => {
     assert.equal(tag.usageCount, 0)
   })
 
-  test('Slug Uniqueness: fails to create a tag with a name that results in a duplicate slug', async ({ assert }) => {
+  test('Slug Uniqueness: fails to create a tag with a name that results in a duplicate slug', async ({
+    assert,
+  }) => {
     const tagName = 'Duplicate Slug Test'
     await Tag.create({ name: tagName }) // slug will be 'duplicate-slug-test'
 
@@ -57,7 +59,7 @@ test.group('Models / Tag', (group) => {
       assert.include(error.message, 'violates unique constraint "tags_slug_unique"')
     }
   })
-  
+
   // Relationship tests for Tags are better handled in Entry model tests or functional tests
   // where the many-to-many relationship is actively used.
 })

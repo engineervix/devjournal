@@ -52,7 +52,7 @@ test.group('Models / User', (group) => {
       assert.include(error.message, 'violates unique constraint "users_email_unique"')
     }
   })
-  
+
   // Placeholder for relationship tests if any direct ones are added to User model later
   // For example, if a user has many posts directly:
   // test('User Relationships: can load related posts', async ({ assert }) => {

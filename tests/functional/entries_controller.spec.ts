@@ -21,10 +21,10 @@ test.group('EntriesController', (group) => {
 
   group.each.setup(async () => {
     await truncateTables()
-    authenticatedUser = await createUser({ 
-      email: 'authuser@example.com', 
+    authenticatedUser = await createUser({
+      email: 'authuser@example.com',
       password: 'password123',
-      fullName: 'Auth User'
+      fullName: 'Auth User',
     })
   })
 
@@ -34,10 +34,30 @@ test.group('EntriesController', (group) => {
       const user1 = authenticatedUser // Re-use the main authenticated user for some entries
       const user2 = await createUser({ email: 'user2@example.com', password: 'password' })
 
-      await createEntry(user1.id, { entryType: EntryType.Thought, title: 'User1 Thought 1', contentMarkdown: 'U1T1', createdAt: DateTime.now().minus({ days: 1 }) })
-      await createEntry(user1.id, { entryType: EntryType.Daily, title: 'User1 Daily 1', contentMarkdown: 'U1D1', createdAt: DateTime.now() })
-      await createEntry(user2.id, { entryType: EntryType.Journal, title: 'User2 Journal 1', contentMarkdown: 'U2J1', createdAt: DateTime.now().minus({ days: 2 }) })
-      await createEntry(user2.id, { entryType: EntryType.Daily, title: 'User2 Daily 2', contentMarkdown: 'U2D2', createdAt: DateTime.now().minus({ days: 5 }) })
+      await createEntry(user1.id, {
+        entryType: EntryType.Thought,
+        title: 'User1 Thought 1',
+        contentMarkdown: 'U1T1',
+        createdAt: DateTime.now().minus({ days: 1 }),
+      })
+      await createEntry(user1.id, {
+        entryType: EntryType.Daily,
+        title: 'User1 Daily 1',
+        contentMarkdown: 'U1D1',
+        createdAt: DateTime.now(),
+      })
+      await createEntry(user2.id, {
+        entryType: EntryType.Journal,
+        title: 'User2 Journal 1',
+        contentMarkdown: 'U2J1',
+        createdAt: DateTime.now().minus({ days: 2 }),
+      })
+      await createEntry(user2.id, {
+        entryType: EntryType.Daily,
+        title: 'User2 Daily 2',
+        contentMarkdown: 'U2D2',
+        createdAt: DateTime.now().minus({ days: 5 }),
+      })
     })
 
     test('list entries (unauthenticated)', async ({ client, assert }) => {
@@ -51,7 +71,7 @@ test.group('EntriesController', (group) => {
       const authClient = getAuthenticatedClient(authenticatedUser)
       const response = await authClient.get('/entries')
       response.assertStatus(200)
-      response.assertBodyContains({ meta: { total: 4 } }) 
+      response.assertBodyContains({ meta: { total: 4 } })
       assert.lengthOf(response.body().data, 4)
     })
 
@@ -64,7 +84,7 @@ test.group('EntriesController', (group) => {
         assert.equal(entry.entry_type, EntryType.Daily)
       })
     })
-    
+
     test('filter by type "thought"', async ({ client, assert }) => {
       const response = await client.get('/entries?type=thought')
       response.assertStatus(200)
@@ -75,12 +95,16 @@ test.group('EntriesController', (group) => {
 
     test('filter by period "today"', async ({ client, assert }) => {
       // Create an entry for today specifically for the main authenticated user to be sure
-      await createEntry(authenticatedUser.id, { entryType: EntryType.Note, title: 'Today Note', createdAt: DateTime.now() })
-      
+      await createEntry(authenticatedUser.id, {
+        entryType: EntryType.Note,
+        title: 'Today Note',
+        createdAt: DateTime.now(),
+      })
+
       const response = await client.get('/entries?period=today')
       response.assertStatus(200)
       // Total will be 2 from setup + 1 new = 3. One from user1 (daily), one new note.
-      const entriesToday = await Entry.query().whereRaw('date(created_at) = date(\'now\')')
+      const entriesToday = await Entry.query().whereRaw("date(created_at) = date('now')")
       assert.equal(response.body().meta.total, entriesToday.length)
       assert.isAtLeast(entriesToday.length, 1) // Ensure the query is actually finding today's entries
 
@@ -92,11 +116,17 @@ test.group('EntriesController', (group) => {
     test('filter by period "week"', async ({ client, assert }) => {
       // All 4 initial entries are within the last week. One is 1 day ago, one today, one 2 days ago, one 5 days ago.
       // The "today" test also adds one for today. So, 5 total.
-      await createEntry(authenticatedUser.id, { entryType: EntryType.Note, title: 'Today Note for week test', createdAt: DateTime.now() })
+      await createEntry(authenticatedUser.id, {
+        entryType: EntryType.Note,
+        title: 'Today Note for week test',
+        createdAt: DateTime.now(),
+      })
       const startOfWeek = DateTime.now().startOf('week').toISODate()
       const endOfWeek = DateTime.now().endOf('week').toISODate()
-      const entriesThisWeek = await Entry.query().whereRaw('date(created_at) >= ? and date(created_at) <= ?', [startOfWeek, endOfWeek])
-
+      const entriesThisWeek = await Entry.query().whereRaw(
+        'date(created_at) >= ? and date(created_at) <= ?',
+        [startOfWeek, endOfWeek]
+      )
 
       const response = await client.get('/entries?period=week')
       response.assertStatus(200)
@@ -110,7 +140,9 @@ test.group('EntriesController', (group) => {
       const entries = response.body().data
       assert.isAtLeast(entries.length, 2)
       for (let i = 0; i < entries.length - 1; i++) {
-        assert.isTrue(DateTime.fromISO(entries[i].created_at) <= DateTime.fromISO(entries[i + 1].created_at))
+        assert.isTrue(
+          DateTime.fromISO(entries[i].created_at) <= DateTime.fromISO(entries[i + 1].created_at)
+        )
       }
     })
 
@@ -120,7 +152,9 @@ test.group('EntriesController', (group) => {
       const entries = response.body().data
       assert.isAtLeast(entries.length, 2)
       for (let i = 0; i < entries.length - 1; i++) {
-        assert.isTrue(DateTime.fromISO(entries[i].created_at) >= DateTime.fromISO(entries[i + 1].created_at))
+        assert.isTrue(
+          DateTime.fromISO(entries[i].created_at) >= DateTime.fromISO(entries[i + 1].created_at)
+        )
       }
     })
   })
@@ -144,17 +178,26 @@ test.group('EntriesController', (group) => {
       response.assertRedirectsToPath(new RegExp(`/entries/[0-9]+`)) // Check if it redirects to an entry
       response.assertSessionHas('flash_messages.success', 'Entry created successfully.') // Or similar message
 
-      const createdEntry = await Entry.query().where('title', entryData.title).preload('tags').first()
+      const createdEntry = await Entry.query()
+        .where('title', entryData.title)
+        .preload('tags')
+        .first()
       assert.isNotNull(createdEntry)
       assert.equal(createdEntry!.userId, authenticatedUser.id)
       assert.equal(createdEntry!.entryType, entryData.entryType)
       assert.equal(createdEntry!.title, entryData.title)
       assert.equal(createdEntry!.contentMarkdown, entryData.contentMarkdown)
-      assert.include(createdEntry!.contentHtml, '<p>This is <strong>bold</strong> and <em>italic</em> text.</p>\n<p>A new paragraph.</p>') // Check HTML conversion
-      assert.include(createdEntry!.contentPlain, 'This is bold and italic text.\n\nA new paragraph.') // Check plain text conversion
-      
+      assert.include(
+        createdEntry!.contentHtml,
+        '<p>This is <strong>bold</strong> and <em>italic</em> text.</p>\n<p>A new paragraph.</p>'
+      ) // Check HTML conversion
+      assert.include(
+        createdEntry!.contentPlain,
+        'This is bold and italic text.\n\nA new paragraph.'
+      ) // Check plain text conversion
+
       assert.lengthOf(createdEntry!.tags, 3)
-      const tagNames = createdEntry!.tags.map(t => t.name.toLowerCase())
+      const tagNames = createdEntry!.tags.map((t) => t.name.toLowerCase())
       assert.includeMembers(tagNames, ['journal', 'new', 'awesome'])
 
       // Verify tag usage counts (this is a bit more involved and depends on how usage_count is updated)
@@ -163,7 +206,7 @@ test.group('EntriesController', (group) => {
         const tag = await Tag.findBy('slug', tagName) // Assuming slugs are lowercase names
         assert.isNotNull(tag)
         // To properly test usage_count, we'd need to know its initial state or implement increment logic in createEntry/controller
-        // assert.isAbove(tag!.usageCount, 0) 
+        // assert.isAbove(tag!.usageCount, 0)
       }
     })
 
@@ -178,9 +221,11 @@ test.group('EntriesController', (group) => {
 
       response.assertStatus(302)
       response.assertRedirectsToPath(new RegExp(`/entries/[0-9]+`))
-      
+
       const expectedTitle = `Daily Log - ${DateTime.now().toFormat('yyyy-MM-dd')}`
-      const createdEntry = await Entry.query().where('contentMarkdown', entryData.contentMarkdown).first()
+      const createdEntry = await Entry.query()
+        .where('contentMarkdown', entryData.contentMarkdown)
+        .first()
       assert.isNotNull(createdEntry)
       assert.equal(createdEntry!.title, expectedTitle)
       assert.equal(createdEntry!.entryType, EntryType.Daily)
@@ -188,22 +233,23 @@ test.group('EntriesController', (group) => {
 
     test('attempt to create an entry with invalid data (authenticated)', async ({ assert }) => {
       const authClient = getAuthenticatedClient(authenticatedUser)
-      const entryData = { // Missing entryType, title
+      const entryData = {
+        // Missing entryType, title
         contentMarkdown: 'This entry is invalid.',
       }
       const response = await authClient.post('/entries').form(entryData)
-      
+
       response.assertStatus(302) // Redirects back
       response.assertRedirectsToPath('/entries/create') // Or wherever the form is
       response.assertSessionHasErrors() // Check for general errors
       // Check for specific errors if your controller/validator provides them
       response.assertSessionHas('flash_messages.error') // Or check for specific error messages
       // Example: response.assertSessionHas('errors.entryType', 'The entryType field is required.')
-      
+
       const count = await Entry.query().count('* as total')
       assert.equal(count[0].$extras.total, 0) // No entry should have been created
     })
-    
+
     test('attempt to create an entry (unauthenticated)', async ({ client, assert }) => {
       const entryData = {
         entryType: EntryType.Thought,
@@ -211,10 +257,10 @@ test.group('EntriesController', (group) => {
         contentMarkdown: 'This should not be created.',
       }
       const response = await client.post('/entries').form(entryData)
-      
+
       response.assertStatus(302) // Or 401/403 if API only and not redirecting to login
       response.assertRedirectsToPath('/login') // Assuming a login page
-      
+
       const count = await Entry.query().count('* as total')
       assert.equal(count[0].$extras.total, 0)
     })
@@ -224,13 +270,17 @@ test.group('EntriesController', (group) => {
     let existingEntry: Entry
 
     showGroup.each.setup(async () => {
-      existingEntry = await createEntry(authenticatedUser.id, {
-        entryType: EntryType.Journal,
-        title: 'Show Test Entry',
-        contentMarkdown: 'Content for show test.',
-        contentHtml: '<p>Content for show test.</p>',
-        contentPlain: 'Content for show test.',
-      }, ['showtag1', 'showtag2'])
+      existingEntry = await createEntry(
+        authenticatedUser.id,
+        {
+          entryType: EntryType.Journal,
+          title: 'Show Test Entry',
+          contentMarkdown: 'Content for show test.',
+          contentHtml: '<p>Content for show test.</p>',
+          contentPlain: 'Content for show test.',
+        },
+        ['showtag1', 'showtag2']
+      )
     })
 
     test('view an existing entry (unauthenticated)', async ({ client, assert }) => {
@@ -242,7 +292,7 @@ test.group('EntriesController', (group) => {
           title: 'Show Test Entry',
           content_markdown: 'Content for show test.', // Ensure your API returns snake_case or adjust assertion
           entry_type: EntryType.Journal,
-        }
+        },
       })
       // Further checks for HTML content if the page renders it directly
       // For example, if using Edge templates: response.assertTextIncludes('Content for show test.')
@@ -257,11 +307,11 @@ test.group('EntriesController', (group) => {
       const authClient = getAuthenticatedClient(authenticatedUser)
       const response = await authClient.get(`/entries/${existingEntry.id}`)
       response.assertStatus(200)
-      response.assertBodyContains({ 
-        entry: { 
+      response.assertBodyContains({
+        entry: {
           id: existingEntry.id,
-          title: 'Show Test Entry' 
-        } 
+          title: 'Show Test Entry',
+        },
       })
     })
 
@@ -270,7 +320,7 @@ test.group('EntriesController', (group) => {
       const response = await client.get(`/entries/${nonExistentId}`)
       response.assertStatus(404)
     })
-    
+
     test('view an entry belonging to another user', async ({ client, assert }) => {
       // Assuming entries are public or rules are relaxed for this test.
       // If entries are private by default, this test might need adjustment or expect a 403/404.
@@ -292,11 +342,15 @@ test.group('EntriesController', (group) => {
     let otherUser: User
 
     updateGroup.each.setup(async () => {
-      ownedEntry = await createEntry(authenticatedUser.id, {
-        entryType: EntryType.Journal,
-        title: 'Original Title',
-        contentMarkdown: 'Original content.',
-      }, ['tagA', 'tagB'])
+      ownedEntry = await createEntry(
+        authenticatedUser.id,
+        {
+          entryType: EntryType.Journal,
+          title: 'Original Title',
+          contentMarkdown: 'Original content.',
+        },
+        ['tagA', 'tagB']
+      )
 
       otherUser = await createUser({ email: 'otheruser@example.com', password: 'password' })
     })
@@ -314,7 +368,6 @@ test.group('EntriesController', (group) => {
       const tagB_before = await Tag.findByOrFail('name', 'tagB')
       assert.isUndefined(await Tag.findBy('name', 'tagC'))
 
-
       const response = await authClient.put(`/entries/${ownedEntry.id}`).form(updatedData)
 
       response.assertStatus(302) // Redirect to show page
@@ -329,9 +382,9 @@ test.group('EntriesController', (group) => {
       assert.equal(entryInDb.contentMarkdown, updatedData.contentMarkdown)
       assert.include(entryInDb.contentHtml, '<p>Updated <strong>markdown</strong> content.</p>')
       assert.include(entryInDb.contentPlain, 'Updated markdown content.')
-      
+
       assert.lengthOf(entryInDb.tags, 2)
-      const tagNames = entryInDb.tags.map(t => t.name)
+      const tagNames = entryInDb.tags.map((t) => t.name)
       assert.includeMembers(tagNames, ['tagB', 'tagC'])
       assert.notIncludeMembers(tagNames, ['tagA'])
 
@@ -341,8 +394,9 @@ test.group('EntriesController', (group) => {
 
       // Assuming controller decrements/increments usage counts
       // This depends on the controller's implementation of updateTags
-      if (tagA_after) { // TagA might be deleted if its usage count became 0 and there's a cleanup mechanism
-         assert.equal(tagA_after.usageCount, tagA_before.usageCount - 1)
+      if (tagA_after) {
+        // TagA might be deleted if its usage count became 0 and there's a cleanup mechanism
+        assert.equal(tagA_after.usageCount, tagA_before.usageCount - 1)
       } else {
         // If tagA is deleted, its usage count must have been 1
         assert.equal(tagA_before.usageCount, 1)
@@ -359,7 +413,7 @@ test.group('EntriesController', (group) => {
         entryType: EntryType.Journal,
         title: '', // Invalid: empty title
         contentMarkdown: 'Some content.',
-        tags: 'validtag'
+        tags: 'validtag',
       }
       const response = await authClient.put(`/entries/${ownedEntry.id}`).form(invalidData)
 
@@ -378,7 +432,7 @@ test.group('EntriesController', (group) => {
         title: 'Malicious Update Title',
         contentMarkdown: 'Trying to change content.',
         entryType: ownedEntry.entryType, // Keep type same to avoid validation issues unrelated to auth
-        tags: 'tagA'
+        tags: 'tagA',
       }
       const response = await authClient.put(`/entries/${ownedEntry.id}`).form(updatedData)
 
@@ -388,7 +442,6 @@ test.group('EntriesController', (group) => {
       // response.assertStatus(302)
       // response.assertRedirectsToPath('/entries') // Or home
       // response.assertSessionHas('flash_messages.error', 'You are not authorized to perform this action.')
-
 
       const entryInDb = await Entry.findOrFail(ownedEntry.id)
       assert.equal(entryInDb.title, 'Original Title') // Title should not have changed
@@ -401,7 +454,7 @@ test.group('EntriesController', (group) => {
         title: 'Update for non-existent',
         contentMarkdown: 'content',
         entryType: EntryType.Note,
-        tags: 'any'
+        tags: 'any',
       })
       response.assertStatus(404)
     })
@@ -410,13 +463,14 @@ test.group('EntriesController', (group) => {
   test.group('destroy action', (destroyGroup) => {
     let entryToDelete: Entry
     let otherUserEntry: Entry
-    let tag1: Tag, tag2: Tag // For checking usage counts
+    let tag1: Tag
+    let tag2: Tag // For checking usage counts
 
     destroyGroup.each.setup(async () => {
       // Create tags that will be used
       tag1 = await Tag.create({ name: 'deleteTag1' })
       tag2 = await Tag.create({ name: 'deleteTag2' })
-      
+
       // Entry owned by authenticatedUser
       entryToDelete = await createEntry(
         authenticatedUser.id,
@@ -428,9 +482,11 @@ test.group('EntriesController', (group) => {
       tag1 = await Tag.findOrFail(tag1.id)
       tag2 = await Tag.findOrFail(tag2.id)
 
-
       // Entry owned by another user
-      const otherUser = await createUser({ email: 'otherfordelete@example.com', password: 'password' })
+      const otherUser = await createUser({
+        email: 'otherfordelete@example.com',
+        password: 'password',
+      })
       otherUserEntry = await createEntry(
         otherUser.id,
         { entryType: EntryType.Note, title: 'Other User Note' },
@@ -442,7 +498,7 @@ test.group('EntriesController', (group) => {
 
     test('successfully delete an owned entry', async ({ client, assert }) => {
       const authClient = getAuthenticatedClient(authenticatedUser)
-      
+
       assert.equal(tag1.usageCount, 2, 'Tag1 initial usage count before delete')
       assert.equal(tag2.usageCount, 1, 'Tag2 initial usage count before delete')
 
@@ -460,7 +516,7 @@ test.group('EntriesController', (group) => {
       const tag2AfterDelete = await Tag.findBy('name', 'deleteTag2') // Tag2 might be deleted if usage count reached 0
 
       assert.equal(tag1AfterDelete.usageCount, 1) // Decremented because entryToDelete used it
-      
+
       // If tag2's only use was entryToDelete, it might be deleted or its usage count is 0
       // The controller's _updateTagsForDelete method seems to only decrement.
       // Let's assume for now it just decrements and doesn't auto-delete tags.
@@ -473,13 +529,13 @@ test.group('EntriesController', (group) => {
       const authClient = getAuthenticatedClient(authenticatedUser) // Authenticated as main user
 
       const response = await authClient.delete(`/entries/${otherUserEntry.id}`)
-      
+
       // Based on controller logic, findOrFail will throw, leading to a 404 by default if no specific error handling for auth.
       // Or, if a policy is added later, it could be 403.
-      response.assertStatus(404) 
+      response.assertStatus(404)
       // If it redirected with flash:
       // response.assertStatus(302)
-      // response.assertRedirectsToPath('/entries') 
+      // response.assertRedirectsToPath('/entries')
       // response.assertSessionHas('flash_messages.error', 'You are not authorized to perform this action.')
 
       const entryNotDeleted = await Entry.find(otherUserEntry.id)
@@ -513,7 +569,7 @@ test.group('EntriesController', (group) => {
         entryType: EntryType.Daily,
         title: 'Daily Log Beta',
         contentMarkdown: 'Just a regular daily log, nothing special. Beta keyword.',
-        createdAt: DateTime.now(), 
+        createdAt: DateTime.now(),
       })
       const otherUser = await createUser({ email: 'searchuser@example.com', password: 'password' })
       await createEntry(otherUser.id, {
@@ -526,7 +582,7 @@ test.group('EntriesController', (group) => {
     test('search with a query string matching title/content', async ({ client, assert }) => {
       const authClient = getAuthenticatedClient(authenticatedUser)
       const response = await authClient.get('/entries/search?q=Alpha')
-      
+
       response.assertStatus(200)
       response.assertViewIs('pages/entries/search_results') // Or your search results view
       response.assertViewModelExists('entries')
@@ -535,16 +591,21 @@ test.group('EntriesController', (group) => {
 
       const entries = response.viewModel('entries').data // Assuming pagination structure
       assert.lengthOf(entries, 2) // Only two entries for the authenticated user contain "Alpha"
-      assert.isTrue(entries.every((e: any) => e.title.includes('Alpha') || e.content_markdown.includes('Alpha')))
+      assert.isTrue(
+        entries.every((e: any) => e.title.includes('Alpha') || e.content_markdown.includes('Alpha'))
+      )
       assert.isTrue(entries.every((e: any) => e.user_id === authenticatedUser.id))
     })
 
-    test('search with a query string matching partial words (if supported by tsquery)', async ({ client, assert }) => {
+    test('search with a query string matching partial words (if supported by tsquery)', async ({
+      client,
+      assert,
+    }) => {
       const authClient = getAuthenticatedClient(authenticatedUser)
       // This test's success depends on how websearch_to_tsquery handles partials or if it's configured for prefix matching.
       // Standard websearch_to_tsquery might not do prefix matching by default without specific configuration.
       // For 'appl', it might match 'apples' if stemming/prefix matching is working.
-      const response = await authClient.get('/entries/search?q=appl') 
+      const response = await authClient.get('/entries/search?q=appl')
       response.assertStatus(200)
       const entries = response.viewModel('entries').data
       // Depending on ts_query config, this might be 0 or 1. If it's 1, 'apples' was matched.
@@ -553,11 +614,13 @@ test.group('EntriesController', (group) => {
         assert.lengthOf(entries, 1)
         assert.include(entries[0].content_markdown, 'apples')
       } else {
-        console.warn("FTS partial match for 'appl' did not find 'apples'. This might be expected depending on PG FTS config.")
+        console.warn(
+          "FTS partial match for 'appl' did not find 'apples'. This might be expected depending on PG FTS config."
+        )
         assert.lengthOf(entries, 0)
       }
     })
-    
+
     test('search with multiple keywords', async ({ client, assert }) => {
       const authClient = getAuthenticatedClient(authenticatedUser)
       // websearch_to_tsquery usually handles multiple words with AND logic or interprets them as a phrase.
@@ -572,7 +635,7 @@ test.group('EntriesController', (group) => {
     test('search with a query string not matching any entry', async ({ client, assert }) => {
       const authClient = getAuthenticatedClient(authenticatedUser)
       const response = await authClient.get('/entries/search?q=NonExistentXYZ')
-      
+
       response.assertStatus(200)
       response.assertViewModelProperty('query', 'NonExistentXYZ')
       const entries = response.viewModel('entries').data
@@ -582,7 +645,7 @@ test.group('EntriesController', (group) => {
     test('search with an empty query string', async ({ client, assert }) => {
       const authClient = getAuthenticatedClient(authenticatedUser)
       const response = await authClient.get('/entries/search?q=')
-      
+
       response.assertStatus(200)
       // The controller seems to return paginated results even for empty query,
       // but the search itself won't match anything specifically due to empty tsquery.
@@ -590,15 +653,19 @@ test.group('EntriesController', (group) => {
       // Based on `if (!query) { return view.render('pages/entries/search_results', { entries: [], query }) }`
       // it should return an empty array for entries if query is empty string.
       response.assertViewModelProperty('query', '')
-      const entries = response.viewModel('entries').data 
-      assert.lengthOf(entries, 0, 'Search with empty query string should return no results as per controller logic')
+      const entries = response.viewModel('entries').data
+      assert.lengthOf(
+        entries,
+        0,
+        'Search with empty query string should return no results as per controller logic'
+      )
     })
 
     test('search with filters (type) in addition to query string', async ({ client, assert }) => {
       const authClient = getAuthenticatedClient(authenticatedUser)
       // We have one "Alpha" in Thought, one "Alpha" in Journal.
       const response = await authClient.get('/entries/search?q=Alpha&type=Journal')
-      
+
       response.assertStatus(200)
       response.assertViewModelProperty('query', 'Alpha')
       response.assertViewModelProperty('filters.type', EntryType.Journal)
@@ -607,7 +674,7 @@ test.group('EntriesController', (group) => {
       assert.equal(entries[0].entry_type, EntryType.Journal)
       assert.include(entries[0].title, 'Another Alpha Entry')
     })
-    
+
     test('search with filters (period) in addition to query string', async ({ client, assert }) => {
       const authClient = getAuthenticatedClient(authenticatedUser)
       // 'Unique Keyword Alpha' is 3 days old. 'Another Alpha Entry' is 1 day old.
@@ -629,40 +696,71 @@ test.group('EntriesController', (group) => {
       assert.isTrue(DateTime.fromISO(entries[0].created_at).hasSame(DateTime.now(), 'day'))
       assert.include(entries[0].title, 'Today Alpha Special')
     })
-    
+
     test('search with sort order "oldest"', async ({ client, assert }) => {
       const authClient = getAuthenticatedClient(authenticatedUser)
       const response = await authClient.get('/entries/search?q=Alpha&sort=oldest')
       response.assertStatus(200)
       const entries = response.viewModel('entries').data
       assert.lengthOf(entries, 2) // The two original Alpha entries for the user
-      assert.isTrue(DateTime.fromISO(entries[0].created_at) < DateTime.fromISO(entries[1].created_at))
+      assert.isTrue(
+        DateTime.fromISO(entries[0].created_at) < DateTime.fromISO(entries[1].created_at)
+      )
       assert.equal(entries[0].title, 'Unique Keyword Alpha') // Created 3 days ago
       assert.equal(entries[1].title, 'Another Alpha Entry') // Created 1 day ago
     })
   })
 
   test.group('byTag action', (byTagGroup) => {
-    let tagA: Tag, tagB: Tag
+    let tagA: Tag
+    let tagB: Tag
 
     byTagGroup.each.setup(async () => {
       tagA = await Tag.create({ name: 'Tag Alpha For Test' }) // slug: tag-alpha-for-test
-      tagB = await Tag.create({ name: 'Tag Beta For Test' })   // slug: tag-beta-for-test
+      tagB = await Tag.create({ name: 'Tag Beta For Test' }) // slug: tag-beta-for-test
 
       // Entries for authenticatedUser
-      await createEntry(authenticatedUser.id, { title: 'Entry 1 with Alpha', entryType: EntryType.Journal, createdAt: DateTime.now().minus({days: 2}) }, [tagA.name])
-      await createEntry(authenticatedUser.id, { title: 'Entry 2 with Alpha and Beta', entryType: EntryType.Thought, createdAt: DateTime.now() }, [tagA.name, tagB.name])
-      await createEntry(authenticatedUser.id, { title: 'Entry 3 with Beta', entryType: EntryType.Journal, createdAt: DateTime.now().minus({days: 1}) }, [tagB.name])
-      
+      await createEntry(
+        authenticatedUser.id,
+        {
+          title: 'Entry 1 with Alpha',
+          entryType: EntryType.Journal,
+          createdAt: DateTime.now().minus({ days: 2 }),
+        },
+        [tagA.name]
+      )
+      await createEntry(
+        authenticatedUser.id,
+        {
+          title: 'Entry 2 with Alpha and Beta',
+          entryType: EntryType.Thought,
+          createdAt: DateTime.now(),
+        },
+        [tagA.name, tagB.name]
+      )
+      await createEntry(
+        authenticatedUser.id,
+        {
+          title: 'Entry 3 with Beta',
+          entryType: EntryType.Journal,
+          createdAt: DateTime.now().minus({ days: 1 }),
+        },
+        [tagB.name]
+      )
+
       // Entry for another user, also with Tag Alpha (to ensure scoping if any)
       const otherUser = await createUser({ email: 'taguser@example.com', password: 'password' })
-      await createEntry(otherUser.id, { title: 'Other User Entry Alpha', entryType: EntryType.Note }, [tagA.name])
+      await createEntry(
+        otherUser.id,
+        { title: 'Other User Entry Alpha', entryType: EntryType.Note },
+        [tagA.name]
+      )
     })
 
     test('list entries for a specific tag', async ({ client, assert }) => {
       const authClient = getAuthenticatedClient(authenticatedUser)
       const response = await authClient.get(`/entries/by-tag/${tagA.slug}`)
-      
+
       response.assertStatus(200)
       response.assertViewIs('pages/entries/by_tag')
       response.assertViewModelExists('entries')
@@ -687,9 +785,11 @@ test.group('EntriesController', (group) => {
       // We have 'Entry 2 with Alpha and Beta' (Thought) created today for authenticatedUser
       // And 'Entry 1 with Alpha' (Journal) created 2 days ago.
       const authClient = getAuthenticatedClient(authenticatedUser)
-      
+
       // Test 1: Filter by period=today, sort=oldest (which is also newest if only one)
-      const responseToday = await authClient.get(`/entries/by-tag/${tagA.slug}?period=today&sort=oldest`)
+      const responseToday = await authClient.get(
+        `/entries/by-tag/${tagA.slug}?period=today&sort=oldest`
+      )
       responseToday.assertStatus(200)
       responseToday.assertViewModelProperty('tag.name', tagA.name)
       const entriesToday = responseToday.viewModel('entries').data
@@ -710,26 +810,38 @@ test.group('EntriesController', (group) => {
   test.group('export action', (exportGroup) => {
     exportGroup.each.setup(async () => {
       // Create some entries for the authenticatedUser
-      await createEntry(authenticatedUser.id, {
-        entryType: EntryType.Journal,
-        title: 'My Journal for Export',
-        contentMarkdown: 'This is the first journal entry.\n\nIt has **bold** text.',
-        createdAt: DateTime.now().minus({ days: 2 }),
-      }, ['exportTag', 'journalTag'])
-      
-      await createEntry(authenticatedUser.id, {
-        entryType: EntryType.Daily,
-        title: 'Daily Log - Export Test', // Title will be auto-generated if not provided
-        contentMarkdown: 'A daily log entry for export.',
-        createdAt: DateTime.now().minus({ days: 1 }),
-      }, ['exportTag', 'dailyTag'])
+      await createEntry(
+        authenticatedUser.id,
+        {
+          entryType: EntryType.Journal,
+          title: 'My Journal for Export',
+          contentMarkdown: 'This is the first journal entry.\n\nIt has **bold** text.',
+          createdAt: DateTime.now().minus({ days: 2 }),
+        },
+        ['exportTag', 'journalTag']
+      )
 
-      await createEntry(authenticatedUser.id, {
-        entryType: EntryType.Thought,
-        title: 'Random Thought Export',
-        contentMarkdown: 'A thought about exporting.',
-        createdAt: DateTime.now(),
-      }, ['exportTag'])
+      await createEntry(
+        authenticatedUser.id,
+        {
+          entryType: EntryType.Daily,
+          title: 'Daily Log - Export Test', // Title will be auto-generated if not provided
+          contentMarkdown: 'A daily log entry for export.',
+          createdAt: DateTime.now().minus({ days: 1 }),
+        },
+        ['exportTag', 'dailyTag']
+      )
+
+      await createEntry(
+        authenticatedUser.id,
+        {
+          entryType: EntryType.Thought,
+          title: 'Random Thought Export',
+          contentMarkdown: 'A thought about exporting.',
+          createdAt: DateTime.now(),
+        },
+        ['exportTag']
+      )
     })
 
     test('export entries as a single Markdown file (authenticated)', async ({ client, assert }) => {
@@ -738,7 +850,10 @@ test.group('EntriesController', (group) => {
 
       response.assertStatus(200)
       response.assertHeader('content-type', 'text/markdown; charset=utf-8') // Or text/markdown; charset=utf-8
-      response.assertHeader('content-disposition', /attachment; filename="devjournal_export_.*\.md"/)
+      response.assertHeader(
+        'content-disposition',
+        /attachment; filename="devjournal_export_.*\.md"/
+      )
 
       const body = response.text()
       assert.include(body, '# My Journal for Export')
@@ -756,7 +871,10 @@ test.group('EntriesController', (group) => {
 
       response.assertStatus(200)
       response.assertHeader('content-type', 'application/zip')
-      response.assertHeader('content-disposition', /attachment; filename="devjournal_export_.*\.zip"/)
+      response.assertHeader(
+        'content-disposition',
+        /attachment; filename="devjournal_export_.*\.zip"/
+      )
       assert.isTrue(response.body().length > 0, 'ZIP file should not be empty')
     })
 
@@ -767,7 +885,10 @@ test.group('EntriesController', (group) => {
 
       response.assertStatus(200)
       response.assertHeader('content-type', 'text/markdown; charset=utf-8')
-      response.assertHeader('content-disposition', /attachment; filename="devjournal_export_.*\.md"/)
+      response.assertHeader(
+        'content-disposition',
+        /attachment; filename="devjournal_export_.*\.md"/
+      )
 
       const body = response.text()
       assert.include(body, '## Daily Log - Export Test')
@@ -775,7 +896,7 @@ test.group('EntriesController', (group) => {
       assert.notInclude(body, '## Random Thought Export')
       assert.include(body, 'Tags: #exportTag, #dailyTag')
     })
-    
+
     test('export with filters (tag=journalTag, format=single)', async ({ client, assert }) => {
       const authClient = getAuthenticatedClient(authenticatedUser)
       // There's one entry with journalTag
@@ -784,7 +905,7 @@ test.group('EntriesController', (group) => {
 
       response.assertStatus(200)
       response.assertHeader('content-type', 'text/markdown; charset=utf-8')
-      
+
       const body = response.text()
       assert.include(body, '# My Journal for Export')
       assert.notInclude(body, '## Daily Log - Export Test')
@@ -795,7 +916,7 @@ test.group('EntriesController', (group) => {
     test('attempt export when unauthenticated', async ({ client }) => {
       const response = await client.get('/entries/export?format=single')
       // This relies on the auth middleware redirecting to login
-      response.assertStatus(302) 
+      response.assertStatus(302)
       response.assertRedirectsToPath('/login') // Or your app's login route
     })
   })
@@ -823,7 +944,7 @@ test.group('EntriesController', (group) => {
       await createEntry(authenticatedUser.id, { title: 'Entry G' }, [tag3.name])
       await createEntry(authenticatedUser.id, { title: 'Entry H' }, [tag3.name])
       await createEntry(authenticatedUser.id, { title: 'Entry I' }, [tag3.name])
-      
+
       // CloudTagUnused remains at 0, but will be fetched by controller if minUsage is 0
       // The controller logic seems to fetch all tags then calculate sizes.
     })
@@ -835,29 +956,29 @@ test.group('EntriesController', (group) => {
       response.assertStatus(200)
       response.assertViewIs('pages/entries/tags_cloud') // Or your tag cloud view name
       response.assertViewModelExists('tagsWithSizes')
-      
+
       const tagsWithSizes = response.viewModel('tagsWithSizes')
       assert.isArray(tagsWithSizes)
       assert.isTrue(tagsWithSizes.length >= 3) // CloudTagOne, CloudTagTwo, CloudTagThree should be present. CloudTagUnused might be if minUsage is 0.
-                                              // Controller fetches top 50 by usage_count.
+      // Controller fetches top 50 by usage_count.
 
       const tagOne = tagsWithSizes.find((t: any) => t.name === 'CloudTagOne')
       const tagTwo = tagsWithSizes.find((t: any) => t.name === 'CloudTagTwo')
       const tagThree = tagsWithSizes.find((t: any) => t.name === 'CloudTagThree')
       const tagUnused = tagsWithSizes.find((t: any) => t.name === 'CloudTagUnused')
 
-
       assert.isDefined(tagOne, 'CloudTagOne should be present')
       assert.isDefined(tagTwo, 'CloudTagTwo should be present')
       assert.isDefined(tagThree, 'CloudTagThree should be present')
-      assert.isDefined(tagUnused, 'CloudTagUnused should be present, as controller fetches all and calculates size')
-
+      assert.isDefined(
+        tagUnused,
+        'CloudTagUnused should be present, as controller fetches all and calculates size'
+      )
 
       assert.isNumber(tagOne.size)
       assert.isNumber(tagTwo.size)
       assert.isNumber(tagThree.size)
       assert.isNumber(tagUnused.size)
-
 
       // Check relative sizes based on usage (tagThree > tagOne > tagTwo > tagUnused)
       // The controller uses minSize=1, maxSize=5.
@@ -872,7 +993,7 @@ test.group('EntriesController', (group) => {
       assert.closeTo(tagTwo.size, 1.8, 0.1)
       assert.closeTo(tagUnused.size, 1.0, 0.1)
     })
-    
+
     test('view tag cloud page (unauthenticated)', async ({ client }) => {
       // Assuming /entries/tags is protected by auth middleware
       const response = await client.get('/entries/tags')

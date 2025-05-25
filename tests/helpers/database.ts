@@ -21,7 +21,11 @@ export async function createUser(userData?: Partial<User>) {
   return user
 }
 
-export async function createEntry(userId: number, entryData: Partial<Entry>, tagNames?: string[]): Promise<Entry> {
+export async function createEntry(
+  userId: number,
+  entryData: Partial<Entry>,
+  tagNames?: string[]
+): Promise<Entry> {
   const entry = new Entry()
   entry.fill({ userId, ...entryData })
   await entry.save()
@@ -35,7 +39,7 @@ export async function createEntry(userId: number, entryData: Partial<Entry>, tag
       }
       // Increment usage count - this might be better handled by a service or event listener in a real app
       // For testing, direct manipulation is okay, or we can test the side effect if it's implemented
-      // tag.usageCount += 1; 
+      // tag.usageCount += 1;
       // await tag.save();
       tags.push(tag.id)
     }

@@ -108,10 +108,10 @@ test.group('Auth', (group) => {
         email: 'logoutuser@example.com',
         password: plainPassword,
       })
-      
+
       // Log the user in first
       await client.post('/').form({ email: user.email, password: plainPassword })
-      
+
       // Now get an authenticated client to perform logout
       const authClient = getAuthenticatedClient(user)
       const response = await authClient.post('/logout')

@@ -63,7 +63,7 @@ test.group('Models / Entry', (group) => {
 
   test('Relationship with User (belongsTo): loads associated user', async ({ assert }) => {
     const entry = await Entry.create({ userId: user.id, entryType: EntryType.Note })
-    
+
     await entry.load('user')
 
     assert.instanceOf(entry.user, User)
@@ -79,13 +79,13 @@ test.group('Models / Entry', (group) => {
     assert.instanceOf(fetchedEntry!.user, User)
     assert.equal(fetchedEntry!.user.id, user.id)
   })
-  
+
   test('Relationship with Tags (manyToMany): attach and load tags', async ({ assert }) => {
     // Need to clear tags table here if tags are created per test, or ensure unique tags
-    await db.rawQuery('TRUNCATE tags RESTART IDENTITY CASCADE') 
+    await db.rawQuery('TRUNCATE tags RESTART IDENTITY CASCADE')
     const tag1 = await Tag.create({ name: 'Tag Alpha' })
     const tag2 = await Tag.create({ name: 'Tag Beta' })
-    
+
     const entry = await Entry.create({ userId: user.id, entryType: EntryType.Bookmark })
     await entry.related('tags').attach([tag1.id, tag2.id])
 
@@ -93,8 +93,8 @@ test.group('Models / Entry', (group) => {
 
     assert.isArray(entry.tags)
     assert.lengthOf(entry.tags, 2)
-    assert.isTrue(entry.tags.some(t => t.id === tag1.id))
-    assert.isTrue(entry.tags.some(t => t.id === tag2.id))
+    assert.isTrue(entry.tags.some((t) => t.id === tag1.id))
+    assert.isTrue(entry.tags.some((t) => t.id === tag2.id))
 
     const entryWithTags = await Entry.query().preload('tags').where('id', entry.id).first()
     assert.isNotNull(entryWithTags)
@@ -106,7 +106,7 @@ test.group('Models / Entry', (group) => {
     const tag1 = await Tag.create({ name: 'Tag Gamma' })
     const tag2 = await Tag.create({ name: 'Tag Delta' })
     const entry = await Entry.create({ userId: user.id, entryType: EntryType.Thought })
-    
+
     await entry.related('tags').attach([tag1.id, tag2.id])
     await entry.related('tags').detach([tag1.id])
 
@@ -129,25 +129,25 @@ test.group('Models / Entry', (group) => {
 
     await entry.load('tags')
     assert.lengthOf(entry.tags, 2)
-    assert.isTrue(entry.tags.some(t => t.id === tag2.id))
-    assert.isTrue(entry.tags.some(t => t.id === tag3.id))
-    assert.isFalse(entry.tags.some(t => t.id === tag1.id))
+    assert.isTrue(entry.tags.some((t) => t.id === tag2.id))
+    assert.isTrue(entry.tags.some((t) => t.id === tag3.id))
+    assert.isFalse(entry.tags.some((t) => t.id === tag1.id))
   })
-  
+
   test('Timestamps: createdAt and updatedAt are auto-generated and updated', async ({ assert }) => {
     const entry = await Entry.create({ userId: user.id, entryType: EntryType.Thought })
-    
+
     assert.isNotNull(entry.createdAt)
     assert.isNotNull(entry.updatedAt)
-    
+
     const initialUpdatedAt = entry.updatedAt
-    
+
     // Wait a bit to ensure updatedAt changes
-    await new Promise(resolve => setTimeout(resolve, 50)) 
-    
+    await new Promise((resolve) => setTimeout(resolve, 50))
+
     entry.title = 'Updated Title'
     await entry.save()
-    
+
     assert.isTrue(entry.updatedAt > initialUpdatedAt)
   })
 })
