@@ -3,7 +3,7 @@
     <div class="mb-6 flex justify-between items-center">
       <h1 class="text-2xl font-bold">Dashboard</h1>
       <div class="text-sm">
-        {{ currentDate }}
+        {{ formatDateWithDay(currentDate, 'short') }}
       </div>
     </div>
 
@@ -88,7 +88,7 @@
                 <h3 class="font-medium">{{ achievement.title || 'Untitled Achievement' }}</h3>
               </div>
               <p class="text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">
-                {{ achievement.createdAt.toFormat('LLL dd, yyyy \'at\' h:mm a') }}
+                {{ formatDateWithDay(achievement.createdAt, 'medium') }}
               </p>
               <a href="{{ route('entries.show', { id: achievement.id }) }}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
                 View details

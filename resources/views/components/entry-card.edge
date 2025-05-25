@@ -21,7 +21,7 @@
 
       {{-- Date --}}
       <span class="text-sm text-gray-500 dark:text-gray-400">
-        {{ entry.createdAt.toFormat('LLL dd, yyyy \'at\' h:mm a') }}
+        {{ formatDateWithDay(entry.createdAt, 'medium') }}
       </span>
 
       {{-- Spacer --}}

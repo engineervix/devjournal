@@ -103,7 +103,7 @@ router
       totalCount,
       topTag,
     }
-    const currentDate = DateTime.now().toFormat('MMMM d, yyyy')
+    const currentDate = DateTime.now()
 
     return view.render('pages/dashboard', {
       currentDate,

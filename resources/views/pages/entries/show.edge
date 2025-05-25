@@ -37,7 +37,7 @@
 
         {{-- Date --}}
         <span class="text-sm text-gray-500 dark:text-gray-400">
-          {{ entry.createdAt.toFormat('LLLL dd, yyyy HH:mm') }}
+          {{ formatDateWithDay(entry.createdAt, 'long') }}
         </span>
       </div>
 

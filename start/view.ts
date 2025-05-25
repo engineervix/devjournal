@@ -48,6 +48,33 @@ edge.global('range', (start: number, end: number) => {
   return Array.from({ length: end - start }, (_, i) => start + i)
 })
 
+/**
+ * Defines a global 'formatDateWithDay' function for Edge templates.
+ * This function formats Luxon DateTime objects with day of the week included.
+ */
+edge.global(
+  'formatDateWithDay',
+  (dateTime: any, format: 'short' | 'medium' | 'long' = 'medium') => {
+    if (!dateTime || typeof dateTime.toFormat !== 'function') {
+      return ''
+    }
+
+    switch (format) {
+      case 'short':
+        // For compact displays: "Mon, May 25, 2025"
+        return dateTime.toFormat('ccc, LLL dd, yyyy')
+      case 'medium':
+        // For entry cards: "Mon, May 25, 2025 at 1:02 AM"
+        return dateTime.toFormat("ccc, LLL dd, yyyy 'at' h:mm a")
+      case 'long':
+        // For detailed views: "Monday, May 25, 2025 14:02"
+        return dateTime.toFormat('cccc, LLLL dd, yyyy HH:mm')
+      default:
+        return dateTime.toFormat("ccc, LLL dd, yyyy 'at' h:mm a")
+    }
+  }
+)
+
 // If you have other global view configurations, they would go here.
 // For example, from the docs:
 // import env from '#start/env'
