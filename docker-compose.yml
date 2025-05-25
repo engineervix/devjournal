@@ -1,10 +1,11 @@
 services:
   db:
-    image: pgvector/pgvector:0.8.0-pg16
+    build:
+      context: ./docker/db
+      dockerfile: Dockerfile
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_DB: devjournal
       POSTGRES_USER: devjournal
       POSTGRES_PASSWORD: password
     healthcheck:
