@@ -1,5 +1,5 @@
 {{-- Tag input with autocomplete component --}}
-<div x-data="tagInput({{ existingTags ? JSON.stringify(existingTags) : '[]' }}, {{ selectedTags ? JSON.stringify(selectedTags) : '[]' }})" class="mb-6">
+<div x-data="tagInput({{ existingTags ? JSON.stringify(existingTags) : '[]' }}, {{ selectedTags ? JSON.stringify(selectedTags) : '[]' }})" class="mb-6" x-cloak>
   <label for="tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tags</label>
 
   <div class="flex flex-wrap items-center gap-2 p-2 border border-gray-300 dark:border-gray-600 rounded-md">
@@ -34,6 +34,7 @@
     class="relative"
     x-show="showSuggestions && filteredSuggestions.length > 0"
     @click.away="showSuggestions = false"
+    x-cloak
   >
     <ul
       class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"

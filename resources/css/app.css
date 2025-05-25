@@ -1,3 +1,24 @@
 @import url('tailwindcss/base');
 @import url('tailwindcss/components');
 @import url('tailwindcss/utilities');
+
+/* Prevent flash of unstyled content */
+@layer base {
+  /* Ensure smooth transitions for theme changes */
+  html {
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  }
+
+  /* Hide elements with x-cloak until Alpine.js loads */
+  [x-cloak] {
+    display: none !important;
+  }
+
+}
+
+/* Smooth transitions for interactive elements */
+@layer components {
+  .transition-theme {
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  }
+}

@@ -23,4 +23,21 @@ export default defineConfig({
       plugins: [tailwindcss, autoprefixer],
     },
   },
+  build: {
+    // Optimize for better loading performance
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Separate Alpine.js into its own chunk for better caching
+          alpine: ['alpinejs'],
+        },
+      },
+    },
+    // Enable CSS code splitting
+    cssCodeSplit: true,
+  },
+  // Optimize dependencies
+  optimizeDeps: {
+    include: ['alpinejs', '@phosphor-icons/web/regular'],
+  },
 })

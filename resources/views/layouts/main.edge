@@ -5,13 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ title ?? 'DevJournal' }}</title>
 
-  {{-- Font import --}}
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  {{-- Prevent FOUC by initializing theme immediately --}}
+  <script>
+    // Initialize theme before any content renders to prevent flashing
+    (function() {
+      const storedTheme = localStorage.getItem('theme');
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = storedTheme || (systemPrefersDark ? 'dark' : 'light');
+
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+
+
 
   {{-- Vite CSS and JS --}}
   @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+  {{-- Prevent Alpine.js FOUC --}}
+  <style>
+    [x-cloak] { display: none !important; }
+
+    /* Critical CSS to prevent layout shift */
+
+    /* Ensure dark mode styles are applied immediately */
+    .dark {
+      color-scheme: dark;
+    }
+
+    /* Prevent theme icon flashing */
+    .theme-icon-light.dark\:hidden {
+      display: none;
+    }
+
+    .dark .theme-icon-dark.hidden {
+      display: none;
+    }
+
+    .dark .theme-icon-dark.dark\:block {
+      display: block;
+    }
+  </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col" data-new-entry-route="{{ route('entries.create') }}">
   {{-- Header --}}
@@ -51,11 +87,11 @@
 
         <div class="flex items-center gap-4">
           {{-- Mobile menu button --}}
-          <div class="md:hidden" x-data="mobileMenu">
+          <div class="md:hidden" x-data="mobileMenu" x-cloak>
             <button @click="toggle" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
               <span class="sr-only">Open main menu</span>
               <i class="ph ph-list text-xl" x-show="!open"></i>
-              <i class="ph ph-x text-xl" x-show="open" style="display: none;"></i>
+              <i class="ph ph-x text-xl" x-show="open" x-cloak></i>
             </button>
 
             {{-- Mobile menu --}}
@@ -68,7 +104,7 @@
                  x-transition:leave-start="transform opacity-100 scale-100"
                  x-transition:leave-end="transform opacity-0 scale-95"
                  class="absolute top-16 right-4 left-4 bg-white dark:bg-gray-800 rounded-md shadow-lg z-50 py-2"
-                 style="display: none;">
+                 x-cloak>
               <a href="{{ route('home') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                 <i class="ph ph-house mr-2"></i>Dashboard
               </a>
@@ -116,7 +152,7 @@
           </form>
 
           {{-- User menu/settings --}}
-          <div class="relative" x-data="userMenu">
+          <div class="relative" x-data="userMenu" x-cloak>
             <button @click="toggle" class="flex items-center focus:outline-none">
               <span class="hidden md:block mr-2">{{ auth.user.fullName ?? auth.user.email }}</span>
               <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white">
@@ -133,8 +169,7 @@
                  x-transition:leave-start="transform opacity-100 scale-100"
                  x-transition:leave-end="transform opacity-0 scale-95"
                  class="absolute right-0 mt-2 w-48 py-2 bg-white dark:bg-gray-800 rounded-md shadow-lg z-50"
-                 style="display: none;" {{-- Add style="display: none;" to prevent flash of unstyled content --}}
-                 >
+                 x-cloak>
               <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
               <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
               <form action="{{ route('auth.logout') }}" method="POST">
@@ -148,8 +183,8 @@
 
           {{-- Theme toggle --}}
           <button id="theme-toggle" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
-            <i class="ph ph-moon theme-icon-light"></i>
-            <i class="ph ph-sun theme-icon-dark"></i>
+            <i class="ph ph-moon theme-icon-light dark:hidden"></i>
+            <i class="ph ph-sun theme-icon-dark hidden dark:block"></i>
           </button>
         </div>
       </div>

@@ -11,24 +11,15 @@ function initializeThemeToggle() {
   function applyTheme(theme) {
     if (theme === 'dark') {
       htmlElement.classList.add('dark');
-      if (lightIcon) lightIcon.classList.add('hidden');
-      if (darkIcon) darkIcon.classList.remove('hidden');
     } else {
       htmlElement.classList.remove('dark');
-      if (lightIcon) lightIcon.classList.remove('hidden');
-      if (darkIcon) darkIcon.classList.add('hidden');
     }
+    // Icons are now handled by CSS classes, no need to manually toggle
   }
 
-  // Initialize theme based on localStorage or system preference
-  const storedTheme = localStorage.getItem('theme');
-  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-  if (storedTheme) {
-    applyTheme(storedTheme);
-  } else {
-    applyTheme(systemPrefersDark ? 'dark' : 'light');
-  }
+  // Theme is already initialized in the head, just sync the icons
+  const currentTheme = htmlElement.classList.contains('dark') ? 'dark' : 'light';
+  applyTheme(currentTheme);
 
   if (themeToggle) {
     themeToggle.addEventListener('click', () => {

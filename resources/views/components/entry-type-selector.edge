@@ -1,5 +1,5 @@
 {{-- Type selector component for entry creation/editing --}}
-<div x-data="{ selected: '{{ entryType || 'daily' }}' }" class="mb-6">
+<div x-data="{ selected: '{{ entryType || 'daily' }}' }" class="mb-6" x-cloak>
   <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Entry Type</label>
 
   <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
