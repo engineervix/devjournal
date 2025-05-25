@@ -1,0 +1,92 @@
+@component('layouts/main')
+  @slot('main')
+    <div class="mb-6 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">Tag Cloud</h1>
+      <div class="text-sm text-gray-500 dark:text-gray-400">
+        {{ tags.length }} tag{{ tags.length === 1 ? '' : 's' }}
+      </div>
+    </div>
+
+    @if(tags.length > 0)
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <div class="flex flex-wrap gap-3 justify-center">
+          @each(tag in tags)
+            @let(sizeClasses = {
+              1: 'text-sm',
+              2: 'text-base',
+              3: 'text-lg',
+              4: 'text-xl',
+              5: 'text-2xl'
+            })
+            <a
+              href="{{ route('entries.byTag', { slug: tag.slug }) }}"
+              class="inline-flex items-center px-3 py-1 rounded-full font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors {{ sizeClasses[tag.size] || 'text-base' }}"
+              title="{{ tag.usageCount }} entries"
+            >
+              {{ tag.name }}
+              <span class="ml-2 text-xs opacity-75">{{ tag.usageCount }}</span>
+            </a>
+          @end
+        </div>
+      </div>
+
+      {{-- Tag Statistics --}}
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
+          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Most Used Tag</h3>
+          @if(tags.length > 0)
+            <p class="text-lg font-semibold">{{ tags[0].name }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ tags[0].usageCount }} entries</p>
+          @else
+            <p class="text-lg font-semibold text-gray-400 dark:text-gray-500">—</p>
+          @end
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
+          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Tags</h3>
+          <p class="text-lg font-semibold">{{ tags.length }}</p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
+          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Average Usage</h3>
+          @if(tags.length > 0)
+            @let(totalUsage = tags.reduce((sum, tag) => sum + tag.usageCount, 0))
+            <p class="text-lg font-semibold">{{ Math.round(totalUsage / tags.length * 10) / 10 }}</p>
+          @else
+            <p class="text-lg font-semibold text-gray-400 dark:text-gray-500">—</p>
+          @end
+        </div>
+      </div>
+
+      {{-- Tag List --}}
+      <div class="mt-6">
+        <h2 class="text-lg font-semibold mb-4">All Tags</h2>
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+          <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            @each(tag in tags)
+              <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div>
+                  <a href="{{ route('entries.byTag', { slug: tag.slug }) }}" class="font-medium text-gray-900 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400">
+                    {{ tag.name }}
+                  </a>
+                </div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                  {{ tag.usageCount }} {{ tag.usageCount === 1 ? 'entry' : 'entries' }}
+                </div>
+              </div>
+            @end
+          </div>
+        </div>
+      </div>
+    @else
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-8 text-center">
+        <i class="ph ph-tag text-4xl text-gray-400 dark:text-gray-500 mb-3"></i>
+        <h3 class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-1">No tags yet</h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-4">Start adding tags to your entries to see them here.</p>
+        <a href="{{ route('entries.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          Create first entry
+        </a>
+      </div>
+    @end
+  @end
+@end
