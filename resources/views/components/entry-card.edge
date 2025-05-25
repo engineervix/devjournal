@@ -44,13 +44,27 @@
 
     {{-- Title --}}
     @if(entry.title)
-      <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{{ entry.title }}</h3>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+        <a href="{{ route('entries.show', { id: entry.id }) }}" class="hover:text-indigo-600 dark:hover:text-indigo-400">
+          {{ entry.title }}
+        </a>
+      </h3>
     @end
 
     {{-- Content --}}
     <div class="prose dark:prose-invert max-w-none">
       @if(entry.contentHtml)
-        {{{ entry.contentHtml }}}
+        @if(searchQuery)
+          {{-- Show truncated content for search results --}}
+          <div class="text-gray-600 dark:text-gray-300 line-clamp-3">
+            {{ entry.contentPlain ? entry.contentPlain.substring(0, 200) + (entry.contentPlain.length > 200 ? '...' : '') : 'No content preview available' }}
+          </div>
+          <a href="{{ route('entries.show', { id: entry.id }) }}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline mt-2 inline-block">
+            Read full entry →
+          </a>
+        @else
+          {{{ entry.contentHtml }}}
+        @end
       @else
         <p class="text-gray-500 dark:text-gray-400">No content</p>
       @end

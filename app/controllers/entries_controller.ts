@@ -373,4 +373,121 @@ export default class EntriesController {
       queryParams: queryParams.toString(),
     })
   }
+
+  /**
+   * Export entries as markdown files
+   */
+  async export({ request, response, auth }: HttpContext) {
+    const user = await auth.getUserOrFail()
+    const { type, period, tag, format = 'zip' } = request.qs()
+
+    const query = Entry.query().where('user_id', user.id)
+
+    // Apply filters
+    if (type) {
+      query.where('entryType', type)
+    }
+
+    if (period) {
+      const now = new Date()
+      let startDate: Date | undefined
+      if (period === 'today') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      } else if (period === 'week') {
+        const firstDayOfWeek = now.getDate() - now.getDay()
+        startDate = new Date(now.getFullYear(), now.getMonth(), firstDayOfWeek)
+      } else if (period === 'month') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+      }
+      if (startDate) {
+        startDate.setHours(0, 0, 0, 0)
+        query.where('createdAt', '>=', startDate.toISOString())
+      }
+    }
+
+    if (tag) {
+      const tagRecord = await Tag.findBy('slug', tag)
+      if (tagRecord) {
+        query.whereHas('tags', (tagQuery) => {
+          tagQuery.where('tags.id', tagRecord.id)
+        })
+      }
+    }
+
+    query.orderBy('createdAt', 'desc').preload('tags')
+    const entries = await query
+
+    if (format === 'single') {
+      // Export as single markdown file
+      let content = '# DevJournal Export\n\n'
+      content += `Generated on: ${new Date().toISOString()}\n\n`
+
+      for (const entry of entries) {
+        content += '---\n\n'
+        content += `## ${entry.title || 'Untitled Entry'}\n\n`
+        content += `**Type:** ${entry.entryType}\n`
+        content += `**Date:** ${entry.createdAt.toFormat('yyyy-MM-dd HH:mm')}\n`
+        if (entry.tags && entry.tags.length > 0) {
+          content += `**Tags:** ${entry.tags.map((t) => t.name).join(', ')}\n`
+        }
+        content += '\n'
+        content += entry.contentMarkdown || 'No content'
+        content += '\n\n'
+      }
+
+      response.header('Content-Type', 'text/markdown')
+      response.header('Content-Disposition', 'attachment; filename="devjournal-export.md"')
+      return response.send(content)
+    } else {
+      // Export as ZIP file with individual markdown files
+      const archiver = await import('archiver')
+      const archive = archiver.default('zip', { zlib: { level: 9 } })
+
+      response.header('Content-Type', 'application/zip')
+      response.header('Content-Disposition', 'attachment; filename="devjournal-export.zip"')
+
+      archive.pipe(response.response)
+
+      for (const entry of entries) {
+        const frontMatter = [
+          '---',
+          `id: ${entry.id}`,
+          `type: ${entry.entryType}`,
+          `title: ${entry.title || 'Untitled Entry'}`,
+          `date: ${entry.createdAt.toISODate()}`,
+          `datetime: ${entry.createdAt.toISO()}`,
+          entry.tags && entry.tags.length > 0
+            ? `tags: [${entry.tags.map((t) => t.name).join(', ')}]`
+            : '',
+          '---',
+          '',
+        ]
+          .filter(Boolean)
+          .join('\n')
+
+        const content = frontMatter + (entry.contentMarkdown || 'No content')
+        const filename = `${entry.createdAt.toFormat('yyyy-MM-dd')}-${entry.entryType}-${entry.id.slice(0, 8)}.md`
+
+        archive.append(content, { name: filename })
+      }
+
+      await archive.finalize()
+    }
+  }
+
+  /**
+   * Show tag cloud view
+   */
+  async tags({ view }: HttpContext) {
+    const tags = await Tag.query().orderBy('usage_count', 'desc')
+
+    // Calculate tag sizes for cloud effect
+    const maxUsage = tags.length > 0 ? tags[0].usageCount : 1
+    const tagsWithSizes = tags.map((tag) => ({
+      ...tag.serialize(),
+      size: Math.max(1, Math.min(5, Math.ceil((tag.usageCount / maxUsage) * 5))),
+    }))
+
+    return view.render('pages/tags/index', { tags: tagsWithSizes })
+  }
 }

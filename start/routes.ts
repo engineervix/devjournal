@@ -63,20 +63,25 @@ router
 
     // Streak calculation (consecutive days with at least one entry)
     let streak = 0
-    let day = today
-    while (true) {
-      const countResult = await Entry.query()
-        .where('user_id', user.id)
-        .where('created_at', '>=', day.toISO())
-        .where('created_at', '<', day.plus({ days: 1 }).toISO())
-        .count('* as total')
-      const count = Number(countResult[0]?.$extras?.total || 0)
-      if (count > 0) {
-        streak++
-        day = day.minus({ days: 1 })
-      } else {
-        break
+    const recentEntries = await Entry.query()
+      .where('user_id', user.id)
+      .where('created_at', '>=', today.minus({ days: 365 }).toISO()) // Only check last year
+      .orderBy('created_at', 'desc')
+
+    // Group entries by date
+    const entriesByDate = new Map<string, boolean>()
+    for (const entry of recentEntries) {
+      const dateKey = entry.createdAt.toISODate()
+      if (dateKey) {
+        entriesByDate.set(dateKey, true)
       }
+    }
+
+    // Calculate streak from today backwards
+    let streakDate = today
+    while (entriesByDate.has(streakDate.toISODate()!)) {
+      streak++
+      streakDate = streakDate.minus({ days: 1 })
     }
 
     // Most used tag
@@ -125,6 +130,12 @@ router
   .group(() => {
     // Search entries
     router.get('/entries/search', [EntriesController, 'search']).as('entries.search')
+
+    // Export entries
+    router.get('/entries/export', [EntriesController, 'export']).as('entries.export')
+
+    // Tags cloud view
+    router.get('/tags', [EntriesController, 'tags']).as('tags.index')
 
     router.resource('entries', EntriesController)
 
