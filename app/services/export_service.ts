@@ -35,23 +35,26 @@ export default class ExportService {
    */
   generateIndividualMarkdownFiles(entries: Entry[]): Array<{ filename: string; content: string }> {
     return entries.map((entry) => {
-      const frontMatter = [
+      const frontMatterLines = [
         '---',
         `id: ${entry.id}`,
         `type: ${entry.entryType}`,
         `title: ${entry.title || 'Untitled Entry'}`,
         `date: ${entry.createdAt.toISODate()}`,
         `datetime: ${entry.createdAt.toISO()}`,
-        entry.tags && entry.tags.length > 0
-          ? `tags: [${entry.tags.map((t) => t.name).join(', ')}]`
-          : '',
-        '---',
-        '',
       ]
-        .filter(Boolean)
-        .join('\n')
 
-      const content = frontMatter + (entry.contentMarkdown || 'No content')
+      // Add tags line if tags exist
+      if (entry.tags && entry.tags.length > 0) {
+        frontMatterLines.push(`tags: [${entry.tags.map((t) => t.name).join(', ')}]`)
+      }
+
+      // Close front matter and add empty line
+      frontMatterLines.push('---', '')
+
+      const frontMatter = frontMatterLines.join('\n')
+
+      const content = frontMatter + '\n' + (entry.contentMarkdown || 'No content')
       const filename = `${entry.createdAt.toFormat('yyyy-MM-dd')}-${entry.entryType}-${entry.id.slice(0, 8)}.md`
 
       return { filename, content }

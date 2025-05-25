@@ -103,6 +103,39 @@ test.group('ExportService', () => {
     assert.include(result[0].content, 'No content')
   })
 
+  test('should have proper spacing between front matter and content', ({ assert }) => {
+    const service = new ExportService()
+    const entries = [
+      {
+        id: 'entry-1',
+        title: 'Test Entry',
+        entryType: 'daily',
+        contentMarkdown: '# Test Content',
+        createdAt: DateTime.fromISO('2024-01-01T10:00:00Z'),
+        tags: [{ name: 'test' }],
+      },
+    ] as any[]
+
+    const result = service.generateIndividualMarkdownFiles(entries)
+
+    assert.lengthOf(result, 1)
+
+    // Check that there's proper spacing between front matter and content
+    const content = result[0].content
+    assert.include(content, '---\n\n# Test Content')
+
+    // Ensure the front matter ends with --- followed by empty line, then content
+    const lines = content.split('\n')
+    const frontMatterEndIndex = lines.lastIndexOf('---')
+    assert.isTrue(frontMatterEndIndex > 0, 'Should find closing --- for front matter')
+    assert.equal(lines[frontMatterEndIndex + 1], '', 'Should have empty line after front matter')
+    assert.equal(
+      lines[frontMatterEndIndex + 2],
+      '# Test Content',
+      'Content should start after empty line'
+    )
+  })
+
   test('should create zip archive', async ({ assert }) => {
     const service = new ExportService()
     const entries = [
