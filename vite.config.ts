@@ -38,6 +38,6 @@ export default defineConfig({
   },
   // Optimize dependencies
   optimizeDeps: {
-    include: ['alpinejs', '@phosphor-icons/web/regular'],
+    include: ['alpinejs'],
   },
 })
