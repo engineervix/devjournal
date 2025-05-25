@@ -193,16 +193,28 @@ export default class EntriesController {
     const filters = { type, period, tag }
     const entries = await this.entryService.getEntriesForExport(user.id, filters)
 
+    // Generate timestamp for filename
+    const { DateTime } = await import('luxon')
+    const timestamp = DateTime.now().toFormat('yyyy-MM-dd_HHmmss')
+
     if (format === 'single') {
       const content = this.exportService.generateSingleMarkdownFile(entries)
+      const filename = `devjournal-export-${timestamp}.md`
       response.header('Content-Type', 'text/markdown')
-      response.header('Content-Disposition', 'attachment; filename="devjournal-export.md"')
+      response.header('Content-Disposition', `attachment; filename="${filename}"`)
       return response.send(content)
     } else {
       const archive = await this.exportService.createZipArchive(entries)
+      const filename = `devjournal-export-${timestamp}.zip`
       response.header('Content-Type', 'application/zip')
-      response.header('Content-Disposition', 'attachment; filename="devjournal-export.zip"')
-      archive.pipe(response.response)
+      response.header('Content-Disposition', `attachment; filename="${filename}"`)
+
+      // Use response.stream and let AdonisJS handle the streaming
+      response.stream(archive, () => {
+        return ['Unable to export entries. Please try again.', 500]
+      })
+
+      // Finalize the archive after setting up the stream
       await archive.finalize()
     }
   }

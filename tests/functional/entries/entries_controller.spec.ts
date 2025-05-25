@@ -269,9 +269,73 @@ test.group('Entries Controller', (group) => {
     const response = await client.get('/entries/export').loginAs(user)
 
     response.assertStatus(200)
-    // The export endpoint should work - we'll just verify it returns successfully
-    // The actual content verification would require more complex zip parsing
-    assert.isTrue(response.status() === 200, 'Export endpoint should be accessible')
+
+    // Check that the Content-Disposition header includes a properly formatted filename
+    const contentDisposition = response.headers()['content-disposition']
+    assert.isDefined(contentDisposition, 'Content-Disposition header should be present')
+
+    // Check that filename follows the pattern: devjournal-export-YYYY-MM-DD_HHMMSS.zip
+    const filenameMatch = contentDisposition.match(
+      /filename="devjournal-export-(\d{4}-\d{2}-\d{2}_\d{6})\.zip"/
+    )
+    assert.isNotNull(
+      filenameMatch,
+      'Filename should follow the pattern devjournal-export-YYYY-MM-DD_HHMMSS.zip'
+    )
+
+    // Verify the timestamp format is valid
+    if (filenameMatch) {
+      const timestamp = filenameMatch[1]
+      const timestampRegex = /^\d{4}-\d{2}-\d{2}_\d{6}$/
+      assert.isTrue(
+        timestampRegex.test(timestamp),
+        'Timestamp should be in format YYYY-MM-DD_HHMMSS'
+      )
+    }
+  })
+
+  test('should export entries as single markdown file with timestamp', async ({
+    client,
+    assert,
+  }) => {
+    const user = await User.create({
+      email: 'test@example.com',
+      password: 'password123',
+    })
+
+    await Entry.create({
+      userId: user.id,
+      entryType: 'daily',
+      title: 'Export Entry',
+      contentMarkdown: 'Export content',
+    })
+
+    const response = await client.get('/entries/export?format=single').loginAs(user)
+
+    response.assertStatus(200)
+
+    // Check that the Content-Disposition header includes a properly formatted filename
+    const contentDisposition = response.headers()['content-disposition']
+    assert.isDefined(contentDisposition, 'Content-Disposition header should be present')
+
+    // Check that filename follows the pattern: devjournal-export-YYYY-MM-DD_HHMMSS.md
+    const filenameMatch = contentDisposition.match(
+      /filename="devjournal-export-(\d{4}-\d{2}-\d{2}_\d{6})\.md"/
+    )
+    assert.isNotNull(
+      filenameMatch,
+      'Filename should follow the pattern devjournal-export-YYYY-MM-DD_HHMMSS.md'
+    )
+
+    // Verify the timestamp format is valid
+    if (filenameMatch) {
+      const timestamp = filenameMatch[1]
+      const timestampRegex = /^\d{4}-\d{2}-\d{2}_\d{6}$/
+      assert.isTrue(
+        timestampRegex.test(timestamp),
+        'Timestamp should be in format YYYY-MM-DD_HHMMSS'
+      )
+    }
   })
 
   test('should require authentication for all routes', async ({ client, assert }) => {
