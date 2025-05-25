@@ -13,6 +13,9 @@
     "lint": "eslint .",
     "release": "commit-and-tag-version",
     "test": "node ace test",
+    "test:coverage": "c8 node ace test",
+    "test:coverage:html": "c8 --reporter=html node ace test",
+    "test:coverage:lcov": "c8 --reporter=lcov node ace test",
     "typecheck": "tsc --noEmit"
   },
   "imports": {
@@ -77,6 +80,7 @@
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^22.15.18",
     "autoprefixer": "^10.4.21",
+    "c8": "^10.1.3",
     "commit-and-tag-version": "^12.5.1",
     "commitizen": "^4.3.1",
     "conventional-changelog-atom": "^5.0.0",
@@ -108,6 +112,44 @@
     }
   },
   "prettier": "@adonisjs/prettier-config",
+  "c8": {
+    "reporter": ["text", "text-summary", "html"],
+    "reports-dir": "coverage",
+    "exclude": [
+      "build/**",
+      "coverage/**",
+      "tests/**",
+      "bin/**",
+      "config/**",
+      "database/migrations/**",
+      "database/seeders/**",
+      "database/factories/**",
+      "providers/**",
+      "start/**",
+      "tmp/**",
+      "public/**",
+      "resources/**",
+      "ace.js",
+      "server.ts",
+      "vite.config.ts",
+      "tailwind.config.ts",
+      "**/*.d.ts",
+      "**/*.spec.ts",
+      "**/*.test.ts"
+    ],
+    "include": [
+      "app/**/*.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "all": true,
+    "check-coverage": true,
+    "lines": 80,
+    "functions": 80,
+    "branches": 80,
+    "statements": 80
+  },
   "commit-and-tag-version": {
     "header": "# Changelog\n\nAll notable changes to this project will be documented here.\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).\n",
     "types": [
