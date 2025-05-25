@@ -12,7 +12,14 @@ import testUtils from '@adonisjs/core/services/test_utils'
  * Configure Japa plugins in the plugins array.
  * Learn more - https://japa.dev/docs/runner-config#plugins-optional
  */
-export const plugins: Config['plugins'] = [assert(), pluginAdonisJS(app)]
+export const plugins: Config['plugins'] = [assert()]
+
+/**
+ * Configure reporters to print test reports
+ */
+export const reporters: Config['reporters'] = {
+  activated: ['spec'],
+}
 
 /**
  * Configure lifecycle function to run before and after all the
