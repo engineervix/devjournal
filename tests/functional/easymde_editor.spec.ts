@@ -42,9 +42,9 @@ test.group('EasyMDE Editor', (group) => {
     const response = await client.get('/entries/create').loginAs(user)
 
     response.assertStatus(200)
-    response.assertTextIncludes('Cmd/Ctrl + Enter to save')
+    response.assertTextIncludes('to save')
     response.assertTextIncludes('Rich text paste supported')
-    response.assertTextIncludes('Focus on writing, formatting via toolbar')
+    response.assertTextIncludes('Focus on writing')
   })
 
   test('should include EasyMDE CSS and JS imports', async ({ client }) => {

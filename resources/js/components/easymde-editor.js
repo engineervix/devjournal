@@ -184,12 +184,22 @@ export function easyMDEEditorComponent() {
           }));
         });
 
-        // Handle Cmd/Ctrl + Enter to submit form
+        // Handle Cmd/Ctrl + S to save form
         this.editor.codemirror.on('keydown', (cm, e) => {
-          if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+          if ((e.ctrlKey || e.metaKey) && e.key === 's') {
             e.preventDefault();
             const form = this.$el.closest('form');
             if (form) {
+              // Trigger form submission via the AJAX form component if available
+              const ajaxFormElement = form.closest('[x-data*="ajaxForm"]');
+              if (ajaxFormElement && ajaxFormElement._x_dataStack) {
+                const ajaxFormData = ajaxFormElement._x_dataStack[0];
+                if (ajaxFormData && ajaxFormData.submitForm) {
+                  ajaxFormData.submitForm(e);
+                  return;
+                }
+              }
+              // Fallback to regular form submission
               form.submit();
             }
           }

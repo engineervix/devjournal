@@ -28,12 +28,54 @@ export function initializeKeyboardShortcuts() {
 
 export function initializeFormShortcuts() {
   document.addEventListener('keydown', function(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      // Find the closest form element to the currently focused element or the body
+    // Handle Ctrl/Cmd + S for form submission (universal save shortcut)
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
       const targetElement = e.target;
       const form = targetElement.closest('form');
 
       if (form) {
+        // Check if this form contains an EasyMDE editor
+        // If it does, let the EasyMDE component handle the shortcut
+        const hasEasyMDE = form.querySelector('[x-data*="easyMDEEditor"]');
+        if (hasEasyMDE) {
+          return; // Let EasyMDE handle it
+        }
+
+        e.preventDefault();
+
+        // Trigger form submission via the AJAX form component if available
+        const ajaxFormElement = form.closest('[x-data*="ajaxForm"]');
+        if (ajaxFormElement && ajaxFormElement._x_dataStack) {
+          const ajaxFormData = ajaxFormElement._x_dataStack[0];
+          if (ajaxFormData && ajaxFormData.submitForm) {
+            ajaxFormData.submitForm(e);
+            return;
+          }
+        }
+
+        // To ensure submit buttons with formaction/formmethod are respected,
+        // we should try to click a primary submit button if one exists.
+        const submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
+        if (submitButton) {
+          submitButton.click(); // Click the button to trigger its specific actions
+        } else {
+          form.submit(); // Fallback to direct form submission
+        }
+      }
+    }
+
+    // Keep the old Ctrl/Cmd + Enter for backward compatibility in non-EasyMDE forms
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      const targetElement = e.target;
+      const form = targetElement.closest('form');
+
+      if (form) {
+        // Only handle this if the form doesn't have EasyMDE
+        const hasEasyMDE = form.querySelector('[x-data*="easyMDEEditor"]');
+        if (hasEasyMDE) {
+          return; // Let EasyMDE handle it or ignore
+        }
+
         // Check if the target is a textarea to prevent submission when adding a newline
         if (targetElement.tagName === 'TEXTAREA' && !e.shiftKey) {
           // Allow Shift+Enter for newline in textarea, but Ctrl/Cmd+Enter submits

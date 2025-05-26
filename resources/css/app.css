@@ -169,6 +169,18 @@
       opacity: 0.7;
     }
   }
+
+  /* Keyboard shortcut styling */
+  .kbd {
+    @apply inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-mono font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded shadow-sm dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600;
+    min-width: 1.5rem;
+    line-height: 1;
+  }
+
+  .kbd-mac {
+    @apply px-1 py-0.5;
+    font-size: 0.75rem;
+  }
 }
 
 /* Custom animations */

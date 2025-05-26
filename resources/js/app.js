@@ -6,6 +6,9 @@
 import Alpine from 'alpinejs';
 import "@phosphor-icons/web/regular";
 
+// Import platform detection utility
+import './utils/platform.js';
+
 // Import modules
 import { initializeThemeToggle } from './modules/theme.js';
 import { initializeKeyboardShortcuts, initializeFormShortcuts } from './modules/shortcuts.js';
