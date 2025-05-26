@@ -19,12 +19,16 @@
 </div>
 
 {{-- Content Field --}}
-@!component('components/easymde-editor', {
-  initialContent: flashMessages.get('contentMarkdown', entry?.contentMarkdown || '')
-})
+<div x-ref="easyMDEEditor">
+  @!component('components/easymde-editor', {
+    initialContent: flashMessages.get('contentMarkdown', entry?.contentMarkdown || '')
+  })
+</div>
 
 {{-- Tags Input --}}
-@!component('components/tag-input', {
-  existingTags: allTags,
-  selectedTags: flashMessages.get('tags', entry?.tags ? entry.tags.map(tag => tag.name) : [])
-})
+<div x-ref="tagInput">
+  @!component('components/tag-input', {
+    existingTags: allTags,
+    selectedTags: flashMessages.get('tags', entry?.tags ? entry.tags.map(tag => tag.name) : [])
+  })
+</div>

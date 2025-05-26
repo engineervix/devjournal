@@ -137,6 +137,10 @@ router
     // Tags cloud view
     router.get('/tags', [EntriesController, 'tags']).as('tags.index')
 
+    // AJAX endpoints for entries
+    router.post('/entries/ajax', [EntriesController, 'storeAjax']).as('entries.store.ajax')
+    router.put('/entries/:id/ajax', [EntriesController, 'updateAjax']).as('entries.update.ajax')
+
     // Restrict entry ID parameter to valid UUIDs only
     // This prevents static files (like installHook.js.map from browser extensions)
     // from being incorrectly routed to the entries controller

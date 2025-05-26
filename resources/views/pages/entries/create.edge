@@ -12,8 +12,8 @@
     {{-- Display Form Validation Errors --}}
     @!component('components/form_validation_errors', { flashMessages: flashMessages })
 
-    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg">
-      <form action="{{ route('entries.store') }}" method="POST">
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg" x-data="ajaxForm">
+      <form x-ref="form" action="{{ route('entries.store') }}" method="POST" @submit="submitForm">
         {{ csrfField() }}
 
         <div class="px-6 py-5">
@@ -25,13 +25,22 @@
           })
         </div>
 
-        <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right">
-          <button
-            type="submit"
-            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Save Entry
-          </button>
+        <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700 flex justify-between items-center">
+          <div class="text-sm text-gray-500 dark:text-gray-400">
+            <span x-show="lastSaved" x-text="getLastSavedText()"></span>
+            <span x-show="hasUnsavedChanges && !isSubmitting" class="text-orange-500">• Unsaved changes</span>
+            <span x-show="isSubmitting" class="text-blue-500">• Saving...</span>
+          </div>
+          <div class="flex space-x-3">
+            <button
+              type="submit"
+              :disabled="isSubmitting"
+              class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span x-show="!isSubmitting">Save Entry</span>
+              <span x-show="isSubmitting">Saving...</span>
+            </button>
+          </div>
         </div>
       </form>
     </div>

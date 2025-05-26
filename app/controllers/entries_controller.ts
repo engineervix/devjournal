@@ -10,11 +10,12 @@ import TagService from '#services/tag_service'
 const entryValidator = vine.compile(
   vine.object({
     entryType: vine.string().trim().in(['daily', 'til', 'snippet', 'debug', 'achievement']),
-    title: vine.string().trim().minLength(1).maxLength(255).optional(),
-    contentMarkdown: vine.string().trim().maxLength(50000).optional(),
+    title: vine.string().trim().maxLength(255).nullable().optional(),
+    contentMarkdown: vine.string().trim().maxLength(50000).nullable().optional(),
     tags: vine
       .array(vine.string().trim().toLowerCase().minLength(1).maxLength(50))
       .maxLength(10)
+      .nullable()
       .optional(),
   })
 )
@@ -57,7 +58,7 @@ export default class EntriesController {
    * Handle form submission for the create action
    */
   async store({ request, response, auth, session }: HttpContext) {
-    const user = auth.getUserOrFail()
+    const user = await auth.getUserOrFail()
     const payload = await request.validateUsing(entryValidator)
 
     const entry = await this.entryService.createEntry(user.id, {
@@ -225,5 +226,137 @@ export default class EntriesController {
   async tags({ view }: HttpContext) {
     const tagsWithSizes = await this.tagService.getTagsWithSizes()
     return view.render('pages/tags/index', { tags: tagsWithSizes })
+  }
+
+  /**
+   * Handle AJAX form submission for creating entries
+   */
+  async storeAjax({ request, response, auth }: HttpContext) {
+    try {
+      const user = await auth.getUserOrFail()
+      const payload = await request.validateUsing(entryValidator)
+
+      const entry = await this.entryService.createEntry(user.id, {
+        entryType: payload.entryType,
+        title: payload.title && payload.title.trim() ? payload.title.trim() : undefined,
+        contentMarkdown:
+          payload.contentMarkdown && payload.contentMarkdown.trim()
+            ? payload.contentMarkdown.trim()
+            : undefined,
+        tags: payload.tags || undefined,
+      })
+
+      // Process content using ContentProcessorService
+      this.contentProcessor.updateEntryContent(entry, payload.contentMarkdown || null)
+      await entry.save()
+
+      // Load the entry with tags for the response
+      await entry.load('tags')
+
+      return response.json({
+        success: true,
+        message: 'Entry created successfully.',
+        entry: {
+          id: entry.id,
+          title: entry.title,
+          entryType: entry.entryType,
+          contentMarkdown: entry.contentMarkdown || '',
+          tags: entry.tags.map((tag) => tag.name),
+          createdAt: entry.createdAt,
+          updatedAt: entry.updatedAt,
+        },
+      })
+    } catch (error) {
+      // Handle validation errors
+      if (error.messages) {
+        return response.status(422).json({
+          success: false,
+          message: 'Validation failed',
+          errors: error.messages,
+        })
+      }
+
+      // Handle other errors
+      return response.status(500).json({
+        success: false,
+        message: 'An error occurred while creating the entry.',
+        errors: [{ message: error.message }],
+      })
+    }
+  }
+
+  /**
+   * Handle AJAX form submission for updating entries
+   */
+  async updateAjax({ params, request, response, auth }: HttpContext) {
+    try {
+      const user = await auth.getUserOrFail()
+
+      // First check if entry exists
+      const entry = await Entry.query().where('id', params.id).preload('tags').first()
+
+      if (!entry) {
+        return response.status(404).json({
+          success: false,
+          message: 'Entry not found.',
+        })
+      }
+
+      if (entry.userId !== user.id) {
+        return response.status(403).json({
+          success: false,
+          message: 'You are not authorized to update this entry.',
+        })
+      }
+
+      const payload = await request.validateUsing(entryValidator)
+
+      const updatedEntry = await this.entryService.updateEntry(params.id, {
+        entryType: payload.entryType,
+        title: payload.title && payload.title.trim() ? payload.title.trim() : undefined,
+        contentMarkdown:
+          payload.contentMarkdown && payload.contentMarkdown.trim()
+            ? payload.contentMarkdown.trim()
+            : undefined,
+        tags: payload.tags || undefined,
+      })
+
+      // Process content using ContentProcessorService
+      this.contentProcessor.updateEntryContent(updatedEntry, payload.contentMarkdown || null)
+      await updatedEntry.save()
+
+      // Load the entry with tags for the response
+      await updatedEntry.load('tags')
+
+      return response.json({
+        success: true,
+        message: 'Entry updated successfully.',
+        entry: {
+          id: updatedEntry.id,
+          title: updatedEntry.title,
+          entryType: updatedEntry.entryType,
+          contentMarkdown: updatedEntry.contentMarkdown || '',
+          tags: updatedEntry.tags.map((tag) => tag.name),
+          createdAt: updatedEntry.createdAt,
+          updatedAt: updatedEntry.updatedAt,
+        },
+      })
+    } catch (error) {
+      // Handle validation errors
+      if (error.messages) {
+        return response.status(422).json({
+          success: false,
+          message: 'Validation failed',
+          errors: error.messages,
+        })
+      }
+
+      // Handle other errors
+      return response.status(500).json({
+        success: false,
+        message: 'An error occurred while updating the entry.',
+        errors: [{ message: error.message }],
+      })
+    }
   }
 }

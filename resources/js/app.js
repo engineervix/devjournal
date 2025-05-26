@@ -17,6 +17,7 @@ import { userMenuComponent } from './components/user-menu.js';
 import { mobileMenuComponent } from './components/mobile-menu.js';
 import { easyMDEEditorComponent } from './components/easymde-editor.js';
 import { tagInputComponent } from './components/tag-input.js';
+import { ajaxFormComponent } from './components/ajax-form.js';
 
 // Import global utilities
 import './utils/globals.js';
@@ -27,6 +28,7 @@ document.addEventListener('alpine:init', () => {
   Alpine.data('mobileMenu', mobileMenuComponent);
   Alpine.data('easyMDEEditor', easyMDEEditorComponent);
   Alpine.data('tagInput', tagInputComponent);
+  Alpine.data('ajaxForm', ajaxFormComponent);
 });
 
 // Initialize Alpine.js
