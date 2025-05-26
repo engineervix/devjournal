@@ -16,9 +16,6 @@ export function easyMDEEditorComponent() {
       this.content = initialContent;
       this.initializeTurndown();
 
-      // Register this editor instance globally so templates can access it
-      window.easyMDEEditorInstance = this;
-
       // Small delay to ensure DOM is ready
       this.$nextTick(() => {
         this.initializeEditor();
@@ -119,6 +116,10 @@ export function easyMDEEditorComponent() {
       if (this.content && this.content !== textarea.value) {
         this.editor.value(this.content);
       }
+
+      // Register this editor instance globally so templates can access it
+      // Only set this after the editor is fully initialized and ready
+      window.easyMDEEditorInstance = this;
     },
 
     insertTemplate(template) {
@@ -138,9 +139,6 @@ export function easyMDEEditorComponent() {
 
         // Recreate the editor with the new content
         this.initializeEditor();
-
-        // Re-register the global reference immediately after recreation
-        window.easyMDEEditorInstance = this;
 
         // Focus the new editor
         setTimeout(() => {

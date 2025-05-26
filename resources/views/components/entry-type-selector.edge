@@ -90,6 +90,8 @@
   </div>
 
   {{-- Entry Templates for different entry types --}}
+  {{-- Note: Using insertTemplateWithRetry() to work around EasyMDE timing issue --}}
+  {{-- where template insertion sometimes requires two clicks to work properly --}}
   <div class="mt-4" x-show="selected === 'daily'">
     <div class="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-100 dark:border-blue-800">
       <h4 class="font-medium mb-2 text-blue-800 dark:text-blue-200">Daily Log Template</h4>
@@ -105,7 +107,7 @@
 ## Blockers/Issues
 -
 </pre>
-      <button type="button" @click="window.insertTemplate($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-blue-700 dark:text-blue-300 hover:underline">
+      <button type="button" @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-blue-700 dark:text-blue-300 hover:underline">
         Use Template
       </button>
     </div>
@@ -127,7 +129,7 @@
 code here
 ```
 </pre>
-      <button type="button" @click="window.insertTemplate($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-green-700 dark:text-green-300 hover:underline">
+      <button type="button" @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-green-700 dark:text-green-300 hover:underline">
         Use Template
       </button>
     </div>
@@ -151,7 +153,7 @@ code here
 
 ## Explanation
 </pre>
-      <button type="button" @click="window.insertTemplate($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-purple-700 dark:text-purple-300 hover:underline">
+      <button type="button" @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-purple-700 dark:text-purple-300 hover:underline">
         Use Template
       </button>
     </div>
@@ -174,7 +176,7 @@ code here
 
 ## Lessons learned
 </pre>
-      <button type="button" @click="window.insertTemplate($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-orange-700 dark:text-orange-300 hover:underline">
+      <button type="button" @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-orange-700 dark:text-orange-300 hover:underline">
         Use Template
       </button>
     </div>
@@ -195,7 +197,7 @@ code here
 
 ## Link to PR/ticket (optional)
 </pre>
-      <button type="button" @click="window.insertTemplate($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-pink-700 dark:text-pink-300 hover:underline">
+      <button type="button" @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-pink-700 dark:text-pink-300 hover:underline">
         Use Template
       </button>
     </div>
