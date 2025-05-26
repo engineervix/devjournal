@@ -298,6 +298,13 @@ export function initializeUnsavedChangesProtection() {
   window.unsavedChanges = {
     hasUnsavedChanges: () => hasUnsavedChanges,
     setUnsavedChanges: setUnsavedChanges,
-    clearUnsavedChanges: () => setUnsavedChanges(false)
+    clearUnsavedChanges: () => {
+      setUnsavedChanges(false);
+      // Recapture the current form data as the new baseline
+      entryForms.forEach(form => {
+        captureOriginalFormData(form);
+      });
+    },
+    setSubmitting: (value) => { isSubmitting = value; }
   };
 }

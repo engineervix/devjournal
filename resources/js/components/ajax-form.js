@@ -50,6 +50,16 @@ export function ajaxFormComponent() {
 
       this.isSubmitting = true;
 
+      // Notify the unsaved changes module that we're submitting
+      if (window.unsavedChanges) {
+        if (window.unsavedChanges.setSubmitting) {
+          window.unsavedChanges.setSubmitting(true);
+        }
+        if (window.unsavedChanges.setUnsavedChanges) {
+          window.unsavedChanges.setUnsavedChanges(false);
+        }
+      }
+
       try {
         const formData = new FormData(this.$refs.form);
 
@@ -112,6 +122,11 @@ export function ajaxFormComponent() {
         this.showNotification('An error occurred while saving. Please try again.', 'error');
       } finally {
         this.isSubmitting = false;
+
+        // Reset submitting state in unsaved changes module
+        if (window.unsavedChanges && window.unsavedChanges.setSubmitting) {
+          window.unsavedChanges.setSubmitting(false);
+        }
       }
     },
 
@@ -139,6 +154,16 @@ export function ajaxFormComponent() {
 
       // Reset form changed flag
       window.formChanged = false;
+
+      // Notify the unsaved changes module that changes have been saved
+      if (window.unsavedChanges && window.unsavedChanges.clearUnsavedChanges) {
+        window.unsavedChanges.clearUnsavedChanges();
+      }
+
+      // Also dispatch the custom event for the unsaved changes module
+      document.dispatchEvent(new CustomEvent('unsavedChanges', {
+        detail: { hasUnsavedChanges: false }
+      }));
     },
 
     handleError(result) {
