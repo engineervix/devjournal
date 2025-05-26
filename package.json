@@ -59,7 +59,8 @@
     "pg": "^8.16.0",
     "pgvector": "^0.2.1",
     "reflect-metadata": "^0.2.2",
-    "turndown": "^7.2.0"
+    "turndown": "^7.2.0",
+    "ua-parser-js": "^2.0.3"
   },
   "devDependencies": {
     "@adonisjs/assembler": "^7.8.2",
