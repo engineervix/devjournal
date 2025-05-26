@@ -6,6 +6,7 @@
 import EasyMDE from 'easymde';
 import TurndownService from 'turndown';
 import hljs from 'highlight.js';
+import DOMPurify from 'dompurify';
 
 export function easyMDEEditorComponent() {
   return {
@@ -98,8 +99,17 @@ export function easyMDEEditorComponent() {
             hljs: hljs,
             singleLineBreaks: true, // GitHub flavored markdown
             sanitizerFunction: (renderedHTML) => {
-              // Basic sanitization - you might want to use DOMPurify in production
-              return renderedHTML;
+              // Use DOMPurify for secure HTML sanitization
+              return DOMPurify.sanitize(renderedHTML, {
+                // Use HTML profile which provides safe defaults for HTML elements and attributes
+                USE_PROFILES: { html: true },
+                // Allow data attributes for syntax highlighting (code blocks)
+                ALLOW_DATA_ATTR: true,
+                // Ensure links open safely in new tabs
+                ADD_ATTR: ['target'],
+                // Disallow aria attributes as they're not needed for markdown preview
+                ALLOW_ARIA_ATTR: false
+              });
             }
           },
 
