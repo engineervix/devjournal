@@ -6,38 +6,40 @@ const shieldConfig = defineConfig({
    * to learn more
    */
   csp: {
-    enabled: true,
-    directives: {
-      defaultSrc: ["'self'"],
+    enabled: false,
+    directives: {},
+    // enabled: true,
+    // directives: {
+    //   defaultSrc: ["'self'"],
 
-      // Scripts
-      scriptSrc: [
-        "'self'",
-        "'unsafe-inline'",
-        'https://cdnjs.cloudflare.com',
-        'https://challenges.cloudflare.com', // For Turnstile
-        'https://static.cloudflareinsights.com', // For Cloudflare analytics
-      ],
+    //   // Scripts
+    //   scriptSrc: [
+    //     "'self'",
+    //     "'unsafe-inline'",
+    //     'https://cdnjs.cloudflare.com',
+    //     'https://challenges.cloudflare.com', // For Turnstile
+    //     'https://static.cloudflareinsights.com', // For Cloudflare analytics
+    //   ],
 
-      // Styles
-      styleSrc: ["'self'", "'unsafe-inline'"], // Required for Tailwind/DaisyUI
+    //   // Styles
+    //   styleSrc: ["'self'", "'unsafe-inline'"], // Required for Tailwind/DaisyUI
 
-      // Images
-      imgSrc: ["'self'", 'data:', 'https:'],
+    //   // Images
+    //   imgSrc: ["'self'", 'data:', 'https:'],
 
-      // Connections
-      connectSrc: ["'self'", 'https://*.cloudflare.com'],
+    //   // Connections
+    //   connectSrc: ["'self'", 'https://*.cloudflare.com'],
 
-      // Fonts
-      fontSrc: ["'self'", 'https:'],
+    //   // Fonts
+    //   fontSrc: ["'self'", 'https:'],
 
-      // Frames - needed for Turnstile
-      frameSrc: ['https://challenges.cloudflare.com'],
+    //   // Frames - needed for Turnstile
+    //   frameSrc: ['https://challenges.cloudflare.com'],
 
-      // Disable unused resource types
-      objectSrc: ["'none'"],
-      mediaSrc: ["'none'"],
-    },
+    //   // Disable unused resource types
+    //   objectSrc: ["'none'"],
+    //   mediaSrc: ["'none'"],
+    // },
     reportOnly: false,
   },
 
