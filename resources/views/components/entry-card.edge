@@ -45,8 +45,17 @@
   iconBg: 'bg-gray-500 dark:bg-gray-600'
 })
 
-{{-- Enhanced Entry Card --}}
-<article class="group bg-gradient-to-br {{ config.gradient }} border {{ config.border }} rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
+{{-- Enhanced Entry Card with Full Click Support --}}
+<article
+  class="group relative entry-card-clickable bg-gradient-to-br {{ config.gradient }} border {{ config.border }} rounded-xl overflow-hidden shadow-sm hover:shadow-lg cursor-pointer"
+  x-data="clickableCard"
+  x-init="targetUrl = '{{ route('entries.show', { id: entry.id }) }}'"
+  @click="handleClick($event)"
+  @mousedown="handleMouseDown($event)"
+  tabindex="0"
+  role="button"
+  aria-label="View entry: {{ entry.title || 'Untitled Entry' }}"
+>
   {{-- Header --}}
   <div class="px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50">
     <div class="flex items-center justify-between">
@@ -68,13 +77,14 @@
       </div>
 
       {{-- Action buttons --}}
-      <div class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+      <div class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 relative z-10">
         <a href="{{ route('entries.edit', { id: entry.id }) }}"
            class="p-2 text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition-colors duration-200"
-           title="Edit entry">
+           title="Edit entry"
+           @click.stop>
           <i class="ph ph-pencil text-sm"></i>
         </a>
-        <form action="{{ route('entries.destroy', { id: entry.id }) }}" method="POST" class="inline">
+        <form action="{{ route('entries.destroy', { id: entry.id }) }}" method="POST" class="inline" @click.stop>
           {{ csrfField() }}
           <button type="submit"
                   class="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition-colors duration-200"
@@ -92,10 +102,7 @@
     {{-- Title --}}
     @if(entry.title)
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2">
-        <a href="{{ route('entries.show', { id: entry.id }) }}"
-           class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">
-          {{ entry.title }}
-        </a>
+        {{ entry.title }}
       </h3>
     @end
 
@@ -107,22 +114,20 @@
           <div class="text-gray-700 dark:text-gray-300 line-clamp-3 mb-3">
             {{ entry.contentPlain ? entry.contentPlain.substring(0, 200) + (entry.contentPlain.length > 200 ? '...' : '') : 'No content preview available' }}
           </div>
-          <a href="{{ route('entries.show', { id: entry.id }) }}"
-             class="inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium">
+          <span class="inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400 font-medium">
             Read full entry
             <i class="ph ph-arrow-right ml-1"></i>
-          </a>
+          </span>
         @else
           {{-- Full content with line clamp for long entries --}}
           <div class="line-clamp-4">
             {{{ entry.contentHtml }}}
           </div>
           @if(entry.contentPlain && entry.contentPlain.length > 300)
-            <a href="{{ route('entries.show', { id: entry.id }) }}"
-               class="inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium mt-2">
+            <span class="inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400 font-medium mt-2">
               Continue reading
               <i class="ph ph-arrow-right ml-1"></i>
-            </a>
+            </span>
           @end
         @end
       @else
@@ -139,7 +144,8 @@
                class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium
                       bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:scale-105
                       dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50
-                      transition-all duration-200">
+                      transition-all duration-200 relative z-10"
+               @click.stop>
               #{{ tag.name }}
             </a>
           @end
@@ -147,4 +153,7 @@
       </div>
     @end
   </div>
+
+  {{-- Visual indicator for clickability --}}
+  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
 </article>

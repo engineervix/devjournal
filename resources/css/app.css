@@ -181,6 +181,40 @@
     @apply px-1 py-0.5;
     font-size: 0.75rem;
   }
+
+  /* Clickable entry card styles */
+  .entry-card-clickable {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .entry-card-clickable:hover {
+    transform: translateY(-1px) scale(1.02);
+  }
+
+  .entry-card-clickable:active {
+    transform: translateY(0) scale(1.01);
+  }
+
+  .entry-card-clickable:focus {
+    @apply outline-none ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-900;
+  }
+
+  /* Prevent text selection on card click */
+  .entry-card-clickable {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Allow text selection within content areas */
+  .entry-card-clickable .prose,
+  .entry-card-clickable h3 {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
 }
 
 /* Custom animations */
