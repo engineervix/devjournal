@@ -156,9 +156,14 @@
     -webkit-backdrop-filter: blur(8px);
   }
 
-  /* Pulse animation for unsaved changes indicator */
-  .pulse-warning {
+  /* Only apply pulse animation when visible */
+  #unsaved-changes-indicator.visible {
     animation: pulseWarning 2s infinite;
+  }
+
+  /* Ensure complete hiding when not visible */
+  #unsaved-changes-indicator.hidden {
+    display: none !important;
   }
 
   @keyframes pulseWarning {

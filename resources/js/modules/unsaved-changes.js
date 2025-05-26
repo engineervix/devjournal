@@ -42,6 +42,16 @@ export function initializeUnsavedChangesProtection() {
     initializeFormProtection(form);
   });
 
+  // Add a small delay to ensure all components are initialized
+  setTimeout(() => {
+    // Recapture original form data after all components are ready
+    entryForms.forEach(form => {
+      captureOriginalFormData(form);
+    });
+    // Ensure we start with no unsaved changes
+    setUnsavedChanges(false);
+  }, 100);
+
     function initializeFormProtection(form) {
     // Store original form data
     captureOriginalFormData(form);
@@ -100,9 +110,12 @@ export function initializeUnsavedChangesProtection() {
 
     // Listen for EasyMDE editor events
     document.addEventListener('easymde:ready', () => {
-      // Update original content when editor is ready
+      // Update original content when editor is ready and recapture all form data
       if (window.easyMDEEditorInstance && window.easyMDEEditorInstance.isReady()) {
-        originalFormData.contentMarkdown = window.easyMDEEditorInstance.getValue();
+        // Recapture all original form data now that EasyMDE is ready
+        captureOriginalFormData(form);
+        // Reset unsaved changes state since we just captured the baseline
+        setUnsavedChanges(false);
       }
     });
 
@@ -250,7 +263,7 @@ export function initializeUnsavedChangesProtection() {
       // Create unsaved changes indicator
       indicator = document.createElement('div');
       indicator.id = 'unsaved-changes-indicator';
-      indicator.className = 'fixed top-4 right-4 bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 px-3 py-2 rounded-md shadow-lg border border-amber-200 dark:border-amber-700 transition-all duration-300 transform translate-x-full opacity-0 z-50 pulse-warning';
+      indicator.className = 'fixed top-4 right-4 bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 px-3 py-2 rounded-md shadow-lg border border-amber-200 dark:border-amber-700 transition-all duration-300 transform translate-x-full opacity-0 z-50 hidden';
       indicator.innerHTML = `
         <div class="flex items-center space-x-2">
           <i class="ph ph-warning-circle"></i>
@@ -270,8 +283,8 @@ export function initializeUnsavedChangesProtection() {
 
       if (hasChanges) {
         // Show floating indicator
-        currentIndicator.classList.remove('translate-x-full', 'opacity-0');
-        currentIndicator.classList.add('translate-x-0', 'opacity-100');
+        currentIndicator.classList.remove('translate-x-full', 'opacity-0', 'hidden');
+        currentIndicator.classList.add('translate-x-0', 'opacity-100', 'visible');
 
         // Update page title
         if (!document.title.startsWith('● ')) {
@@ -279,8 +292,8 @@ export function initializeUnsavedChangesProtection() {
         }
       } else {
         // Hide floating indicator
-        currentIndicator.classList.add('translate-x-full', 'opacity-0');
-        currentIndicator.classList.remove('translate-x-0', 'opacity-100');
+        currentIndicator.classList.add('translate-x-full', 'opacity-0', 'hidden');
+        currentIndicator.classList.remove('translate-x-0', 'opacity-100', 'visible');
 
         // Restore page title
         document.title = originalTitle;
