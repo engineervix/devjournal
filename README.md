@@ -1,6 +1,10 @@
 # DevJournal
 
-A modern developer journal application built with AdonisJS, designed to help developers track their learning journey, code snippets, debugging sessions, and achievements.
+A modern developer journal application built with [AdonisJS](https://adonisjs.com/), designed to help developers track their learning journey, code snippets, debugging sessions, and achievements.
+
+[![Node v22](https://img.shields.io/badge/Node-v22-teal.svg)](https://nodejs.org/en/blog/release/v22.0.0)
+[![code style: prettier](https://img.shields.io/badge/code%20style-prettier-ff69b4.svg)](https://prettier.io/)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -82,7 +86,7 @@ A modern developer journal application built with AdonisJS, designed to help dev
 
 4. **Start the postgres container**
    ```bash
-   docker compose up -d
+   docker compose -f docker/docker-compose.dev.yml up -d
    ```
 
 5. **Run migrations**
@@ -141,18 +145,21 @@ A modern developer journal application built with AdonisJS, designed to help dev
 ## Usage
 
 ### Creating Entries
+
 1. Click the "+" button or use `Cmd/Ctrl + N`
 2. Select an entry type (Daily, TIL, Snippet, Debug, Achievement)
 3. Use the provided templates or write custom content
 4. Optionally add tags for organization
-5. Save with `Cmd/Ctrl + Enter`
+5. Save with `Cmd/Ctrl + S`
 
 ### Searching
+
 - Use the search bar in the header
 - Search across titles and content
 - Filter by entry type, date range, or tags
 
 ### Keyboard Shortcuts
+
 - `Cmd/Ctrl + N` - New entry
 - `Cmd/Ctrl + /` - Focus search
-- `Cmd/Ctrl + Enter` - Save entry (in forms)
+- `Cmd/Ctrl + S` - Save entry (in forms)
