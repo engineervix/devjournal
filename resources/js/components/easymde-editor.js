@@ -5,12 +5,14 @@
 
 import EasyMDE from 'easymde';
 import TurndownService from 'turndown';
+import hljs from 'highlight.js';
 
 export function easyMDEEditorComponent() {
   return {
     content: '',
     editor: null,
     turndownService: null,
+    isInitialized: false,
 
     init(initialContent = '') {
       this.content = initialContent;
@@ -29,12 +31,38 @@ export function easyMDEEditorComponent() {
         bulletListMarker: '-',
         emDelimiter: '*',
         strongDelimiter: '**',
-        linkStyle: 'inlined'
+        linkStyle: 'inlined',
+        // Add support for strikethrough and other GitHub flavored markdown
+        preformattedCode: false
+      });
+
+      // Add custom rules for better conversion
+      this.turndownService.addRule('strikethrough', {
+        filter: ['del', 's', 'strike'],
+        replacement: function (content) {
+          return '~~' + content + '~~';
+        }
+      });
+
+      // Handle code blocks better
+      this.turndownService.addRule('codeBlock', {
+        filter: function (node) {
+          return node.nodeName === 'PRE' && node.firstChild && node.firstChild.nodeName === 'CODE';
+        },
+        replacement: function (content, node) {
+          const language = node.firstChild.className.replace(/^language-/, '') || '';
+          return '\n\n```' + language + '\n' + node.firstChild.textContent + '\n```\n\n';
+        }
       });
     },
 
     initializeEditor() {
       const textarea = this.$refs.textarea;
+
+      if (!textarea) {
+        console.error('EasyMDE: Textarea element not found');
+        return;
+      }
 
       // Clean up any existing editor instance
       if (this.editor) {
@@ -45,85 +73,163 @@ export function easyMDEEditorComponent() {
       // Set the initial content in the textarea
       textarea.value = this.content;
 
-      this.editor = new EasyMDE({
-        element: textarea,
-        spellChecker: false,
-        minHeight: '300px',
-        maxHeight: '500px',
-        placeholder: 'Start writing in Markdown...',
-        toolbar: [
-          'bold', 'italic', 'strikethrough', '|',
-          'heading-1', 'heading-2', 'heading-3', '|',
-          'code', 'quote', '|',
-          'unordered-list', 'ordered-list', '|',
-          'link', 'image', '|',
-          'preview', 'fullscreen', '|',
-          'guide'
-        ],
-        renderingConfig: {
-          codeSyntaxHighlighting: true,
-        },
-        shortcuts: {
-          togglePreview: 'Cmd-P',
-          toggleFullScreen: 'F11'
-        },
-        status: ['lines', 'words', 'cursor'],
-        forceSync: true,
-        // Ensure the editor is editable
-        readOnly: false,
-        // Allow line wrapping
-        lineWrapping: true
-      });
+      try {
+        this.editor = new EasyMDE({
+          element: textarea,
+          spellChecker: false,
+          minHeight: '300px',
+          maxHeight: '500px',
+          placeholder: 'Start writing in Markdown...',
 
-      // Handle rich text paste events
-      this.editor.codemirror.on('paste', (cm, e) => {
-        // Only process if we have HTML content
-        if (e.clipboardData && e.clipboardData.types.includes('text/html')) {
-          e.preventDefault();
+          // Toolbar configuration optimized for developer journaling
+          toolbar: [
+            'bold', 'italic', 'strikethrough', '|',
+            'heading-1', 'heading-2', 'heading-3', '|',
+            'code', 'quote', '|',
+            'unordered-list', 'ordered-list', '|',
+            'link', 'image', '|',
+            'table', 'horizontal-rule', '|',
+            'guide'
+          ],
 
-          // Get the HTML content from the clipboard
-          const html = e.clipboardData.getData('text/html');
+          // Rendering configuration
+          renderingConfig: {
+            codeSyntaxHighlighting: true,
+            hljs: hljs,
+            singleLineBreaks: true, // GitHub flavored markdown
+            sanitizerFunction: (renderedHTML) => {
+              // Basic sanitization - you might want to use DOMPurify in production
+              return renderedHTML;
+            }
+          },
 
-          // Convert HTML to Markdown using Turndown
-          const markdown = this.turndownService.turndown(html);
+          // Parsing configuration for better markdown support
+          parsingConfig: {
+            allowAtxHeaderWithoutSpace: false, // Enforce space after #
+            strikethrough: true,
+            underscoresBreakWords: false
+          },
 
-          // Insert the converted Markdown at the cursor position
-          cm.replaceSelection(markdown);
+          // Status bar
+          status: ['lines', 'words', 'cursor'],
 
-          return true;
-        }
-        return false;
-      });
+          // Sync settings
+          forceSync: true,
 
-      // Track changes for unsaved changes detection
-      this.editor.codemirror.on('change', () => {
-        this.content = this.editor.value();
-        window.formChanged = true;
-      });
+          // Editor settings
+          readOnly: false,
+          lineWrapping: true,
+          indentWithTabs: false,
+          tabSize: 2,
 
-      // Handle Cmd/Ctrl + Enter to submit form
-      this.editor.codemirror.on('keydown', (cm, e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-          e.preventDefault();
-          const form = this.$el.closest('form');
-          if (form) {
-            form.submit();
+          // Block styles for consistency
+          blockStyles: {
+            bold: '**',
+            italic: '*',
+            code: '```'
+          },
+
+          // Insert text configurations
+          insertTexts: {
+            horizontalRule: ['', '\n\n---\n\n'],
+            image: ['![Alt text](', ')'],
+            link: ['[Link text](', ')'],
+            table: ['', '\n\n| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text     | Text     |\n\n']
+          },
+
+          // Error handling
+          errorCallback: (errorMessage) => {
+            console.error('EasyMDE Error:', errorMessage);
+            // You could show a toast notification here
           }
+        });
+
+        // Handle rich text paste events
+        this.editor.codemirror.on('paste', (cm, e) => {
+          // Only process if we have HTML content
+          if (e.clipboardData && e.clipboardData.types.includes('text/html')) {
+            e.preventDefault();
+
+            try {
+              // Get the HTML content from the clipboard
+              const html = e.clipboardData.getData('text/html');
+
+              // Convert HTML to Markdown using Turndown
+              const markdown = this.turndownService.turndown(html);
+
+              // Insert the converted Markdown at the cursor position
+              cm.replaceSelection(markdown);
+
+              return true;
+            } catch (error) {
+              console.error('Error converting pasted HTML to Markdown:', error);
+              // Fall back to plain text
+              const plainText = e.clipboardData.getData('text/plain');
+              if (plainText) {
+                cm.replaceSelection(plainText);
+              }
+            }
+          }
+          return false;
+        });
+
+        // Track changes for unsaved changes detection
+        this.editor.codemirror.on('change', () => {
+          this.content = this.editor.value();
+          window.formChanged = true;
+        });
+
+        // Handle Cmd/Ctrl + Enter to submit form
+        this.editor.codemirror.on('keydown', (cm, e) => {
+          if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            const form = this.$el.closest('form');
+            if (form) {
+              form.submit();
+            }
+          }
+        });
+
+        // Handle editor focus/blur for better UX
+        this.editor.codemirror.on('focus', () => {
+          this.$el.classList.add('editor-focused');
+        });
+
+        this.editor.codemirror.on('blur', () => {
+          this.$el.classList.remove('editor-focused');
+        });
+
+        // Ensure the editor has the latest content after initialization
+        if (this.content && this.content !== textarea.value) {
+          this.editor.value(this.content);
         }
-      });
 
-      // Ensure the editor has the latest content after initialization
-      if (this.content && this.content !== textarea.value) {
-        this.editor.value(this.content);
+        // Register this editor instance globally so templates can access it
+        // Only set this after the editor is fully initialized and ready
+        window.easyMDEEditorInstance = this;
+        this.isInitialized = true;
+
+      } catch (error) {
+        console.error('Failed to initialize EasyMDE editor:', error);
+        // Fallback: show the textarea
+        textarea.style.display = 'block';
       }
-
-      // Register this editor instance globally so templates can access it
-      // Only set this after the editor is fully initialized and ready
-      window.easyMDEEditorInstance = this;
     },
 
     insertTemplate(template) {
-      if (this.editor) {
+      if (!this.isInitialized || !this.editor) {
+        // If editor isn't ready yet, set the content and it will be applied when editor initializes
+        this.content = template.trim();
+        // Try again after a short delay
+        setTimeout(() => {
+          if (this.editor) {
+            this.insertTemplate(template);
+          }
+        }, 100);
+        return;
+      }
+
+      try {
         // Clean up the template content
         const cleanTemplate = template.trim();
 
@@ -133,6 +239,7 @@ export function easyMDEEditorComponent() {
         // Destroy the current editor
         this.editor.toTextArea();
         this.editor = null;
+        this.isInitialized = false;
 
         // Set the content directly in the textarea
         textarea.value = cleanTemplate;
@@ -144,22 +251,19 @@ export function easyMDEEditorComponent() {
         setTimeout(() => {
           if (this.editor && this.editor.codemirror) {
             this.editor.codemirror.focus();
-            this.editor.codemirror.setCursor(0, 0);
+            // Position cursor at the end of the first line (after title)
+            const lines = cleanTemplate.split('\n');
+            if (lines.length > 0) {
+              this.editor.codemirror.setCursor(0, lines[0].length);
+            }
           }
         }, 100);
 
         // Update the content property to keep it in sync
         this.content = cleanTemplate;
 
-      } else {
-        // If editor isn't ready yet, set the content and it will be applied when editor initializes
-        this.content = template.trim();
-        // Try again after a short delay
-        setTimeout(() => {
-          if (this.editor) {
-            this.insertTemplate(template);
-          }
-        }, 100);
+      } catch (error) {
+        console.error('Error inserting template:', error);
       }
     },
 
@@ -175,13 +279,19 @@ export function easyMDEEditorComponent() {
     },
 
     isReady() {
-      return this.editor !== null;
+      return this.isInitialized && this.editor !== null;
     },
 
     destroy() {
       if (this.editor) {
         this.editor.toTextArea();
         this.editor = null;
+      }
+      this.isInitialized = false;
+
+      // Clean up global reference
+      if (window.easyMDEEditorInstance === this) {
+        window.easyMDEEditorInstance = null;
       }
     }
   };
