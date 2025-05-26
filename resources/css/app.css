@@ -149,6 +149,26 @@
   .copy-button:focus {
     opacity: 1 !important;
   }
+
+  /* Unsaved changes indicator styles */
+  #unsaved-changes-indicator {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* Pulse animation for unsaved changes indicator */
+  .pulse-warning {
+    animation: pulseWarning 2s infinite;
+  }
+
+  @keyframes pulseWarning {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
 }
 
 /* Custom animations */

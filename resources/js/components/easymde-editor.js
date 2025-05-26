@@ -177,6 +177,11 @@ export function easyMDEEditorComponent() {
         this.editor.codemirror.on('change', () => {
           this.content = this.editor.value();
           window.formChanged = true;
+
+          // Dispatch custom event for unsaved changes module
+          document.dispatchEvent(new CustomEvent('easymde:change', {
+            detail: { content: this.content }
+          }));
         });
 
         // Handle Cmd/Ctrl + Enter to submit form
@@ -208,6 +213,11 @@ export function easyMDEEditorComponent() {
         // Only set this after the editor is fully initialized and ready
         window.easyMDEEditorInstance = this;
         this.isInitialized = true;
+
+        // Dispatch ready event for unsaved changes module
+        document.dispatchEvent(new CustomEvent('easymde:ready', {
+          detail: { instance: this }
+        }));
 
       } catch (error) {
         console.error('Failed to initialize EasyMDE editor:', error);

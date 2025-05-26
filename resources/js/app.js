@@ -10,6 +10,7 @@ import "@phosphor-icons/web/regular";
 import { initializeThemeToggle } from './modules/theme.js';
 import { initializeKeyboardShortcuts, initializeFormShortcuts } from './modules/shortcuts.js';
 import { initializeCodeFeatures } from './modules/code-features.js';
+import { initializeUnsavedChangesProtection } from './modules/unsaved-changes.js';
 
 // Import Alpine.js components
 import { userMenuComponent } from './components/user-menu.js';
@@ -38,4 +39,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeKeyboardShortcuts();
   initializeFormShortcuts();
   initializeCodeFeatures();
+  initializeUnsavedChangesProtection();
 });
