@@ -1,20 +1,135 @@
+x-logging: &default-logging
+  driver: 'json-file'
+  options:
+    max-size: '1m'
+    max-file: '1'
+    tag: '{{.Name}}'
+
+x-common-labels: &default-labels
+  logging: 'promtail'
+  logging_jobname: 'containerlogs'
+  stackname: 'devjournal'
+
 services:
-  db:
+  app:
     build:
-      context: ./docker/db
+      context: .
       dockerfile: Dockerfile
-    ports:
-      - '5432:5432'
+    container_name: devjournal-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
-      POSTGRES_USER: devjournal
-      POSTGRES_PASSWORD: password
-    healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'devjournal', '-d', 'devjournal']
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      APP_NAME: ${APP_NAME:-dev-journal}
+      APP_KEY: ${APP_KEY}
+      LOG_LEVEL: info
+      SESSION_DRIVER: cookie
+      TZ: Europe/London
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
+    networks:
+      - traefik-public
+      - default
+    logging: *default-logging
+    labels:
+      <<: *default-labels
+      docker-volume-backup.stop-during-backup: 'true'
+      traefik.enable: 'true'
+      traefik.http.routers.devjournal.rule: 'Host(`${DOMAIN_NAME}`)'
+      traefik.http.routers.devjournal.entrypoints: 'websecure'
+      traefik.http.routers.devjournal.tls: 'true'
+      traefik.http.routers.devjournal.tls.certresolver: 'letsencrypt'
+      traefik.http.services.devjournal.loadbalancer.server.port: '3000'
+      traefik.http.middlewares.secHeaders.headers.browserXssFilter: 'true'
+      traefik.http.middlewares.secHeaders.headers.contentTypeNosniff: 'true'
+      traefik.http.middlewares.secHeaders.headers.forceSTSHeader: 'true'
+      traefik.http.middlewares.secHeaders.headers.stsIncludeSubdomains: 'true'
+      traefik.http.middlewares.secHeaders.headers.stsPreload: 'true'
+      traefik.http.middlewares.secHeaders.headers.stsSeconds: '31536000'
+      traefik.http.routers.devjournal.middlewares: 'secHeaders'
+
+  db:
+    image: pgvector/pgvector:0.8.0-pg16
+    container_name: devjournal-db
+    restart: unless-stopped
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+      - database_dump_data:/tmp/backup
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+      - default
+    logging: *default-logging
+    labels:
+      <<: *default-labels
+      traefik.enable: 'false'
+      docker-volume-backup.stop-during-backup: 'true'
+      # Command that will be executed in the container before archive creation
+      docker-volume-backup.archive-pre: >-
+        /bin/sh -c '
+          set -e &&
+          mkdir -p /tmp/backup &&
+          TIMESTAMP=$$(date +%Y%m%d_%H%M%S) &&
+          BACKUP_FILE="/tmp/backup/postgres_dump_$$TIMESTAMP.gz" &&
+          LATEST_LINK="/tmp/backup/postgres_dump_latest.gz" &&
+          echo "Starting PostgreSQL backup: $$(date)" &&
+          PGPASSWORD=${POSTGRES_PASSWORD} pg_dump -Fc --no-acl --no-owner -U ${POSTGRES_USER} -w ${POSTGRES_DB} | gzip > $$BACKUP_FILE &&
+          chmod 644 $$BACKUP_FILE &&
+          ln -sf $$(basename $$BACKUP_FILE) $$LATEST_LINK &&
+          echo "PostgreSQL backup completed successfully: $$BACKUP_FILE ($$(stat -c%s $$BACKUP_FILE) bytes)"
+        '
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backup:
+    image: offen/docker-volume-backup:v2.43.3
+    container_name: devjournal-backup
+    restart: always
+    networks:
+      - default
+    volumes:
+      - database_dump_data:/backup/database_dump:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # so we can run our cron rules in local timezone
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      # Core backup settings
+      - BACKUP_FILENAME=devjournal-backup-%Y%m%d-%H%M%S.tar.gz
+      - BACKUP_CRON_EXPRESSION=5 3 * * *
+      - BACKUP_RETENTION_DAYS=7
+
+      # Backblaze B2 configuration (S3-compatible API)
+      - AWS_ACCESS_KEY_ID=${B2_APPLICATION_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${B2_APPLICATION_KEY:-}
+      - AWS_ENDPOINT=${B2_ENDPOINT:-}
+      - AWS_S3_BUCKET_NAME=${B2_BUCKET_NAME:-}
+      - AWS_REGION=${B2_REGION:-}
+
+      # Notification settings
+      - NOTIFICATION_URLS=${NOTIFICATION_URL:-}
+      - NOTIFICATION_LEVEL=error
+    logging: *default-logging
+    labels:
+      <<: *default-labels
+      traefik.enable: 'false'
 
 volumes:
-  postgres-data:
+  postgres_data:
+  database_dump_data:
+
+networks:
+  traefik-public:
+    external: true
+  default:

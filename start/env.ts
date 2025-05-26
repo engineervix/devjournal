@@ -31,4 +31,12 @@ export default await Env.create(new URL('../', import.meta.url), {
   |----------------------------------------------------------
   */
   DATABASE_URL: Env.schema.string(),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring https://www.cloudflare.com/application-services/products/turnstile/
+  |----------------------------------------------------------
+  */
+  TURNSTILE_SITE_KEY: Env.schema.string.optional(),
+  TURNSTILE_SECRET_KEY: Env.schema.string.optional(),
 })

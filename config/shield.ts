@@ -6,8 +6,38 @@ const shieldConfig = defineConfig({
    * to learn more
    */
   csp: {
-    enabled: false,
-    directives: {},
+    enabled: true,
+    directives: {
+      defaultSrc: ["'self'"],
+
+      // Scripts
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        'https://cdnjs.cloudflare.com',
+        'https://challenges.cloudflare.com', // For Turnstile
+        'https://static.cloudflareinsights.com', // For Cloudflare analytics
+      ],
+
+      // Styles
+      styleSrc: ["'self'", "'unsafe-inline'"], // Required for Tailwind/DaisyUI
+
+      // Images
+      imgSrc: ["'self'", 'data:', 'https:'],
+
+      // Connections
+      connectSrc: ["'self'", 'https://*.cloudflare.com'],
+
+      // Fonts
+      fontSrc: ["'self'", 'https:'],
+
+      // Frames - needed for Turnstile
+      frameSrc: ['https://challenges.cloudflare.com'],
+
+      // Disable unused resource types
+      objectSrc: ["'none'"],
+      mediaSrc: ["'none'"],
+    },
     reportOnly: false,
   },
 
@@ -34,9 +64,14 @@ const shieldConfig = defineConfig({
   /**
    * Force browser to always use HTTPS
    */
+  // hsts: {
+  //   enabled: true,
+  //   maxAge: '180 days',
+  // },
+
+  // Disable HSTS in AdonisJS since we're handling it via reverse proxy
   hsts: {
-    enabled: true,
-    maxAge: '180 days',
+    enabled: false,
   },
 
   /**

@@ -1,0 +1,44 @@
+# Versioning and metadata
+.git
+.gitignore
+.dockerignore
+
+# Build dependencies
+dist
+node_modules
+coverage
+/npm-debug.log
+
+# OS
+.DS_Store
+*.swp
+/tmp/
+
+# Environment (contains sensitive data)
+.env
+
+# Files not required for production
+.editorconfig
+.eslintrc.js
+nodemon.json
+Dockerfile
+docker-compose.yml
+README.md
+
+# Tests and documentation
+tests
+bin/test.ts
+docs
+
+# IDE and editor settings
+.idea
+.vscode
+
+# Logs
+*.log
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Others
+docker

@@ -1,4 +1,5 @@
 export PATH := "./node_modules/.bin:" + env_var('PATH')
+DOCKER_COMPOSE_DEV := "docker compose -f docker/docker-compose.dev.yml --env-file .env"
 
 default:
     just --list
@@ -6,23 +7,23 @@ default:
 # docker-compose up
 up *build:
     if [[ "{{build}}" =~ ^(-b|b|build|--build)$ ]]; then \
-        docker-compose -f docker-compose.yml up -d --build; \
+        {{DOCKER_COMPOSE_DEV}} up -d --build; \
     elif [[ "{{build}}" = "" ]]; then \
-        docker-compose -f docker-compose.yml up -d; \
+        {{DOCKER_COMPOSE_DEV}} up -d; \
     else \
         echo "{{build}} doesn't match any of -b, b, build or --build"; \
     fi
 
 # docker-compose exec [container] [command(s)]
 exec container +command:
-    docker-compose exec {{container}} "{{command}}"
+    {{DOCKER_COMPOSE_DEV}} exec {{container}} "{{command}}"
 
 # docker-compose logs [container] [-f (Follow log output)]
 logs container *follow:
     if [[ "{{follow}}" =~ ^(-f|f|follow|--follow)$ ]]; then \
-        docker-compose logs {{container}} -f; \
+        {{DOCKER_COMPOSE_DEV}} logs {{container}} -f; \
     elif [[ "{{follow}}" = "" ]]; then \
-        docker-compose logs {{container}}; \
+        {{DOCKER_COMPOSE_DEV}} logs {{container}}; \
     else \
         echo "{{follow}} doesn't match any of -f, f, follow or --follow"; \
     fi
@@ -34,9 +35,9 @@ stop:
 # docker-compose down [-v]
 down *volumes:
     if [[ "{{volumes}}" =~ ^(-v|v|--vol|vol|volumes|--volumes)$ ]]; then \
-        docker-compose down -v; \
+        {{DOCKER_COMPOSE_DEV}} down -v; \
     elif [[ "{{volumes}}" = "" ]]; then \
-        docker-compose down; \
+        {{DOCKER_COMPOSE_DEV}} down; \
     else \
         echo "{{volumes}} doesn't match any of -v, v, vol, --vol, volumes or --volumes"; \
     fi

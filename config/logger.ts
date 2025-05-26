@@ -1,6 +1,17 @@
 import env from '#start/env'
 import app from '@adonisjs/core/services/app'
+import * as Sentry from '@sentry/node'
 import { defineConfig, targets } from '@adonisjs/core/logger'
+import { nodeProfilingIntegration } from '@sentry/profiling-node'
+
+// Initialize Sentry separately
+if (app.inProduction) {
+  Sentry.init({
+    dsn: env.get('SENTRY_DSN'),
+    integrations: [nodeProfilingIntegration()],
+    tracesSampleRate: 1.0,
+  })
+}
 
 const loggerConfig = defineConfig({
   default: 'app',
@@ -18,6 +29,13 @@ const loggerConfig = defineConfig({
         targets: targets()
           .pushIf(!app.inProduction, targets.pretty())
           .pushIf(app.inProduction, targets.file({ destination: 1 }))
+          .pushIf(app.inProduction, {
+            target: 'pino-sentry-transport',
+            options: {
+              dsn: env.get('SENTRY_DSN'),
+              level: 'error',
+            },
+          })
           .toArray(),
       },
     },

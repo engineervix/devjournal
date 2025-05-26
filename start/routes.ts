@@ -32,7 +32,7 @@ router
     }
   })
   .as('auth.login')
-  .use(middleware.guest())
+  .use([middleware.guest(), middleware.turnstile()])
 
 router
   .get('/home', async ({ view, auth }) => {
