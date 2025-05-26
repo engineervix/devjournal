@@ -1,4 +1,12 @@
 import edge from 'edge.js'
+import env from '#start/env'
+import app from '@adonisjs/core/services/app'
+
+/**
+ * Share environment variables and app instance with Edge templates
+ */
+edge.global('env', env)
+edge.global('app', app)
 
 /**
  * Defines a global 'constructUrl' function for Edge templates.

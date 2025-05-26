@@ -21,6 +21,11 @@
 
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+  {{-- Turnstile script for production --}}
+  @if(app.inProduction && env.get('TURNSTILE_SITE_KEY'))
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  @endif
+
   {{-- Prevent Alpine.js FOUC --}}
   <style>
     [x-cloak] { display: none !important; }
@@ -81,9 +86,28 @@
         linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px),
         linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
     }
+
+    /* Turnstile widget styling */
+    .cf-turnstile {
+      border-radius: 0.75rem !important;
+      overflow: hidden;
+    }
+
+    .cf-turnstile iframe {
+      border-radius: 0.75rem !important;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden" x-data="{ showPassword: false }">
+  {{-- Theme Toggle - Top Right Corner --}}
+  <div class="fixed top-4 right-4 z-50">
+    <button id="theme-toggle"
+            class="w-12 h-12 rounded-full bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-all duration-200 backdrop-blur-sm border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center">
+      <i class="ph ph-moon theme-icon-light text-gray-700 text-lg"></i>
+      <i class="ph ph-sun theme-icon-dark text-gray-200 text-lg hidden"></i>
+    </button>
+  </div>
+
   {{-- Background with gradient and pattern --}}
   <div class="fixed inset-0 login-bg code-pattern"></div>
   {{-- Floating Code Elements --}}
@@ -182,6 +206,22 @@
             </div>
           </div>
 
+          {{-- Turnstile Widget --}}
+          @if(app.inProduction && env.get('TURNSTILE_SITE_KEY'))
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                <i class="ph ph-shield-check mr-2"></i>Security Check
+              </label>
+              <div class="flex justify-center">
+                <div class="cf-turnstile glass-effect rounded-xl p-4"
+                     data-sitekey="{{ env.get('TURNSTILE_SITE_KEY') }}"
+                     data-theme="auto"
+                     data-size="normal">
+                </div>
+              </div>
+            </div>
+          @endif
+
           {{-- Login Button --}}
           <div class="pt-4">
             <button type="submit"
@@ -207,15 +247,7 @@
         </div>
       </div>
 
-      {{-- Theme Toggle --}}
-      <div class="text-center">
-        <button id="theme-toggle"
-                class="inline-flex items-center px-4 py-2 bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl transition-all duration-200 backdrop-blur-sm border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 shadow-sm">
-          <i class="ph ph-moon theme-icon-light mr-2 text-gray-700"></i>
-          <i class="ph ph-sun theme-icon-dark mr-2 text-gray-200 hidden"></i>
-          <span class="text-sm font-medium">Toggle Theme</span>
-        </button>
-      </div>
+
     </div>
   </div>
 
