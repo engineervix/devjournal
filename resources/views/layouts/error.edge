@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title ?? 'DevJournal' }}</title>
+
+  {{-- Favicons --}}
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/ico/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/ico/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/ico/favicon-16x16.png" />
+  <link rel="manifest" href="/images/ico/site.webmanifest" />
+
+  {{-- Prevent FOUC by initializing theme immediately --}}
+  <script>
+    // Initialize theme before any content renders to prevent flashing
+    (function() {
+      const storedTheme = localStorage.getItem('theme');
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = storedTheme || (systemPrefersDark ? 'dark' : 'light');
+
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+
+  {{-- Vite CSS and JS --}}
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+  {{-- Prevent Alpine.js FOUC --}}
+  <style>
+    [x-cloak] { display: none !important; }
+
+    /* Critical CSS to prevent layout shift */
+    .dark {
+      color-scheme: dark;
+    }
+
+    /* Prevent theme icon flashing */
+    .theme-icon-light.dark\:hidden {
+      display: none;
+    }
+
+    .dark .theme-icon-dark.hidden {
+      display: none;
+    }
+
+    .dark .theme-icon-dark.dark\:block {
+      display: block;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
+  {{-- Simple Header --}}
+  <header class="bg-white dark:bg-gray-800 shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center">
+          <a href="/" class="font-bold text-xl text-indigo-600 dark:text-indigo-400">DevJournal</a>
+        </div>
+
+        <div class="flex items-center gap-4">
+          {{-- Login link --}}
+          <a href="{{ route('auth.login.show') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <i class="ph ph-sign-in mr-2"></i>
+            Login
+          </a>
+
+          {{-- Theme toggle --}}
+          <button id="theme-toggle" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center justify-center">
+            <i class="ph ph-moon theme-icon-light text-gray-700 text-lg"></i>
+            <i class="ph ph-sun theme-icon-dark text-gray-300 text-lg hidden"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  {{-- Main Content --}}
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    {{{ await $slots.main() }}}
+  </main>
+
+  {{-- Footer --}}
+  <footer class="bg-white dark:bg-gray-800 shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <p class="text-center text-sm text-gray-500 dark:text-gray-400">
+        © {{ new Date().getFullYear() }} Victor Miti.
+      </p>
+    </div>
+  </footer>
+</body>
+</html>
