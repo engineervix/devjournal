@@ -91,14 +91,70 @@
     .cf-turnstile {
       border-radius: 0.75rem !important;
       overflow: hidden;
+      max-width: 100%;
     }
 
     .cf-turnstile iframe {
       border-radius: 0.75rem !important;
+      max-width: 100%;
+    }
+
+    /* Responsive adjustments for smaller screens */
+    @media (max-height: 700px) {
+      .login-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+      }
+
+      .login-form {
+        padding: 1.5rem;
+      }
+
+      .login-header {
+        margin-bottom: 1rem;
+      }
+
+      .login-footer {
+        margin-top: 1rem;
+        padding-top: 1rem;
+      }
+    }
+
+    @media (max-height: 600px) {
+      .floating-animation {
+        display: none;
+      }
+
+      .login-container {
+        align-items: flex-start;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+      }
+
+      .login-header {
+        margin-bottom: 0.5rem;
+      }
+
+      .login-form {
+        padding: 1rem;
+      }
+
+      .login-footer {
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+      }
+    }
+
+    /* Additional mobile optimizations */
+    @media (max-width: 480px) {
+      .cf-turnstile {
+        transform: scale(0.9);
+        transform-origin: center;
+      }
     }
   </style>
 </head>
-<body class="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden" x-data="{ showPassword: false }">
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900" x-data="{ showPassword: false }">
   {{-- Theme Toggle - Top Right Corner --}}
   <div class="fixed top-4 right-4 z-50">
     <button id="theme-toggle"
@@ -133,28 +189,28 @@
   </div>
 
   {{-- Main Login Container --}}
-  <div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative z-10">
-    <div class="max-w-md w-full space-y-8">
+  <div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative z-10 py-12 login-container">
+    <div class="max-w-md w-full space-y-6">
       {{-- Header --}}
-      <div class="text-center">
-        <div class="mx-auto h-20 w-20 glass-effect rounded-2xl flex items-center justify-center mb-6 animate-bounce-subtle">
-          <i class="ph ph-code text-3xl text-indigo-600 dark:text-indigo-400"></i>
+      <div class="text-center login-header">
+        <div class="mx-auto h-16 w-16 sm:h-20 sm:w-20 glass-effect rounded-2xl flex items-center justify-center mb-4 sm:mb-6 animate-bounce-subtle">
+          <i class="ph ph-code text-2xl sm:text-3xl text-indigo-600 dark:text-indigo-400"></i>
         </div>
-        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">DevJournal</h1>
-        <p class="text-lg text-gray-600 dark:text-gray-300">Track your development journey</p>
-        <div class="mt-4 h-1 w-20 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto rounded-full"></div>
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">DevJournal</h1>
+        <p class="text-base sm:text-lg text-gray-600 dark:text-gray-300">Track your development journey</p>
+        <div class="mt-3 sm:mt-4 h-1 w-20 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto rounded-full"></div>
       </div>
 
       {{-- Login Form --}}
-      <div class="glass-effect rounded-2xl p-8 shadow-2xl animate-slide-up">
-        <div class="text-center mb-8">
-          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Welcome Back</h2>
-          <p class="text-gray-600 dark:text-gray-300">Sign in to continue your coding journey</p>
+      <div class="glass-effect rounded-2xl p-6 sm:p-8 shadow-2xl animate-slide-up login-form">
+        <div class="text-center mb-4 sm:mb-6">
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Welcome Back</h2>
+          <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300">Sign in to continue your coding journey</p>
         </div>
 
         {{-- Error Message --}}
         @if(flashMessages.has('error'))
-          <div class="mb-6 bg-red-500/20 border border-red-500/30 text-red-100 p-4 rounded-xl backdrop-blur-sm animate-fade-in">
+          <div class="mb-4 bg-red-500/20 border border-red-500/30 text-red-100 p-3 rounded-xl backdrop-blur-sm animate-fade-in">
             <div class="flex items-center">
               <i class="ph ph-warning-circle text-red-300 mr-3"></i>
               <span>{{ flashMessages.get('error') }}</span>
@@ -162,7 +218,7 @@
           </div>
         @endif
 
-        <form action="{{ route('auth.login') }}" method="POST" class="space-y-6">
+        <form action="{{ route('auth.login') }}" method="POST" class="space-y-5">
           {{ csrfField() }}
 
           {{-- Email Field --}}
@@ -213,7 +269,7 @@
                 <i class="ph ph-shield-check mr-2"></i>Security Check
               </label>
               <div class="flex justify-center">
-                <div class="cf-turnstile glass-effect rounded-xl p-4"
+                <div class="cf-turnstile glass-effect rounded-xl p-3"
                      data-sitekey="{{ env.get('TURNSTILE_SITE_KEY') }}"
                      data-theme="auto"
                      data-size="normal">
@@ -223,7 +279,7 @@
           @endif
 
           {{-- Login Button --}}
-          <div class="pt-4">
+          <div class="pt-2">
             <button type="submit"
                     class="group w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
               <i class="ph ph-sign-in mr-2 group-hover:translate-x-1 transition-transform duration-200"></i>
@@ -233,15 +289,15 @@
         </form>
 
         {{-- Footer --}}
-        <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-600">
+        <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600 login-footer">
           <div class="text-center">
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+            <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
               Ready to level up your development skills?
             </p>
-            <div class="mt-3 flex justify-center space-x-4 text-gray-400 dark:text-gray-500">
-              <i class="ph ph-code text-lg"></i>
-              <i class="ph ph-lightning text-lg"></i>
-              <i class="ph ph-rocket text-lg"></i>
+            <div class="mt-2 flex justify-center space-x-4 text-gray-400 dark:text-gray-500">
+              <i class="ph ph-code text-base sm:text-lg"></i>
+              <i class="ph ph-lightning text-base sm:text-lg"></i>
+              <i class="ph ph-rocket text-base sm:text-lg"></i>
             </div>
           </div>
         </div>
