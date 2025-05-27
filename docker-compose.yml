@@ -107,7 +107,7 @@ services:
     environment:
       # Core backup settings
       - BACKUP_FILENAME=devjournal-backup-%Y%m%d-%H%M%S.tar.gz
-      - BACKUP_CRON_EXPRESSION=5 3 * * *
+      - BACKUP_CRON_EXPRESSION=5 4 * * *
       - BACKUP_RETENTION_DAYS=7
 
       # Backblaze B2 configuration (S3-compatible API)
