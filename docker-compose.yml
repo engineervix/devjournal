@@ -93,7 +93,7 @@ services:
       retries: 3
 
   backup:
-    image: offen/docker-volume-backup:v2.43.3
+    image: offen/docker-volume-backup:v2.43.4
     container_name: devjournal-backup
     restart: always
     networks:
