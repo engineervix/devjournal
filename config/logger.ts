@@ -8,8 +8,14 @@ import { nodeProfilingIntegration } from '@sentry/profiling-node'
 if (app.inProduction) {
   Sentry.init({
     dsn: env.get('SENTRY_DSN'),
-    integrations: [nodeProfilingIntegration()],
+    integrations: [
+      ...Sentry.getDefaultIntegrations({}).filter(
+        (integration: { name: string }) => integration.name !== 'Console'
+      ),
+      nodeProfilingIntegration(),
+    ],
     tracesSampleRate: 1.0,
+    enableLogs: false,
   })
 }
 
@@ -32,8 +38,10 @@ const loggerConfig = defineConfig({
           .pushIf(app.inProduction, {
             target: 'pino-sentry-transport',
             options: {
-              dsn: env.get('SENTRY_DSN'),
-              level: 'error',
+              sentry: {
+                dsn: env.get('SENTRY_DSN'),
+              },
+              minLevel: 50, // pino error level
             },
           })
           .toArray(),
