@@ -98,11 +98,6 @@ export default class TurnstileMiddleware {
       return ctx.response.redirect().back()
     }
 
-    logger.info('Turnstile validation successful', {
-      ip: ctx.request.ip(),
-      url: ctx.request.url(),
-    })
-
     return next()
   }
 }
