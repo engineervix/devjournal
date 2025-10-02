@@ -55,9 +55,22 @@ export default class TurnstileMiddleware {
   }
 
   async handle(ctx: HttpContext, next: NextFn) {
-    // Skip validation in development
-    if (!ctx.request.completeUrl().startsWith('https')) {
-      logger.debug('Skipping Turnstile validation in non-HTTPS environment')
+    const secretKey = env.get('TURNSTILE_SECRET_KEY')
+    const siteKey = env.get('TURNSTILE_SITE_KEY')
+
+    // Skip validation only if Turnstile is not configured (both keys missing)
+    if (!secretKey || !siteKey) {
+      logger.debug('Turnstile not configured - skipping validation')
+      return next()
+    }
+
+    // Skip validation in development environment only if explicitly not using HTTPS
+    // This allows testing with localhost HTTPS setups
+    const isDevelopment = env.get('NODE_ENV') !== 'production'
+    const isHttpsRequest = ctx.request.completeUrl().startsWith('https')
+
+    if (isDevelopment && !isHttpsRequest) {
+      logger.debug('Skipping Turnstile validation in development HTTP environment')
       return next()
     }
 
@@ -67,6 +80,7 @@ export default class TurnstileMiddleware {
       logger.info('Missing Turnstile response token', {
         ip: ctx.request.ip(),
         url: ctx.request.url(),
+        userAgent: ctx.request.header('user-agent'),
       })
       ctx.session.flash('errors', { form: 'Please complete the security challenge' })
       return ctx.response.redirect().back()
@@ -78,10 +92,16 @@ export default class TurnstileMiddleware {
       logger.warn('Failed Turnstile validation', {
         ip: ctx.request.ip(),
         url: ctx.request.url(),
+        userAgent: ctx.request.header('user-agent'),
       })
       ctx.session.flash('errors', { form: 'Security challenge failed. Please try again.' })
       return ctx.response.redirect().back()
     }
+
+    logger.info('Turnstile validation successful', {
+      ip: ctx.request.ip(),
+      url: ctx.request.url(),
+    })
 
     return next()
   }
