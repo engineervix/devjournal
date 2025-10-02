@@ -39,7 +39,7 @@ services:
     logging: *default-logging
     labels:
       <<: *default-labels
-      docker-volume-backup.stop-during-backup: 'true'
+      # docker-volume-backup.stop-during-backup: 'true'
       traefik.enable: 'true'
       traefik.http.routers.devjournal.rule: 'Host(`${DOMAIN_NAME}`)'
       traefik.http.routers.devjournal.entrypoints: 'websecure'
@@ -71,19 +71,18 @@ services:
     labels:
       <<: *default-labels
       traefik.enable: 'false'
-      docker-volume-backup.stop-during-backup: 'true'
+      # docker-volume-backup.stop-during-backup: 'true'
       # Command that will be executed in the container before archive creation
       docker-volume-backup.archive-pre: >-
         /bin/sh -c '
           set -e &&
           mkdir -p /tmp/backup &&
+          rm -fv /tmp/backup/*.gz &&
           TIMESTAMP=$$(date +%Y%m%d_%H%M%S) &&
           BACKUP_FILE="/tmp/backup/postgres_dump_$$TIMESTAMP.gz" &&
-          LATEST_LINK="/tmp/backup/postgres_dump_latest.gz" &&
           echo "Starting PostgreSQL backup: $$(date)" &&
           PGPASSWORD=${POSTGRES_PASSWORD} pg_dump -Fc --no-acl --no-owner -U ${POSTGRES_USER} -w ${POSTGRES_DB} | gzip > $$BACKUP_FILE &&
           chmod 644 $$BACKUP_FILE &&
-          ln -sf $$(basename $$BACKUP_FILE) $$LATEST_LINK &&
           echo "PostgreSQL backup completed successfully: $$BACKUP_FILE ($$(stat -c%s $$BACKUP_FILE) bytes)"
         '
     healthcheck:
@@ -108,7 +107,7 @@ services:
       # Core backup settings
       - BACKUP_FILENAME=devjournal-backup-%Y%m%d-%H%M%S.tar.gz
       - BACKUP_CRON_EXPRESSION=5 4 * * *
-      - BACKUP_RETENTION_DAYS=7
+      - BACKUP_RETENTION_DAYS=2
 
       # Backblaze B2 configuration (S3-compatible API)
       - AWS_ACCESS_KEY_ID=${B2_APPLICATION_KEY_ID:-}
