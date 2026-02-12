@@ -7,6 +7,7 @@ Command-line interface for DevJournal - create journal entries from your termina
 Download the latest release from [GitHub Releases](https://github.com/engineervix/devjournal/releases).
 
 **Linux/macOS:**
+
 ```bash
 # Download and extract
 wget https://github.com/engineervix/devjournal/releases/latest/download/devlog-client-linux-amd64
@@ -21,6 +22,7 @@ devlog-client version
 Download `devlog-client-windows-amd64.exe`, add to PATH, then run `devlog-client.exe version`
 
 **Build from source:**
+
 ```bash
 just build-cli
 # Binary: dist/cli/devlog-client
@@ -42,24 +44,30 @@ devlog-client add --type daily
 ## Commands
 
 ### `config set-url <URL>`
+
 Set your DevJournal API URL.
 
 ### `config view`
+
 View current configuration.
 
 ### `login`
+
 Authenticate with API token.
 
 ### `add [flags] [content]`
+
 Create a journal entry.
 
 **Flags:**
+
 - `-t, --type` - Entry type: `daily` (default), `til`, `snippet`, `debug`, `achievement`
 - `--tags` - Comma-separated tags
 - `--title` - Custom title
 - `-q, --quick` - Skip editor, read from args or stdin
 
 **Examples:**
+
 ```bash
 # Open editor
 devlog-client add -t til --tags "go,cli"
@@ -70,11 +78,13 @@ git log --oneline -5 | devlog-client add -q -t snippet
 ```
 
 ### `version`
+
 Show version information.
 
 ## Configuration
 
 Stored in `~/.config/devlog-client/config.json`:
+
 ```json
 {
   "api_url": "https://your-journal.example.com/api/v1",
@@ -85,16 +95,19 @@ Stored in `~/.config/devlog-client/config.json`:
 ## Development
 
 **Run tests:**
+
 ```bash
 just test-cli
 ```
 
 **Test coverage:**
+
 ```bash
 just test-cli-coverage
 ```
 
 **Build:**
+
 ```bash
 just build-cli
 ```
@@ -102,11 +115,13 @@ just build-cli
 ## Releasing
 
 Releases are automated via GitHub Actions. When a tag is pushed:
+
 1. App and CLI tests run
 2. CLI binaries built for 6 platforms (Linux/macOS/Windows × amd64/arm64)
 3. Release created with changelog and binaries attached
 
 **Create a release:**
+
 ```bash
 # Ensure tests pass
 just test-cli
