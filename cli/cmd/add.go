@@ -163,9 +163,10 @@ var addCmd = &cobra.Command{
 		// Parse success response
 		var successResp APISuccessResponse
 		if err := json.Unmarshal(resp.Body(), &successResp); err == nil {
-			fmt.Println("✓ Entry created successfully!")
 			if successResp.Message != "" {
-				fmt.Printf("  %s\n", successResp.Message)
+				fmt.Printf("✓ %s\n", successResp.Message)
+			} else {
+				fmt.Println("✓ Entry created successfully!")
 			}
 		} else {
 			fmt.Println("✓ Entry created successfully!")
