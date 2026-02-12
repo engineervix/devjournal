@@ -36,13 +36,11 @@ var loginCmd = &cobra.Command{
 		apiURL := viper.GetString("api_url")
 		client := resty.New()
 
-		// Make a simple request to test authentication
-		// We'll try to create an entry with minimal data to test auth
-		// (or you could add a dedicated /api/v1/me endpoint)
+		// Validate the token using the /me endpoint
 		resp, err := client.R().
 			SetAuthToken(token).
 			SetHeader("Content-Type", "application/json").
-			Get(apiURL + "/entries")
+			Get(apiURL + "/me")
 
 		if err != nil {
 			fmt.Printf("\n✗ Error connecting to API: %v\n", err)

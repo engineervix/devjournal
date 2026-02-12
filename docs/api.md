@@ -31,12 +31,18 @@ All API endpoints require authentication using Personal Access Tokens (PATs).
 
 ### Creating an Access Token
 
-Generate a token via the web interface:
+Generate a token using the Ace command:
 
-1. Navigate to **Settings** → **API Tokens**
-2. Click **Create New Token**
-3. Give your token a descriptive name
-4. Copy the token immediately (it won't be shown again)
+```bash
+node ace make:token user@example.com "My API Token"
+```
+
+This will output your token. **Copy it immediately** - it won't be shown again.
+
+**Parameters:**
+
+- `email`: Your user account email
+- `name`: A descriptive name for the token (e.g., "CLI Access", "Automation Script")
 
 ### Using Your Token
 
@@ -47,6 +53,34 @@ Authorization: Bearer YOUR_TOKEN_HERE
 ```
 
 ## Endpoints
+
+### Validate Token
+
+Verify that your access token is valid and get user information.
+
+**Endpoint:** `GET /api/v1/me`
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "email": "user@example.com",
+    "fullName": "John Doe"
+  }
+}
+```
+
+**Error Response (401 Unauthorized):**
+
+```json
+{
+  "success": false,
+  "message": "Authentication required."
+}
+```
 
 ### Create Entry
 
