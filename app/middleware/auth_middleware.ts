@@ -27,8 +27,17 @@ export default class AuthMiddleware {
       await ctx.auth.authenticateUsing(options.guards, { loginRoute: this.redirectTo })
       return next()
     } catch (error) {
-      // For AJAX requests, return JSON response instead of redirect
-      if (ctx.request.ajax() || ctx.request.header('X-Requested-With') === 'XMLHttpRequest') {
+      // For API requests (with Authorization header or /api/ path), return JSON response
+      const isApiRequest =
+        ctx.request.header('Authorization') !== undefined ||
+        ctx.request.url().startsWith('/api/')
+
+      // For AJAX or API requests, return JSON response instead of redirect
+      if (
+        ctx.request.ajax() ||
+        ctx.request.header('X-Requested-With') === 'XMLHttpRequest' ||
+        isApiRequest
+      ) {
         return ctx.response.status(401).json({
           success: false,
           message: 'Authentication required.',
