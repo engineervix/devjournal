@@ -1,0 +1,35 @@
+{{--
+  OpenGraph and Twitter Card meta tags
+
+  Props:
+  - title: Page title (defaults to 'DevJournal')
+  - description: Page description (defaults to site description)
+  - image: Absolute URL to image (defaults to /images/illustrations/og-image.jpg)
+  - url: Current page URL (defaults to request.completeUrl())
+  - type: OpenGraph type (defaults to 'website')
+  - locale: Locale code (defaults to 'en_ZM')
+--}}
+
+@let(baseUrl = request.completeUrl().split('?')[0].replace(request.url(), ''))
+@let(defaultImage = baseUrl + '/images/illustrations/og-image.jpg')
+@let(defaultDescription = 'The developer\'s journal for daily logs, learning notes, and career achievements. Self-hosted, keyboard-driven, built for engineering growth.')
+
+{{-- OpenGraph Meta Tags --}}
+<meta property="og:title" content="{{ title || 'DevJournal' }}" />
+<meta property="og:description" content="{{ description || defaultDescription }}" />
+<meta property="og:image" content="{{ image || defaultImage }}" />
+<meta property="og:url" content="{{ url || request.completeUrl() }}" />
+<meta property="og:type" content="{{ type || 'website' }}" />
+<meta property="og:locale" content="{{ locale || 'en_ZM' }}" />
+<meta property="og:locale:alternate" content="en_GB" />
+
+{{-- Twitter Card Tags --}}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="{{ title || 'DevJournal' }}" />
+<meta name="twitter:description" content="{{ description || defaultDescription }}" />
+<meta name="twitter:image" content="{{ image || defaultImage }}" />
+
+{{-- Render additional meta slot if provided --}}
+@if($slots.additional)
+  {{{ await $slots.additional() }}}
+@endif

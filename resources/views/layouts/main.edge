@@ -1,34 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="csrf-token" content="{{ csrfToken }}" />
+    {{-- Common meta tags --}}
+    @!component('components/meta/common', { description: description })
+
     <title>
       {{ title ?? 'DevJournal' }}
     </title>
 
     {{-- Favicons --}}
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/ico/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/ico/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/images/ico/favicon-16x16.png" />
-    <link rel="manifest" href="/images/ico/site.webmanifest" />
+    @!component('components/meta/favicons')
 
-    {{-- OpenGraph Meta Tags --}}
-    <meta property="og:title" content="{{ title ?? 'DevJournal' }}" />
-    <meta
-      property="og:description"
-      content="The developer's journal for daily logs, learning notes, and career achievements. Self-hosted, keyboard-driven, built for engineering growth."
-    />
-    <meta
-      property="og:image"
-      content="{{ request.protocol() }}://{{ request.host() }}/images/illustrations/og-image.jpg"
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="en_ZM" />
-    <meta property="og:locale:alternate" content="en_GB" />
-    {{-- Twitter specific --}}
-    <meta name="twitter:card" content="summary_large_image" />
+    {{-- OpenGraph and Twitter Card meta tags --}}
+    @!component('components/meta/opengraph', {
+      title: title,
+      description: description,
+      image: ogImage,
+      type: ogType
+    })
 
     {{-- Prevent FOUC by initializing theme immediately --}}
     <script>
@@ -51,25 +40,25 @@
       [x-cloak] {
         display: none !important;
       }
-      
+
       /* Critical CSS to prevent layout shift */
-      
+
       /* Ensure dark mode styles are applied immediately */
-      
+
       .dark {
         color-scheme: dark;
       }
-      
+
       /* Prevent theme icon flashing */
-      
+
       .theme-icon-light.dark\:hidden {
         display: none;
       }
-      
+
       .dark .theme-icon-dark.hidden {
         display: none;
       }
-      
+
       .dark .theme-icon-dark.dark\:block {
         display: block;
       }
@@ -115,7 +104,7 @@
           </a>
             </nav>
           @endif
-          
+
           <div class="flex items-center gap-4">
             {{-- Mobile menu button --}}
             @if(auth.user)
@@ -180,7 +169,7 @@
                 </div>
               </div>
             @endif
-            
+
             {{-- Search Bar --}}
             @if(auth.user)
               <form action="{{ route('entries.search') }}" method="GET" class="hidden md:block">
@@ -197,7 +186,7 @@
                 </div>
               </form>
             @endif
-            
+
             {{-- User menu/settings --}}
             @if(auth.user)
               <div class="relative" x-data="userMenu" x-cloak>
@@ -243,7 +232,7 @@
                 Login
           </a>
             @endif
-            
+
             {{-- Theme toggle --}}
             <button
               id="theme-toggle"
@@ -262,7 +251,7 @@
       {{-- Display Flash Messages --}}
       @component('components/flash_messages')
       @end
-      
+
       {{{ await $slots.main() }}}
     </main>
 
@@ -298,7 +287,7 @@
         </div>
       </div>
     @endif
-    
+
     {{-- Footer --}}
     <footer class="bg-white dark:bg-gray-800 shadow">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
