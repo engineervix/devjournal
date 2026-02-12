@@ -30,7 +30,7 @@ logs container *follow:
 
 # docker-compose stop
 stop:
-    docker-compose stop
+    {{DOCKER_COMPOSE_DEV}} stop
 
 # docker-compose down [-v]
 down *volumes:
