@@ -1,3 +1,24 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
+
+- [API Documentation](#api-documentation)
+  - [Overview](#overview)
+  - [Authentication](#authentication)
+    - [Creating an Access Token](#creating-an-access-token)
+    - [Using Your Token](#using-your-token)
+  - [Endpoints](#endpoints)
+    - [Create Entry](#create-entry)
+  - [Example Usage](#example-usage)
+    - [cURL](#curl)
+    - [JavaScript (fetch)](#javascript-fetch)
+    - [Python (requests)](#python-requests)
+  - [Rate Limiting](#rate-limiting)
+  - [CORS](#cors)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # API Documentation
 
 ## Overview
