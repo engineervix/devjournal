@@ -29,8 +29,7 @@ export default class AuthMiddleware {
     } catch (error) {
       // For API requests (with Authorization header or /api/ path), return JSON response
       const isApiRequest =
-        ctx.request.header('Authorization') !== undefined ||
-        ctx.request.url().startsWith('/api/')
+        ctx.request.header('Authorization') !== undefined || ctx.request.url().startsWith('/api/')
 
       // For AJAX or API requests, return JSON response instead of redirect
       if (

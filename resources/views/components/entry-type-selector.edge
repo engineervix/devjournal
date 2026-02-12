@@ -7,7 +7,8 @@
       type="button"
       @click="selected = 'daily'"
       :class="selected === 'daily' ? 'ring-2 ring-indigo-500' : 'ring-1 ring-gray-300 dark:ring-gray-600'"
-      class="col-span-1 relative bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:border-gray-400 focus:outline-none">
+      class="col-span-1 relative bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:border-gray-400 focus:outline-none"
+    >
       <span class="flex items-center">
         <span class="text-xl text-blue-500 mr-2">
           <i class="ph ph-calendar-check"></i>
@@ -24,7 +25,8 @@
       type="button"
       @click="selected = 'til'"
       :class="selected === 'til' ? 'ring-2 ring-indigo-500' : 'ring-1 ring-gray-300 dark:ring-gray-600'"
-      class="col-span-1 relative bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:border-gray-400 focus:outline-none">
+      class="col-span-1 relative bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:border-gray-400 focus:outline-none"
+    >
       <span class="flex items-center">
         <span class="text-xl text-green-500 mr-2">
           <i class="ph ph-lightbulb"></i>
@@ -41,7 +43,8 @@
       type="button"
       @click="selected = 'snippet'"
       :class="selected === 'snippet' ? 'ring-2 ring-indigo-500' : 'ring-1 ring-gray-300 dark:ring-gray-600'"
-      class="col-span-1 relative bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:border-gray-400 focus:outline-none">
+      class="col-span-1 relative bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:border-gray-400 focus:outline-none"
+    >
       <span class="flex items-center">
         <span class="text-xl text-purple-500 mr-2">
           <i class="ph ph-code"></i>
@@ -58,7 +61,8 @@
       type="button"
       @click="selected = 'debug'"
       :class="selected === 'debug' ? 'ring-2 ring-indigo-500' : 'ring-1 ring-gray-300 dark:ring-gray-600'"
-      class="col-span-1 relative bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:border-gray-400 focus:outline-none">
+      class="col-span-1 relative bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:border-gray-400 focus:outline-none"
+    >
       <span class="flex items-center">
         <span class="text-xl text-orange-500 mr-2">
           <i class="ph ph-bug"></i>
@@ -75,7 +79,8 @@
       type="button"
       @click="selected = 'achievement'"
       :class="selected === 'achievement' ? 'ring-2 ring-indigo-500' : 'ring-1 ring-gray-300 dark:ring-gray-600'"
-      class="col-span-1 relative bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:border-gray-400 focus:outline-none">
+      class="col-span-1 relative bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:border-gray-400 focus:outline-none"
+    >
       <span class="flex items-center">
         <span class="text-xl text-pink-500 mr-2">
           <i class="ph ph-medal"></i>
@@ -85,7 +90,13 @@
           <span class="block text-xs text-gray-500 dark:text-gray-400">Celebrate wins</span>
         </span>
       </span>
-      <input type="radio" name="entryType" value="achievement" :checked="selected === 'achievement'" class="hidden" />
+      <input
+        type="radio"
+        name="entryType"
+        value="achievement"
+        :checked="selected === 'achievement'"
+        class="hidden"
+      />
     </button>
   </div>
 
@@ -93,10 +104,14 @@
   {{-- Note: Using insertTemplateWithRetry() to work around EasyMDE timing issue --}}
   {{-- where template insertion sometimes requires two clicks to work properly --}}
   <div class="mt-4" x-show="selected === 'daily'">
-    <div class="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-100 dark:border-blue-800">
-      <h4 class="font-medium mb-2 text-blue-800 dark:text-blue-200">Daily Log Template</h4>
+    <div
+      class="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-100 dark:border-blue-800"
+    >
+      <h4 class="font-medium mb-2 text-blue-800 dark:text-blue-200">
+        Daily Log Template
+      </h4>
       <pre class="text-sm text-blue-700 dark:text-blue-300">
-## Daily Log
+        ## Daily Log
 
 ### What I did today
 
@@ -109,18 +124,26 @@
 ### Blockers/Issues
 
 -
-</pre>
-      <button type="button" @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-blue-700 dark:text-blue-300 hover:underline">
+      </pre>
+      <button
+        type="button"
+        @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())"
+        class="mt-2 text-sm text-blue-700 dark:text-blue-300 hover:underline"
+      >
         Use Template
       </button>
     </div>
   </div>
 
   <div class="mt-4" x-show="selected === 'til'">
-    <div class="p-4 bg-green-50 dark:bg-green-900/30 rounded-lg border border-green-100 dark:border-green-800">
-      <h4 class="font-medium mb-2 text-green-800 dark:text-green-200">TIL Template</h4>
+    <div
+      class="p-4 bg-green-50 dark:bg-green-900/30 rounded-lg border border-green-100 dark:border-green-800"
+    >
+      <h4 class="font-medium mb-2 text-green-800 dark:text-green-200">
+        TIL Template
+      </h4>
       <pre class="text-sm text-green-700 dark:text-green-300">
-## Today I Learned: [Concept/Technology]
+        ## Today I Learned: [Concept/Technology]
 
 ### What I learned
 
@@ -133,18 +156,26 @@
 ```
 code here
 ```
-</pre>
-      <button type="button" @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-green-700 dark:text-green-300 hover:underline">
+      </pre>
+      <button
+        type="button"
+        @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())"
+        class="mt-2 text-sm text-green-700 dark:text-green-300 hover:underline"
+      >
         Use Template
       </button>
     </div>
   </div>
 
   <div class="mt-4" x-show="selected === 'snippet'">
-    <div class="p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg border border-purple-100 dark:border-purple-800">
-      <h4 class="font-medium mb-2 text-purple-800 dark:text-purple-200">Code Snippet Template</h4>
+    <div
+      class="p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg border border-purple-100 dark:border-purple-800"
+    >
+      <h4 class="font-medium mb-2 text-purple-800 dark:text-purple-200">
+        Code Snippet Template
+      </h4>
       <pre class="text-sm text-purple-700 dark:text-purple-300">
-## [Snippet Name]
+        ## [Snippet Name]
 
 ### Language/Technology
 
@@ -159,18 +190,26 @@ code here
 ```
 
 ### Explanation
-</pre>
-      <button type="button" @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-purple-700 dark:text-purple-300 hover:underline">
+      </pre>
+      <button
+        type="button"
+        @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())"
+        class="mt-2 text-sm text-purple-700 dark:text-purple-300 hover:underline"
+      >
         Use Template
       </button>
     </div>
   </div>
 
   <div class="mt-4" x-show="selected === 'debug'">
-    <div class="p-4 bg-orange-50 dark:bg-orange-900/30 rounded-lg border border-orange-100 dark:border-orange-800">
-      <h4 class="font-medium mb-2 text-orange-800 dark:text-orange-200">Debug Session Template</h4>
+    <div
+      class="p-4 bg-orange-50 dark:bg-orange-900/30 rounded-lg border border-orange-100 dark:border-orange-800"
+    >
+      <h4 class="font-medium mb-2 text-orange-800 dark:text-orange-200">
+        Debug Session Template
+      </h4>
       <pre class="text-sm text-orange-700 dark:text-orange-300">
-## [Bug/Issue Title]
+        ## [Bug/Issue Title]
 
 ### Problem description
 
@@ -183,18 +222,26 @@ code here
 ### Time spent (optional)
 
 ### Lessons learned
-</pre>
-      <button type="button" @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-orange-700 dark:text-orange-300 hover:underline">
+      </pre>
+      <button
+        type="button"
+        @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())"
+        class="mt-2 text-sm text-orange-700 dark:text-orange-300 hover:underline"
+      >
         Use Template
       </button>
     </div>
   </div>
 
   <div class="mt-4" x-show="selected === 'achievement'">
-    <div class="p-4 bg-pink-50 dark:bg-pink-900/30 rounded-lg border border-pink-100 dark:border-pink-800">
-      <h4 class="font-medium mb-2 text-pink-800 dark:text-pink-200">Achievement Template</h4>
+    <div
+      class="p-4 bg-pink-50 dark:bg-pink-900/30 rounded-lg border border-pink-100 dark:border-pink-800"
+    >
+      <h4 class="font-medium mb-2 text-pink-800 dark:text-pink-200">
+        Achievement Template
+      </h4>
       <pre class="text-sm text-pink-700 dark:text-pink-300">
-## [Achievement Title]
+        ## [Achievement Title]
 
 ### What I accomplished
 
@@ -205,8 +252,12 @@ code here
 -
 
 ### Link to PR/ticket (optional)
-</pre>
-      <button type="button" @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())" class="mt-2 text-sm text-pink-700 dark:text-pink-300 hover:underline">
+      </pre>
+      <button
+        type="button"
+        @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())"
+        class="mt-2 text-sm text-pink-700 dark:text-pink-300 hover:underline"
+      >
         Use Template
       </button>
     </div>

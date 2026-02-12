@@ -148,7 +148,7 @@ router
       .resource('entries', EntriesController)
       .where('id', /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
 
-      router.get('/tags/:slug', [EntriesController, 'byTag']).as('entries.byTag')
+    router.get('/tags/:slug', [EntriesController, 'byTag']).as('entries.byTag')
   })
   .use(middleware.auth())
 

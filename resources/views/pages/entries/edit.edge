@@ -1,49 +1,58 @@
 @component('layouts/main')
 
-@slot('main')
-  <div class="mb-6 flex justify-between items-center">
-    <h1 class="text-2xl font-bold">Edit Entry</h1>
-    <div>
-      <a href="{{ route('entries.show', { id: entry.id }) }}" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-        <i class="ph ph-x"></i> Cancel
+  @slot('main')
+    <div class="mb-6 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">
+        Edit Entry
+      </h1>
+      <div>
+        <a
+          href="{{ route('entries.show', { id: entry.id }) }}"
+          class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+        >
+          <i class="ph ph-x"></i>Cancel
       </a>
+      </div>
     </div>
-  </div>
 
-  {{-- Display Form Validation Errors --}}
-  @!component('components/form_validation_errors', { flashMessages: flashMessages })
+    {{-- Display Form Validation Errors --}}
+    @!component('components/form_validation_errors', { flashMessages: flashMessages })
 
-  <div class="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg" x-data="ajaxForm">
-    <form x-ref="form" action="{{ route('entries.update', { id: entry.id }) }}?_method=PUT" method="POST" @submit="submitForm">
-      {{ csrfField() }}
-
-      <div class="px-6 py-5">
-        @!component('pages/entries/_form', {
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg" x-data="ajaxForm">
+      <form
+        x-ref="form"
+        action="{{ route('entries.update', { id: entry.id }) }}?_method=PUT"
+        method="POST"
+        @submit="submitForm"
+      >
+        {{ csrfField() }}
+        <div class="px-6 py-5">
+          @!component('pages/entries/_form', {
           entry: entry,
           allTags: allTags,
           flashMessages: flashMessages,
           request: request
-        })
-      </div>
+          })
+        </div>
 
-      <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700 flex justify-between items-center">
-        <div class="text-sm text-gray-500 dark:text-gray-400">
-          <span x-show="lastSaved" x-text="getLastSavedText()"></span>
-          <span x-show="hasUnsavedChanges && !isSubmitting" class="text-orange-500">• Unsaved changes</span>
-          <span x-show="isSubmitting" class="text-blue-500">• Saving...</span>
+        <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700 flex justify-between items-center">
+          <div class="text-sm text-gray-500 dark:text-gray-400">
+            <span x-show="lastSaved" x-text="getLastSavedText()"></span>
+            <span x-show="hasUnsavedChanges && !isSubmitting" class="text-orange-500">• Unsaved changes</span>
+            <span x-show="isSubmitting" class="text-blue-500">• Saving...</span>
+          </div>
+          <div class="flex space-x-3">
+            <button
+              type="submit"
+              :disabled="isSubmitting"
+              class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span x-show="!isSubmitting">Update Entry</span>
+              <span x-show="isSubmitting">Saving...</span>
+            </button>
+          </div>
         </div>
-        <div class="flex space-x-3">
-          <button
-            type="submit"
-            :disabled="isSubmitting"
-            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <span x-show="!isSubmitting">Update Entry</span>
-            <span x-show="isSubmitting">Saving...</span>
-          </button>
-        </div>
-      </div>
-    </form>
-  </div>
-@end
+      </form>
+    </div>
+  @end
 @end

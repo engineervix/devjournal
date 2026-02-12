@@ -122,17 +122,17 @@ const response = await fetch('https://your-domain.com/api/v1/entries', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer YOUR_TOKEN_HERE',
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
     entryType: 'til',
     contentMarkdown: 'Learned how to use the DevJournal API',
-    tags: ['api']
-  })
-});
+    tags: ['api'],
+  }),
+})
 
-const data = await response.json();
-console.log(data);
+const data = await response.json()
+console.log(data)
 ```
 
 ### Python (requests)

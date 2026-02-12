@@ -62,13 +62,10 @@ test.group('Api entries', (group) => {
   })
 
   test('cannot create entry with invalid token', async ({ client }) => {
-    const response = await client
-      .post('/api/v1/entries')
-      .bearerToken('invalid-token-12345')
-      .json({
-        entryType: 'daily',
-        contentMarkdown: 'This is a test note from API',
-      })
+    const response = await client.post('/api/v1/entries').bearerToken('invalid-token-12345').json({
+      entryType: 'daily',
+      contentMarkdown: 'This is a test note from API',
+    })
 
     response.assertStatus(401)
   })
@@ -105,10 +102,7 @@ test.group('Api entries', (group) => {
     )
 
     // Verify tags are associated with the entry
-    const entry = await Entry.query()
-      .where('user_id', user.id)
-      .preload('tags')
-      .firstOrFail()
+    const entry = await Entry.query().where('user_id', user.id).preload('tags').firstOrFail()
     assert.lengthOf(entry.tags, 2)
   })
 
@@ -144,7 +138,6 @@ test.group('Api entries', (group) => {
     assert.equal(existingTags[0].id, existingTag.id)
   })
 
-
   test('creates entry with auto-generated title', async ({ client, assert }) => {
     const user = await User.create({
       fullName: 'Test User',
@@ -152,14 +145,10 @@ test.group('Api entries', (group) => {
       password: 'password',
     })
 
-    const response = await client
-      .post('/api/v1/entries')
-      .withGuard('api')
-      .loginAs(user)
-      .json({
-        entryType: 'daily',
-        contentMarkdown: 'Entry without explicit title',
-      })
+    const response = await client.post('/api/v1/entries').withGuard('api').loginAs(user).json({
+      entryType: 'daily',
+      contentMarkdown: 'Entry without explicit title',
+    })
 
     response.assertStatus(201)
 
@@ -176,14 +165,10 @@ test.group('Api entries', (group) => {
       password: 'password',
     })
 
-    const response = await client
-      .post('/api/v1/entries')
-      .withGuard('api')
-      .loginAs(user)
-      .json({
-        entryType: 'daily',
-        contentMarkdown: '# Heading\n\nThis is **bold** text.',
-      })
+    const response = await client.post('/api/v1/entries').withGuard('api').loginAs(user).json({
+      entryType: 'daily',
+      contentMarkdown: '# Heading\n\nThis is **bold** text.',
+    })
 
     response.assertStatus(201)
 

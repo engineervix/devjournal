@@ -41,7 +41,7 @@ export default class EntriesController {
     // Process content using ContentProcessorService
     this.contentProcessor.updateEntryContent(entry, payload.contentMarkdown || null)
     await entry.save()
-    
+
     // Load tags for response
     await entry.load('tags')
 

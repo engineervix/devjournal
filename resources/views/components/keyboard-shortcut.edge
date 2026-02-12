@@ -9,9 +9,9 @@
 
 <span class="{{ cssClass || 'inline-flex items-center gap-1' }}">
   @if(request.header('user-agent', '').includes('Mac'))
-    <kbd class="kbd kbd-mac">⌘</kbd><kbd class="kbd">{{ (shortcut || 's').toUpperCase() }}</kbd>
+    <kbd class="kbd kbd-mac">⌘</kbd>    <kbd class="kbd">{{ (shortcut || 's').toUpperCase() }}</kbd>
   @else
-    <kbd class="kbd">Ctrl</kbd><kbd class="kbd">+</kbd><kbd class="kbd">{{ (shortcut || 's').toUpperCase() }}</kbd>
+    <kbd class="kbd">Ctrl</kbd>    <kbd class="kbd">+</kbd>    <kbd class="kbd">{{ (shortcut || 's').toUpperCase() }}</kbd>
   @endif
   @if(action)
     <span class="ml-1">{{ action }}</span>

@@ -1,13 +1,14 @@
 {{-- EasyMDE Editor Component --}}
-<div x-data="easyMDEEditor" x-init="init({{ JSON.stringify(initialContent || '') }})" class="mb-6" x-cloak>
+<div
+  x-data="easyMDEEditor"
+  x-init="init({{ JSON.stringify(initialContent || '') }})"
+  class="mb-6"
+  x-cloak
+>
   <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content</label>
 
   <div class="easymde-wrapper">
-    <textarea
-      x-ref="textarea"
-      id="content"
-      name="contentMarkdown"
-    ></textarea>
+    <textarea x-ref="textarea" id="content" name="contentMarkdown"></textarea>
   </div>
 
   {{-- Keyboard shortcuts hint --}}
