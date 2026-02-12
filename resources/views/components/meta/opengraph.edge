@@ -10,7 +10,7 @@
   - locale: Locale code (defaults to 'en_ZM')
 --}}
 
-@let(baseUrl = request.completeUrl().split('?')[0].replace(request.url(), ''))
+@let(baseUrl = request.protocol() + '://' + request.host())
 @let(defaultImage = baseUrl + '/images/illustrations/og-image.jpg')
 @let(defaultDescription = 'The developer\'s journal for daily logs, learning notes, and career achievements. Self-hosted, keyboard-driven, built for engineering growth.')
 
