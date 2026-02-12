@@ -1,216 +1,272 @@
 @component('layouts/main')
 
-@slot('main')
-  <div class="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">My Entries</h1>
-    <div class="flex items-center space-x-2">
-      {{-- Export Dropdown --}}
-      <div class="relative" x-data="{ open: false }" x-cloak>
-        <button
-          @click="open = !open"
-          class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
-          <i class="ph ph-download-simple -ml-0.5"></i>
-          <span>Export</span>
-          <i class="ph-bold ph-caret-down -mr-1"></i>
-        </button>
+  @slot('main')
+    <div class="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
+        My Entries
+      </h1>
+      <div class="flex items-center space-x-2">
+        {{-- Export Dropdown --}}
+        <div class="relative" x-data="{ open: false }" x-cloak>
+          <button
+            @click="open = !open"
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            <i class="ph ph-download-simple -ml-0.5"></i>
+            <span>Export</span>
+            <i class="ph-bold ph-caret-down -mr-1"></i>
+          </button>
 
-        <div
-          x-show="open"
-          @click.away="open = false"
-          x-transition:enter="transition ease-out duration-100"
-          x-transition:enter-start="transform opacity-0 scale-95"
-          x-transition:enter-end="transform opacity-100 scale-100"
-          x-transition:leave="transition ease-in duration-75"
-          x-transition:leave-start="transform opacity-100 scale-100"
-          x-transition:leave-end="transform opacity-0 scale-95"
-          class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-        >
-          <div class="py-1">
-            <a href="{{ route('entries.export') }}?{{ queryParams }}&format=zip" class="group flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-              <i class="ph ph-file-zip mr-3 text-gray-400 group-hover:text-gray-500"></i>
-              ZIP Archive (Individual Files)
+          <div
+            x-show="open"
+            @click.away="open = false"
+            x-transition:enter="transition ease-out duration-100"
+            x-transition:enter-start="transform opacity-0 scale-95"
+            x-transition:enter-end="transform opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="transform opacity-100 scale-100"
+            x-transition:leave-end="transform opacity-0 scale-95"
+            class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          >
+            <div class="py-1">
+              <a
+                href="{{ route('entries.export') }}?{{ queryParams }}&format=zip"
+                class="group flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <i class="ph ph-file-zip mr-3 text-gray-400 group-hover:text-gray-500"></i>
+                ZIP Archive (Individual Files)
             </a>
-            <a href="{{ route('entries.export') }}?{{ queryParams }}&format=single" class="group flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-              <i class="ph ph-file-text mr-3 text-gray-400 group-hover:text-gray-500"></i>
-              Single Markdown File
+              <a
+                href="{{ route('entries.export') }}?{{ queryParams }}&format=single"
+                class="group flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <i class="ph ph-file-text mr-3 text-gray-400 group-hover:text-gray-500"></i>
+                Single Markdown File
             </a>
+            </div>
           </div>
         </div>
-      </div>
 
-      {{-- Entry Type Filter --}}
-      <div class="relative" x-data="{ open: false }" x-cloak>
-        <button
-          @click="open = !open"
-          class="inline-flex items-center gap-x-1.5 rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-        >
-          <span>{{ request.qs().type || 'All Types' }}</span>
-          <i class="ph-bold ph-caret-down -mr-1 text-gray-400"></i>
-        </button>
+        {{-- Entry Type Filter --}}
+        <div class="relative" x-data="{ open: false }" x-cloak>
+          <button
+            @click="open = !open"
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            <span>{{ request.qs().type || 'All Types' }}</span>
+            <i class="ph-bold ph-caret-down -mr-1 text-gray-400"></i>
+          </button>
 
-        <div
-          x-show="open"
-          @click.away="open = false"
-          x-transition:enter="transition ease-out duration-100"
-          x-transition:enter-start="transform opacity-0 scale-95"
-          x-transition:enter-end="transform opacity-100 scale-100"
-          x-transition:leave="transition ease-in duration-75"
-          x-transition:leave-start="transform opacity-100 scale-100"
-          x-transition:leave-end="transform opacity-0 scale-95"
-          class="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-        >
-          <div class="py-1">
-            <a href="{{ route('entries.index') }}" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ !request.qs().type ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-              All Types
+          <div
+            x-show="open"
+            @click.away="open = false"
+            x-transition:enter="transition ease-out duration-100"
+            x-transition:enter-start="transform opacity-0 scale-95"
+            x-transition:enter-end="transform opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="transform opacity-100 scale-100"
+            x-transition:leave-end="transform opacity-0 scale-95"
+            class="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          >
+            <div class="py-1">
+              <a
+                href="{{ route('entries.index') }}"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ !request.qs().type ? 'bg-gray-100 dark:bg-gray-700' : '' }}"
+              >
+                All Types
             </a>
-            <a href="{{ route('entries.index') }}?type=daily" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().type === 'daily' ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-              Daily Log
+              <a
+                href="{{ route('entries.index') }}?type=daily"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().type === 'daily' ? 'bg-gray-100 dark:bg-gray-700' : '' }}"
+              >
+                Daily Log
             </a>
-            <a href="{{ route('entries.index') }}?type=til" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().type === 'til' ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-              Today I Learned
+              <a
+                href="{{ route('entries.index') }}?type=til"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().type === 'til' ? 'bg-gray-100 dark:bg-gray-700' : '' }}"
+              >
+                Today I Learned
             </a>
-            <a href="{{ route('entries.index') }}?type=snippet" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().type === 'snippet' ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-              Code Snippet
+              <a
+                href="{{ route('entries.index') }}?type=snippet"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().type === 'snippet' ? 'bg-gray-100 dark:bg-gray-700' : '' }}"
+              >
+                Code Snippet
             </a>
-            <a href="{{ route('entries.index') }}?type=debug" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().type === 'debug' ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-              Debug Session
+              <a
+                href="{{ route('entries.index') }}?type=debug"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().type === 'debug' ? 'bg-gray-100 dark:bg-gray-700' : '' }}"
+              >
+                Debug Session
             </a>
-            <a href="{{ route('entries.index') }}?type=achievement" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().type === 'achievement' ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-              Achievement
+              <a
+                href="{{ route('entries.index') }}?type=achievement"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().type === 'achievement' ? 'bg-gray-100 dark:bg-gray-700' : '' }}"
+              >
+                Achievement
             </a>
+            </div>
           </div>
         </div>
-      </div>
 
-      {{-- Date Range Selector --}}
-      <div class="relative" x-data="{ open: false }" x-cloak>
-        <button
-          @click="open = !open"
-          class="inline-flex items-center gap-x-1.5 rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-        >
-          <span>{{ request.qs().period || 'All Time' }}</span>
-          <i class="ph-bold ph-caret-down -mr-1 text-gray-400"></i>
-        </button>
+        {{-- Date Range Selector --}}
+        <div class="relative" x-data="{ open: false }" x-cloak>
+          <button
+            @click="open = !open"
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            <span>{{ request.qs().period || 'All Time' }}</span>
+            <i class="ph-bold ph-caret-down -mr-1 text-gray-400"></i>
+          </button>
 
-        <div
-          x-show="open"
-          @click.away="open = false"
-          x-transition:enter="transition ease-out duration-100"
-          x-transition:enter-start="transform opacity-0 scale-95"
-          x-transition:enter-end="transform opacity-100 scale-100"
-          x-transition:leave="transition ease-in duration-75"
-          x-transition:leave-start="transform opacity-100 scale-100"
-          x-transition:leave-end="transform opacity-0 scale-95"
-          class="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-        >
-          <div class="py-1">
-            <a href="{{ constructUrl({ period: null }) }}" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ !request.qs().period ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-              All Time
+          <div
+            x-show="open"
+            @click.away="open = false"
+            x-transition:enter="transition ease-out duration-100"
+            x-transition:enter-start="transform opacity-0 scale-95"
+            x-transition:enter-end="transform opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="transform opacity-100 scale-100"
+            x-transition:leave-end="transform opacity-0 scale-95"
+            class="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          >
+            <div class="py-1">
+              <a
+                href="{{ constructUrl({ period: null }) }}"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ !request.qs().period ? 'bg-gray-100 dark:bg-gray-700' : '' }}"
+              >
+                All Time
             </a>
-            <a href="{{ constructUrl({ period: 'today' }) }}" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().period === 'today' ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-              Today
+              <a
+                href="{{ constructUrl({ period: 'today' }) }}"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().period === 'today' ? 'bg-gray-100 dark:bg-gray-700' : '' }}"
+              >
+                Today
             </a>
-            <a href="{{ constructUrl({ period: 'this-week' }) }}" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().period === 'this-week' ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-              This Week
+              <a
+                href="{{ constructUrl({ period: 'this-week' }) }}"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().period === 'this-week' ? 'bg-gray-100 dark:bg-gray-700' : '' }}"
+              >
+                This Week
             </a>
-            <a href="{{ constructUrl({ period: 'this-month' }) }}" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().period === 'this-month' ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-              This Month
+              <a
+                href="{{ constructUrl({ period: 'this-month' }) }}"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().period === 'this-month' ? 'bg-gray-100 dark:bg-gray-700' : '' }}"
+              >
+                This Month
             </a>
-            <a href="{{ constructUrl({ period: 'this-year' }) }}" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().period === 'this-year' ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-              This Year
+              <a
+                href="{{ constructUrl({ period: 'this-year' }) }}"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().period === 'this-year' ? 'bg-gray-100 dark:bg-gray-700' : '' }}"
+              >
+                This Year
             </a>
+            </div>
           </div>
         </div>
-      </div>
 
-      {{-- Sort Order --}}
-      <div class="relative" x-data="{ open: false }" x-cloak>
-        <button
-          @click="open = !open"
-          class="inline-flex items-center gap-x-1.5 rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-        >
-          <span>{{ request.qs().sort === 'oldest' ? 'Oldest First' : 'Newest First' }}</span>
-          <i class="ph-bold ph-caret-down -mr-1 text-gray-400"></i>
-        </button>
+        {{-- Sort Order --}}
+        <div class="relative" x-data="{ open: false }" x-cloak>
+          <button
+            @click="open = !open"
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            <span>{{ request.qs().sort === 'oldest' ? 'Oldest First' : 'Newest First' }}</span>
+            <i class="ph-bold ph-caret-down -mr-1 text-gray-400"></i>
+          </button>
 
-        <div
-          x-show="open"
-          @click.away="open = false"
-          x-transition:enter="transition ease-out duration-100"
-          x-transition:enter-start="transform opacity-0 scale-95"
-          x-transition:enter-end="transform opacity-100 scale-100"
-          x-transition:leave="transition ease-in duration-75"
-          x-transition:leave-start="transform opacity-100 scale-100"
-          x-transition:leave-end="transform opacity-0 scale-95"
-          class="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-        >
-          <div class="py-1">
-            <a href="{{ constructUrl({ sort: 'newest' }) }}" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().sort !== 'oldest' ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-              Newest First
+          <div
+            x-show="open"
+            @click.away="open = false"
+            x-transition:enter="transition ease-out duration-100"
+            x-transition:enter-start="transform opacity-0 scale-95"
+            x-transition:enter-end="transform opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="transform opacity-100 scale-100"
+            x-transition:leave-end="transform opacity-0 scale-95"
+            class="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          >
+            <div class="py-1">
+              <a
+                href="{{ constructUrl({ sort: 'newest' }) }}"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().sort !== 'oldest' ? 'bg-gray-100 dark:bg-gray-700' : '' }}"
+              >
+                Newest First
             </a>
-            <a href="{{ constructUrl({ sort: 'oldest' }) }}" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().sort === 'oldest' ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-              Oldest First
+              <a
+                href="{{ constructUrl({ sort: 'oldest' }) }}"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ request.qs().sort === 'oldest' ? 'bg-gray-100 dark:bg-gray-700' : '' }}"
+              >
+                Oldest First
             </a>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  @if(entries.length > 0)
-    <div class="space-y-4">
-      @each(entry in entries)
-        @!component('components/entry-card', { entry })
-      @end
-
-      {{-- Pagination --}}
-      <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0 my-6 pt-6">
-        <div class="-mt-px flex w-0 flex-1">
-          @if(entries.getMeta().currentPage > 1)
-            <a
-              href="{{ route('entries.index') }}?page={{ entries.getMeta().currentPage - 1 }}{{ queryParams }}"
-              class="inline-flex items-center border-t-2 border-transparent pr-1 pt-4 text-sm font-medium text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300"
-            >
-              <i class="ph ph-arrow-left mr-3"></i>
-              Previous
+    @if(entries.length > 0)
+      <div class="space-y-4">
+        @each(entry in entries)
+          @!component('components/entry-card', { entry })
+        @end
+        
+        {{-- Pagination --}}
+        <nav
+          class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0 my-6 pt-6"
+        >
+          <div class="-mt-px flex w-0 flex-1">
+            @if(entries.getMeta().currentPage > 1)
+              <a
+                href="{{ route('entries.index') }}?page={{ entries.getMeta().currentPage - 1 }}{{ queryParams }}"
+                class="inline-flex items-center border-t-2 border-transparent pr-1 pt-4 text-sm font-medium text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                <i class="ph ph-arrow-left mr-3"></i>
+                Previous
             </a>
-          @endif
-        </div>
+            @endif
+          </div>
 
-        <div class="hidden md:-mt-px md:flex">
-          @each(page in range(1, entries.getMeta().lastPage + 1))
-            <a
-              href="{{ route('entries.index') }}?page={{ page }}{{ queryParams }}"
-              class="{{ page === entries.getMeta().currentPage ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300' }} inline-flex items-center border-t-2 px-4 pt-4 text-sm font-medium"
-            >
-              {{ page }}
+          <div class="hidden md:-mt-px md:flex">
+            @each(page in range(1, entries.getMeta().lastPage + 1))
+              <a
+                href="{{ route('entries.index') }}?page={{ page }}{{ queryParams }}"
+                class="{{ page === entries.getMeta().currentPage ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300' }} inline-flex items-center border-t-2 px-4 pt-4 text-sm font-medium"
+              >
+                {{ page }}
             </a>
-          @end
-        </div>
+            @end
+          </div>
 
-        <div class="-mt-px flex w-0 flex-1 justify-end">
-          @if(entries.getMeta().currentPage < entries.getMeta().lastPage)
-            <a
-              href="{{ route('entries.index') }}?page={{ entries.getMeta().currentPage + 1 }}{{ queryParams }}"
-              class="inline-flex items-center border-t-2 border-transparent pl-1 pt-4 text-sm font-medium text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300"
-            >
-              Next
+          <div class="-mt-px flex w-0 flex-1 justify-end">
+            @if(entries.getMeta().currentPage < entries.getMeta().lastPage)
+              <a
+                href="{{ route('entries.index') }}?page={{ entries.getMeta().currentPage + 1 }}{{ queryParams }}"
+                class="inline-flex items-center border-t-2 border-transparent pl-1 pt-4 text-sm font-medium text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                Next
               <i class="ph ph-arrow-right ml-3"></i>
-            </a>
-          @endif
-        </div>
-      </nav>
-    </div>
-  @else
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-8 text-center">
-      <i class="ph ph-notebook text-4xl text-gray-400 dark:text-gray-500 mb-3"></i>
-      <h3 class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-1">No entries found</h3>
-      <p class="text-gray-500 dark:text-gray-400 mb-4">Try adjusting your filters or create a new entry.</p>
-      <a href="{{ route('entries.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-        Create new entry
+              </a>
+            @endif
+          </div>
+        </nav>
+      </div>
+    @else
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-8 text-center">
+        <i class="ph ph-notebook text-4xl text-gray-400 dark:text-gray-500 mb-3"></i>
+        <h3 class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-1">
+          No entries found
+        </h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-4">
+          Try adjusting your filters or create a new entry.
+        </p>
+        <a
+          href="{{ route('entries.create') }}"
+          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Create new entry
       </a>
-    </div>
+      </div>
+    @end
   @end
-@end
 @end

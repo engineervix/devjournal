@@ -148,7 +148,14 @@ router
       .resource('entries', EntriesController)
       .where('id', /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
 
-    // Filter entries by tag
     router.get('/tags/:slug', [EntriesController, 'byTag']).as('entries.byTag')
   })
   .use(middleware.auth())
+
+// API Routes
+router
+  .group(() => {
+    router.post('/entries', [() => import('#controllers/api/entries_controller'), 'store'])
+  })
+  .prefix('api/v1')
+  .use(middleware.auth({ guards: ['api'] }))

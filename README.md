@@ -8,7 +8,8 @@ A modern developer journal application built with [AdonisJS](https://adonisjs.co
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
 - [Features](#features)
   - [📝 **Entry Types**](#-entry-types)
@@ -27,7 +28,6 @@ A modern developer journal application built with [AdonisJS](https://adonisjs.co
   - [Keyboard Shortcuts](#keyboard-shortcuts)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 
 ## Features
 
@@ -60,6 +60,7 @@ A modern developer journal application built with [AdonisJS](https://adonisjs.co
 ## Quick Start
 
 ### Prerequisites
+
 - Node.js 22+
 - PostgreSQL 16+
 - npm
@@ -67,17 +68,20 @@ A modern developer journal application built with [AdonisJS](https://adonisjs.co
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd devjournal
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment**
+
    ```bash
    cp -v .env.example .env
    cp -v .env.test.example .env.test
@@ -85,21 +89,25 @@ A modern developer journal application built with [AdonisJS](https://adonisjs.co
    ```
 
 4. **Start the postgres container**
+
    ```bash
    docker compose -f docker/docker-compose.dev.yml up -d
    ```
 
 5. **Run migrations**
+
    ```bash
    node ace migration:run
    ```
 
 6. **Create your user account**
+
    ```bash
    node ace create:user
    ```
 
 7. **Start development server**
+
    ```bash
    npm run dev
    ```
@@ -110,6 +118,7 @@ A modern developer journal application built with [AdonisJS](https://adonisjs.co
 ## Development
 
 ### Available Scripts
+
 - `npm run dev` - Start development server with hot reload
 - `npm run build` - Build for production
 - `npm run start` - Start production server
@@ -120,11 +129,13 @@ A modern developer journal application built with [AdonisJS](https://adonisjs.co
 - `npm run typecheck` - Run TypeScript type checking
 
 ### Database Commands
+
 - `node ace migration:run` - Run pending migrations
 - `node ace migration:rollback` - Rollback last migration
 - `node ace migration:status` - Check migration status
 
 ### Project Structure
+
 ```
 ├── app/
 │   ├── controllers/     # HTTP controllers

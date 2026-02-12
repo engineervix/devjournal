@@ -3,12 +3,12 @@
  * Uses ua-parser-js to detect the user's platform for appropriate keyboard shortcuts
  */
 
-import { UAParser } from 'ua-parser-js';
+import { UAParser } from 'ua-parser-js'
 
 class PlatformDetector {
   constructor() {
-    this.parser = new UAParser();
-    this.os = this.parser.getOS();
+    this.parser = new UAParser()
+    this.os = this.parser.getOS()
   }
 
   /**
@@ -16,7 +16,7 @@ class PlatformDetector {
    * @returns {boolean}
    */
   isMacOS() {
-    return this.os.name === 'Mac OS';
+    return this.os.name === 'Mac OS'
   }
 
   /**
@@ -24,7 +24,7 @@ class PlatformDetector {
    * @returns {string} 'Cmd' for macOS, 'Ctrl' for others
    */
   getModifierKeyName() {
-    return this.isMacOS() ? 'Cmd' : 'Ctrl';
+    return this.isMacOS() ? 'Cmd' : 'Ctrl'
   }
 
   /**
@@ -32,7 +32,7 @@ class PlatformDetector {
    * @returns {string} '⌘' for macOS, 'Ctrl' for others
    */
   getModifierKeySymbol() {
-    return this.isMacOS() ? '⌘' : 'Ctrl';
+    return this.isMacOS() ? '⌘' : 'Ctrl'
   }
 
   /**
@@ -41,7 +41,7 @@ class PlatformDetector {
    * @returns {string} Formatted shortcut like 'Cmd+S' or 'Ctrl+S'
    */
   getShortcutString(key) {
-    return `${this.getModifierKeyName()}+${key.toUpperCase()}`;
+    return `${this.getModifierKeyName()}+${key.toUpperCase()}`
   }
 
   /**
@@ -50,9 +50,9 @@ class PlatformDetector {
    * @returns {string} Formatted shortcut like '⌘S' or 'Ctrl+S'
    */
   getShortcutSymbol(key) {
-    const modifier = this.getModifierKeySymbol();
-    const separator = this.isMacOS() ? '' : '+';
-    return `${modifier}${separator}${key.toUpperCase()}`;
+    const modifier = this.getModifierKeySymbol()
+    const separator = this.isMacOS() ? '' : '+'
+    return `${modifier}${separator}${key.toUpperCase()}`
   }
 
   /**
@@ -61,22 +61,22 @@ class PlatformDetector {
    * @returns {string} HTML string with <kbd> elements
    */
   getShortcutHTML(key) {
-    const modifier = this.getModifierKeySymbol();
-    const keyUpper = key.toUpperCase();
+    const modifier = this.getModifierKeySymbol()
+    const keyUpper = key.toUpperCase()
 
     if (this.isMacOS()) {
-      return `<kbd class="kbd-mac">${modifier}</kbd><kbd>${keyUpper}</kbd>`;
+      return `<kbd class="kbd-mac">${modifier}</kbd><kbd>${keyUpper}</kbd>`
     } else {
-      return `<kbd>${modifier}</kbd><kbd>+</kbd><kbd>${keyUpper}</kbd>`;
+      return `<kbd>${modifier}</kbd><kbd>+</kbd><kbd>${keyUpper}</kbd>`
     }
   }
 }
 
 // Create a singleton instance
-const platformDetector = new PlatformDetector();
+const platformDetector = new PlatformDetector()
 
 // Export both the class and the singleton instance
-export { PlatformDetector, platformDetector };
+export { PlatformDetector, platformDetector }
 
 // Also make it available globally for use in Edge templates
-window.platformDetector = platformDetector;
+window.platformDetector = platformDetector

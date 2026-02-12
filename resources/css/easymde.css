@@ -10,7 +10,8 @@
 
 .EasyMDEContainer .CodeMirror {
   @apply bg-white text-gray-900;
-  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  font-family:
+    ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
   font-size: 14px;
   line-height: 1.5;
 }
@@ -115,12 +116,12 @@
 
 /* Table button styling */
 .EasyMDEContainer .editor-toolbar .fa-table:before {
-  content: "⊞";
+  content: '⊞';
 }
 
 /* Horizontal rule button styling */
 .EasyMDEContainer .editor-toolbar .fa-minus:before {
-  content: "—";
+  content: '—';
 }
 
 /* Custom scrollbar for better integration */
@@ -152,7 +153,8 @@
 /* Style the original textarea before EasyMDE transforms it */
 .easymde-wrapper textarea {
   @apply w-full min-h-64 p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200;
-  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  font-family:
+    ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 }
 
 /* Loading state for editor initialization */

@@ -5,11 +5,18 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'sans': ['system-ui', 'sans-serif'],
-        'mono': ['ui-monospace', 'Cascadia Code', 'Source Code Pro', 'Menlo', 'Consolas', 'DejaVu Sans Mono', 'monospace'],
+        sans: ['system-ui', 'sans-serif'],
+        mono: [
+          'ui-monospace',
+          'Cascadia Code',
+          'Source Code Pro',
+          'Menlo',
+          'Consolas',
+          'DejaVu Sans Mono',
+          'monospace',
+        ],
       },
     },
   },
   plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')],
 }
-

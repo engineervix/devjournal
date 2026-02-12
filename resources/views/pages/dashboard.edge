@@ -2,11 +2,17 @@
   @slot('main')
     <div class="mb-8 flex justify-between items-center">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Track your development journey</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+          Dashboard
+        </h1>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Track your development journey
+        </p>
       </div>
       <div class="text-right">
-        <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Today</div>
+        <div class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          Today
+        </div>
         <div class="text-lg font-semibold text-gray-900 dark:text-white">
           {{ formatDateWithDay(currentDate, 'short') }}
         </div>
@@ -16,11 +22,17 @@
     {{-- Enhanced Quick Stats --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       {{-- Entries Today --}}
-      <div class="relative overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border border-blue-200 dark:border-blue-800/30 rounded-xl p-6 transition-all duration-200 hover:shadow-lg hover:scale-105">
+      <div
+        class="relative overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border border-blue-200 dark:border-blue-800/30 rounded-xl p-6 transition-all duration-200 hover:shadow-lg hover:scale-105"
+      >
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-blue-600 dark:text-blue-400">Entries Today</p>
-            <p class="text-3xl font-bold text-blue-900 dark:text-blue-100 mt-1">{{ stats.todayCount }}</p>
+            <p class="text-sm font-medium text-blue-600 dark:text-blue-400">
+              Entries Today
+            </p>
+            <p class="text-3xl font-bold text-blue-900 dark:text-blue-100 mt-1">
+              {{ stats.todayCount }}
+            </p>
           </div>
           <div class="flex-shrink-0">
             <div class="w-12 h-12 bg-blue-500 dark:bg-blue-600 rounded-lg flex items-center justify-center">
@@ -28,16 +40,25 @@
             </div>
           </div>
         </div>
-        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-blue-600"></div>
+        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-blue-600">
+        </div>
       </div>
 
       {{-- Current Streak --}}
-      <div class="relative overflow-hidden bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border border-green-200 dark:border-green-800/30 rounded-xl p-6 transition-all duration-200 hover:shadow-lg hover:scale-105">
+      <div
+        class="relative overflow-hidden bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border border-green-200 dark:border-green-800/30 rounded-xl p-6 transition-all duration-200 hover:shadow-lg hover:scale-105"
+      >
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-green-600 dark:text-green-400">Current Streak</p>
-            <p class="text-3xl font-bold text-green-900 dark:text-green-100 mt-1">{{ stats.streak }}</p>
-            <p class="text-xs text-green-600 dark:text-green-400 mt-1">days</p>
+            <p class="text-sm font-medium text-green-600 dark:text-green-400">
+              Current Streak
+            </p>
+            <p class="text-3xl font-bold text-green-900 dark:text-green-100 mt-1">
+              {{ stats.streak }}
+            </p>
+            <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+              days
+            </p>
           </div>
           <div class="flex-shrink-0">
             <div class="w-12 h-12 bg-green-500 dark:bg-green-600 rounded-lg flex items-center justify-center">
@@ -48,20 +69,32 @@
         {{-- Mini progress bar for streak visualization --}}
         <div class="mt-3">
           <div class="w-full bg-green-200 dark:bg-green-800/30 rounded-full h-2">
-            <div class="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-300"
-                 style="width: {{ Math.min((stats.streak / 30) * 100, 100) }}%"></div>
+            <div
+              class="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-300"
+              style="width: {{ Math.min((stats.streak / 30) * 100, 100) }}%"
+            >
+            </div>
           </div>
-          <p class="text-xs text-green-600 dark:text-green-400 mt-1">Goal: 30 days</p>
+          <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+            Goal: 30 days
+          </p>
         </div>
-        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-green-600"></div>
+        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-green-600">
+        </div>
       </div>
 
       {{-- Total Entries --}}
-      <div class="relative overflow-hidden bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border border-purple-200 dark:border-purple-800/30 rounded-xl p-6 transition-all duration-200 hover:shadow-lg hover:scale-105">
+      <div
+        class="relative overflow-hidden bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border border-purple-200 dark:border-purple-800/30 rounded-xl p-6 transition-all duration-200 hover:shadow-lg hover:scale-105"
+      >
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-purple-600 dark:text-purple-400">Total Entries</p>
-            <p class="text-3xl font-bold text-purple-900 dark:text-purple-100 mt-1">{{ stats.totalCount }}</p>
+            <p class="text-sm font-medium text-purple-600 dark:text-purple-400">
+              Total Entries
+            </p>
+            <p class="text-3xl font-bold text-purple-900 dark:text-purple-100 mt-1">
+              {{ stats.totalCount }}
+            </p>
           </div>
           <div class="flex-shrink-0">
             <div class="w-12 h-12 bg-purple-500 dark:bg-purple-600 rounded-lg flex items-center justify-center">
@@ -69,20 +102,33 @@
             </div>
           </div>
         </div>
-        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-400 to-purple-600"></div>
+        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-400 to-purple-600">
+        </div>
       </div>
 
       {{-- Most Used Tag --}}
-      <div class="relative overflow-hidden bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border border-orange-200 dark:border-orange-800/30 rounded-xl p-6 transition-all duration-200 hover:shadow-lg hover:scale-105">
+      <div
+        class="relative overflow-hidden bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border border-orange-200 dark:border-orange-800/30 rounded-xl p-6 transition-all duration-200 hover:shadow-lg hover:scale-105"
+      >
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-orange-600 dark:text-orange-400">Top Tag</p>
+            <p class="text-sm font-medium text-orange-600 dark:text-orange-400">
+              Top Tag
+            </p>
             @if(stats.topTag)
-              <p class="text-2xl font-bold text-orange-900 dark:text-orange-100 mt-1 truncate">{{ stats.topTag.name }}</p>
-              <p class="text-xs text-orange-600 dark:text-orange-400 mt-1">{{ stats.topTag.usageCount }} uses</p>
+              <p class="text-2xl font-bold text-orange-900 dark:text-orange-100 mt-1 truncate">
+                {{ stats.topTag.name }}
+              </p>
+              <p class="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                {{ stats.topTag.usageCount }} uses
+              </p>
             @else
-              <p class="text-2xl font-bold text-orange-400 dark:text-orange-500 mt-1">—</p>
-              <p class="text-xs text-orange-600 dark:text-orange-400 mt-1">No tags yet</p>
+              <p class="text-2xl font-bold text-orange-400 dark:text-orange-500 mt-1">
+                —
+              </p>
+              <p class="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                No tags yet
+              </p>
             @end
           </div>
           <div class="flex-shrink-0">
@@ -91,7 +137,8 @@
             </div>
           </div>
         </div>
-        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 to-orange-600"></div>
+        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 to-orange-600">
+        </div>
       </div>
     </div>
 
@@ -100,10 +147,14 @@
       <div class="lg:col-span-2">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center">
-            <div class="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center mr-3">
+            <div
+              class="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center mr-3"
+            >
               <i class="ph ph-calendar text-indigo-600 dark:text-indigo-400"></i>
             </div>
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Today's Entries</h2>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+              Today's Entries
+            </h2>
           </div>
           <div class="text-sm text-gray-500 dark:text-gray-400">
             {{ todayEntries.length }} {{ todayEntries.length === 1 ? 'entry' : 'entries' }}
@@ -111,7 +162,9 @@
         </div>
 
         @if(!hasDailyLog)
-          <div class="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border border-amber-200 dark:border-amber-800/30 rounded-xl p-6 mb-6 shadow-sm">
+          <div
+            class="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border border-amber-200 dark:border-amber-800/30 rounded-xl p-6 mb-6 shadow-sm"
+          >
             <div class="flex items-start">
               <div class="flex-shrink-0">
                 <div class="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
@@ -119,12 +172,16 @@
                 </div>
               </div>
               <div class="ml-4 flex-1">
-                <h3 class="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-1">Daily Log Missing</h3>
+                <h3 class="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-1">
+                  Daily Log Missing
+                </h3>
                 <p class="text-sm text-amber-700 dark:text-amber-300 mb-3">
                   You haven't created a daily log today. Keep your streak going!
                 </p>
-                <a href="{{ route('entries.create') }}?type=daily"
-                   class="inline-flex items-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
+                <a
+                  href="{{ route('entries.create') }}?type=daily"
+                  class="inline-flex items-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+                >
                   <i class="ph ph-plus mr-2"></i>
                   Create Daily Log
                 </a>
@@ -132,7 +189,7 @@
             </div>
           </div>
         @end
-
+        
         @if(todayEntries.length > 0)
           <div class="space-y-4">
             @each(entry in todayEntries)
@@ -140,22 +197,32 @@
             @end
           </div>
         @else
-          <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-900/50 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-12 text-center">
-            <div class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div
+            class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-900/50 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-12 text-center"
+          >
+            <div
+              class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
               <i class="ph ph-notebook text-2xl text-gray-400 dark:text-gray-500"></i>
             </div>
-            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No entries today</h3>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              No entries today
+            </h3>
             <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-sm mx-auto">
               Start documenting your development journey. Every entry helps you grow!
             </p>
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
-              <a href="{{ route('entries.create') }}?type=daily"
-                 class="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+              <a
+                href="{{ route('entries.create') }}?type=daily"
+                class="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
                 <i class="ph ph-calendar-check mr-2"></i>
                 Daily Log
               </a>
-              <a href="{{ route('entries.create') }}?type=til"
-                 class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+              <a
+                href="{{ route('entries.create') }}?type=til"
+                class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              >
                 <i class="ph ph-lightbulb mr-2"></i>
                 TIL Entry
               </a>
@@ -173,10 +240,14 @@
               <div class="w-8 h-8 bg-pink-100 dark:bg-pink-900/30 rounded-lg flex items-center justify-center mr-3">
                 <i class="ph ph-medal text-pink-600 dark:text-pink-400"></i>
               </div>
-              <h2 class="text-xl font-bold text-gray-900 dark:text-white">Achievements</h2>
+              <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                Achievements
+              </h2>
             </div>
-            <a href="{{ route('entries.create') }}?type=achievement"
-               class="text-sm text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 font-medium">
+            <a
+              href="{{ route('entries.create') }}?type=achievement"
+              class="text-sm text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 font-medium"
+            >
               Add +
             </a>
           </div>
@@ -184,10 +255,14 @@
           @if(achievements.length > 0)
             <div class="space-y-4">
               @each(achievement in achievements)
-                <div class="group bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 border border-pink-200 dark:border-pink-800/30 rounded-xl p-5 hover:shadow-md transition-all duration-200">
+                <div
+                  class="group bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 border border-pink-200 dark:border-pink-800/30 rounded-xl p-5 hover:shadow-md transition-all duration-200"
+                >
                   <div class="flex items-start">
                     <div class="flex-shrink-0 mr-4">
-                      <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-lg flex items-center justify-center">
+                      <div
+                        class="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-lg flex items-center justify-center"
+                      >
                         <i class="ph ph-trophy text-white text-lg"></i>
                       </div>
                     </div>
@@ -198,8 +273,10 @@
                       <p class="text-xs text-pink-600 dark:text-pink-400 mb-2">
                         {{ formatDateWithDay(achievement.createdAt, 'short') }}
                       </p>
-                      <a href="{{ route('entries.show', { id: achievement.id }) }}"
-                         class="text-xs text-pink-700 dark:text-pink-300 hover:text-pink-800 dark:hover:text-pink-200 font-medium group-hover:underline">
+                      <a
+                        href="{{ route('entries.show', { id: achievement.id }) }}"
+                        class="text-xs text-pink-700 dark:text-pink-300 hover:text-pink-800 dark:hover:text-pink-200 font-medium group-hover:underline"
+                      >
                         View details →
                       </a>
                     </div>
@@ -208,16 +285,24 @@
               @end
             </div>
           @else
-            <div class="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 border-2 border-dashed border-pink-200 dark:border-pink-800/30 rounded-xl p-8 text-center">
-              <div class="w-12 h-12 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+            <div
+              class="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 border-2 border-dashed border-pink-200 dark:border-pink-800/30 rounded-xl p-8 text-center"
+            >
+              <div
+                class="w-12 h-12 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-3"
+              >
                 <i class="ph ph-medal text-pink-500 dark:text-pink-400 text-xl"></i>
               </div>
-              <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-2">No achievements yet</h3>
+              <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-2">
+                No achievements yet
+              </h3>
               <p class="text-xs text-gray-600 dark:text-gray-400 mb-4">
                 Record your wins and milestones
               </p>
-              <a href="{{ route('entries.create') }}?type=achievement"
-                 class="inline-flex items-center px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-medium rounded-lg transition-colors duration-200">
+              <a
+                href="{{ route('entries.create') }}?type=achievement"
+                class="inline-flex items-center px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-medium rounded-lg transition-colors duration-200"
+              >
                 <i class="ph ph-plus mr-1"></i>
                 Record Achievement
               </a>
@@ -229,27 +314,39 @@
         <div>
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center">
-              <div class="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center mr-3">
+              <div
+                class="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center mr-3"
+              >
                 <i class="ph ph-tag text-indigo-600 dark:text-indigo-400"></i>
               </div>
-              <h2 class="text-xl font-bold text-gray-900 dark:text-white">Popular Tags</h2>
+              <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                Popular Tags
+              </h2>
             </div>
-            <a href="{{ route('tags.index') }}"
-               class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium">
+            <a
+              href="{{ route('tags.index') }}"
+              class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
+            >
               View all →
             </a>
           </div>
 
           @if(popularTags.length > 0)
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm">
+            <div
+              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm"
+            >
               <div class="flex flex-wrap gap-2">
                 @each(tag in popularTags)
-                  <a href="{{ route('entries.byTag', { slug: tag.slug }) }}"
-                     class="group inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                  <a
+                    href="{{ route('entries.byTag', { slug: tag.slug }) }}"
+                    class="group inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
                             bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:scale-105
-                            dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50">
+                            dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50"
+                  >
                     <span class="mr-2">#{{ tag.name }}</span>
-                    <span class="px-2 py-0.5 bg-indigo-200 dark:bg-indigo-800 text-indigo-800 dark:text-indigo-200 rounded-full text-xs font-semibold">
+                    <span
+                      class="px-2 py-0.5 bg-indigo-200 dark:bg-indigo-800 text-indigo-800 dark:text-indigo-200 rounded-full text-xs font-semibold"
+                    >
                       {{ tag.usageCount }}
                     </span>
                   </a>
@@ -257,11 +354,17 @@
               </div>
             </div>
           @else
-            <div class="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border-2 border-dashed border-indigo-200 dark:border-indigo-800/30 rounded-xl p-8 text-center">
-              <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+            <div
+              class="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border-2 border-dashed border-indigo-200 dark:border-indigo-800/30 rounded-xl p-8 text-center"
+            >
+              <div
+                class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-3"
+              >
                 <i class="ph ph-tag text-indigo-500 dark:text-indigo-400 text-xl"></i>
               </div>
-              <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-2">No tags yet</h3>
+              <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-2">
+                No tags yet
+              </h3>
               <p class="text-xs text-gray-600 dark:text-gray-400">
                 Tags will appear as you create entries
               </p>

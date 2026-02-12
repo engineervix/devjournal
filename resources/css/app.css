@@ -12,7 +12,9 @@
 @layer base {
   /* Ensure smooth transitions for theme changes */
   html {
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    transition:
+      background-color 0.2s ease-in-out,
+      color 0.2s ease-in-out;
   }
 
   /* Hide elements with x-cloak until Alpine.js loads */
@@ -69,7 +71,10 @@
 /* Enhanced components and utilities */
 @layer components {
   .transition-theme {
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    transition:
+      background-color 0.2s ease-in-out,
+      color 0.2s ease-in-out,
+      border-color 0.2s ease-in-out;
   }
 
   /* Line clamping utilities */
@@ -104,12 +109,16 @@
 
   .card-hover:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow:
+      0 10px 25px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
 
   /* Dark mode card hover effects */
   .dark .card-hover:hover {
-    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    box-shadow:
+      0 10px 25px -3px rgba(0, 0, 0, 0.3),
+      0 4px 6px -2px rgba(0, 0, 0, 0.2);
   }
 
   /* Gradient text utility */
@@ -167,7 +176,8 @@
   }
 
   @keyframes pulseWarning {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {
@@ -258,7 +268,11 @@
 }
 
 @keyframes bounceSubtle {
-  0%, 20%, 50%, 80%, 100% {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0);
   }
   40% {
