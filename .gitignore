@@ -28,3 +28,13 @@ yarn-error.log
 
 # Platform specific
 .DS_Store
+
+# CLI
+dist/
+
+# Go
+*.out
+coverage.html
+cli/devlog
+cli/coverage.out
+cli/coverage.html

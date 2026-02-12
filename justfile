@@ -98,3 +98,37 @@ release-notes:
         const releaseNotesPath = path.join("{{invocation_directory()}}", '../', 'LATEST_RELEASE_NOTES.md');
         fs.writeFileSync(releaseNotesPath, lines.join(''), 'utf8');
     })();
+
+# Build the CLI tool
+build-cli:
+    @mkdir -p dist/cli
+    cd cli && go build -ldflags="-s -w" -o ../dist/cli/devlog-client main.go
+
+# 🧪 Run CLI tests with better output formatting
+test-cli:
+    @echo "🧪 Running tests..."
+    cd cli && gotestsum --format=pkgname-and-test-fails ./...
+
+# 🏃‍♂️ Run CLI tests with coverage
+test-cli-coverage:
+    cd cli && go test -v -coverprofile=coverage.out ./...
+    cd cli && go tool cover -html=coverage.out -o coverage.html
+    @echo "Coverage report generated: cli/coverage.html"
+
+# 🧹 Formats all Go source files in the project.
+fmt-cli:
+    @echo "Formatting code..."
+    cd cli && go fmt ./...
+
+# 🔎 Vets the code for potential bugs and suspicious constructs.
+vet-cli:
+    @echo "Vetting code..."
+    cd cli && go vet ./...
+
+# ✅ Runs both the formatter and the vet tool sequentially.
+check-cli: fmt-cli vet-cli
+
+# Run CLI benchmarks
+bench-cli:
+    cd cli && go test -bench=. -benchmem ./...
+

@@ -106,9 +106,81 @@ jobs:
       - name: Build site
         run: npm run build
 
+  test-cli:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: cli/go.mod
+          cache-dependency-path: cli/go.sum
+
+      - name: Run CLI tests
+        working-directory: ./cli
+        run: go test -v ./...
+
+      - name: Run CLI vet
+        working-directory: ./cli
+        run: go vet ./...
+
+  build-cli:
+    needs: test-cli
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [linux, darwin, windows]
+        arch: [amd64, arm64]
+        exclude:
+          - os: windows
+            arch: arm64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: cli/go.mod
+          cache-dependency-path: cli/go.sum
+
+      - name: Build CLI binary
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+        run: |
+          mkdir -p dist
+          output="devlog-client-$GOOS-$GOARCH"
+          if [ "$GOOS" = "windows" ]; then
+            output="$output.exe"
+          fi
+
+          VERSION="${{ github.ref_name }}"
+          BUILD_TIME=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+          GIT_COMMIT=$(git rev-parse --short HEAD)
+
+          cd cli
+          go build -ldflags "\
+            -s -w \
+            -X main.version=${VERSION} \
+            -X main.commit=${GIT_COMMIT} \
+            -X main.date=${BUILD_TIME}" \
+            -o "../dist/$output" main.go
+        shell: bash
+
+      - name: Upload CLI binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: devlog-client-${{ matrix.os }}-${{ matrix.arch }}
+          path: dist/devlog-client-*
+          if-no-files-found: error
+
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [build]
+    needs: [build, build-cli]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -133,8 +205,14 @@ jobs:
           TODAY="($(TZ=Europe/London date --iso))"
           echo "release_name=${{ github.ref_name }} $TODAY" >> $GITHUB_OUTPUT
 
+      - name: Download all CLI artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: cli-artifacts
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ steps.release_info.outputs.release_name }}
           body_path: ../LATEST_RELEASE_NOTES.md
+          files: cli-artifacts/**/*
