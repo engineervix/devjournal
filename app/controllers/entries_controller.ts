@@ -91,7 +91,7 @@ export default class EntriesController {
     return view.render('pages/entries/show', {
       entry,
       title: `${title} | DevJournal`,
-      description
+      description,
     })
   }
 
@@ -172,7 +172,7 @@ export default class EntriesController {
       title: searchQuery ? `Search: ${searchQuery} | DevJournal` : 'Search Entries | DevJournal',
       description: searchQuery
         ? `Found ${entries.length} result${entries.length === 1 ? '' : 's'} for "${searchQuery}"`
-        : 'Search your development journal entries'
+        : 'Search your development journal entries',
     })
   }
 
@@ -197,7 +197,7 @@ export default class EntriesController {
       entries,
       queryParams: queryParams.toString(),
       title: `#${tag.name} | DevJournal`,
-      description: `${entries.length} entr${entries.length === 1 ? 'y' : 'ies'} tagged with #${tag.name}`
+      description: `${entries.length} entr${entries.length === 1 ? 'y' : 'ies'} tagged with #${tag.name}`,
     })
   }
 

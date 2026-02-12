@@ -40,25 +40,25 @@
       [x-cloak] {
         display: none !important;
       }
-
+      
       /* Critical CSS to prevent layout shift */
-
+      
       /* Ensure dark mode styles are applied immediately */
-
+      
       .dark {
         color-scheme: dark;
       }
-
+      
       /* Prevent theme icon flashing */
-
+      
       .theme-icon-light.dark\:hidden {
         display: none;
       }
-
+      
       .dark .theme-icon-dark.hidden {
         display: none;
       }
-
+      
       .dark .theme-icon-dark.dark\:block {
         display: block;
       }
@@ -104,7 +104,7 @@
           </a>
             </nav>
           @endif
-
+          
           <div class="flex items-center gap-4">
             {{-- Mobile menu button --}}
             @if(auth.user)
@@ -169,7 +169,7 @@
                 </div>
               </div>
             @endif
-
+            
             {{-- Search Bar --}}
             @if(auth.user)
               <form action="{{ route('entries.search') }}" method="GET" class="hidden md:block">
@@ -186,7 +186,7 @@
                 </div>
               </form>
             @endif
-
+            
             {{-- User menu/settings --}}
             @if(auth.user)
               <div class="relative" x-data="userMenu" x-cloak>
@@ -232,7 +232,7 @@
                 Login
           </a>
             @endif
-
+            
             {{-- Theme toggle --}}
             <button
               id="theme-toggle"
@@ -251,7 +251,7 @@
       {{-- Display Flash Messages --}}
       @component('components/flash_messages')
       @end
-
+      
       {{{ await $slots.main() }}}
     </main>
 
@@ -287,7 +287,7 @@
         </div>
       </div>
     @endif
-
+    
     {{-- Footer --}}
     <footer class="bg-white dark:bg-gray-800 shadow">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
