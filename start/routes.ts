@@ -155,6 +155,7 @@ router
 // API Routes
 router
   .group(() => {
+    router.get('/me', [() => import('#controllers/api/auth_controller'), 'me'])
     router.post('/entries', [() => import('#controllers/api/entries_controller'), 'store'])
   })
   .prefix('api/v1')
