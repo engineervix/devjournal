@@ -81,7 +81,18 @@ export default class EntriesController {
    */
   async show({ params, view }: HttpContext) {
     const entry = await Entry.query().where('id', params.id).preload('tags').firstOrFail()
-    return view.render('pages/entries/show', { entry })
+
+    // Create metadata for OpenGraph
+    const title = entry.title || 'Entry'
+    const description = entry.contentPlain
+      ? entry.contentPlain.slice(0, 160).trim() + (entry.contentPlain.length > 160 ? '...' : '')
+      : 'View this entry in DevJournal'
+
+    return view.render('pages/entries/show', {
+      entry,
+      title: `${title} | DevJournal`,
+      description,
+    })
   }
 
   /**
@@ -158,6 +169,10 @@ export default class EntriesController {
       entries,
       query: searchQuery,
       queryParams: queryParams.toString(),
+      title: searchQuery ? `Search: ${searchQuery} | DevJournal` : 'Search Entries | DevJournal',
+      description: searchQuery
+        ? `Found ${entries.length} result${entries.length === 1 ? '' : 's'} for "${searchQuery}"`
+        : 'Search your development journal entries',
     })
   }
 
@@ -181,6 +196,8 @@ export default class EntriesController {
       tag,
       entries,
       queryParams: queryParams.toString(),
+      title: `#${tag.name} | DevJournal`,
+      description: `${entries.length} entr${entries.length === 1 ? 'y' : 'ies'} tagged with #${tag.name}`,
     })
   }
 

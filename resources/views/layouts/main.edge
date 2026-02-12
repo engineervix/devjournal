@@ -1,34 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="csrf-token" content="{{ csrfToken }}" />
+    {{-- Common meta tags --}}
+    @!component('components/meta/common', { description: description })
+
     <title>
       {{ title ?? 'DevJournal' }}
     </title>
 
     {{-- Favicons --}}
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/ico/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/ico/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/images/ico/favicon-16x16.png" />
-    <link rel="manifest" href="/images/ico/site.webmanifest" />
+    @!component('components/meta/favicons')
 
-    {{-- OpenGraph Meta Tags --}}
-    <meta property="og:title" content="{{ title ?? 'DevJournal' }}" />
-    <meta
-      property="og:description"
-      content="The developer's journal for daily logs, learning notes, and career achievements. Self-hosted, keyboard-driven, built for engineering growth."
-    />
-    <meta
-      property="og:image"
-      content="{{ request.protocol() }}://{{ request.host() }}/images/illustrations/og-image.jpg"
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="en_ZM" />
-    <meta property="og:locale:alternate" content="en_GB" />
-    {{-- Twitter specific --}}
-    <meta name="twitter:card" content="summary_large_image" />
+    {{-- OpenGraph and Twitter Card meta tags --}}
+    @!component('components/meta/opengraph', {
+      title: title,
+      description: description,
+      image: ogImage,
+      type: ogType
+    })
 
     {{-- Prevent FOUC by initializing theme immediately --}}
     <script>
