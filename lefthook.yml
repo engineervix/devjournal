@@ -1,0 +1,33 @@
+# Lefthook configuration for DevJournal
+# Docs: https://github.com/evilmartians/lefthook/blob/master/docs/configuration.md
+
+pre-commit:
+  parallel: true
+  commands:
+    lint-js:
+      glob: '*.{ts,js}'
+      run: npx eslint {staged_files}
+      stage_fixed: true
+
+    lint-css:
+      glob: '*.css'
+      run: npx stylelint {staged_files} --fix
+      stage_fixed: true
+
+    format:
+      glob: '*.{ts,js,json,css,md,edge}'
+      run: npx prettier --write {staged_files}
+      stage_fixed: true
+
+    typecheck:
+      run: npm run typecheck
+
+commit-msg:
+  commands:
+    commitlint:
+      run: npx commitlint --edit {1}
+
+pre-push:
+  commands:
+    test:
+      run: npm run test:coverage

@@ -14,6 +14,7 @@ The application helps developers track their learning journey, code snippets, de
 - Dev server runs at <http://localhost:3333>
 - **Linting and formatting / code style**:
   - TypeScript: ESLint with `@adonisjs/eslint-config`
+  - CSS: stylelint with `stylelint-config-standard` and Tailwind support
   - Code formatting: Prettier with `@adonisjs/prettier-config`
   - Edge templates: Standard Edge.js syntax
 - **Testing**: Japa test runner with c8 for coverage (80% threshold required)
@@ -29,7 +30,10 @@ npm run dev              # Start dev server with HMR (hot module reload)
 npm run build            # Build for production
 npm start                # Start production server
 npm run format           # Format all code with Prettier
+npm run format:check     # Check code formatting without modifying files
 npm run lint             # Run ESLint checks
+npm run lint:css         # Run stylelint on CSS files
+npm run lint:all         # Run all linters (ESLint + stylelint)
 npm run typecheck        # Run TypeScript type checking
 ```
 
@@ -90,6 +94,39 @@ npm run release          # Create new release (bump version, tag, changelog)
 ```
 
 This project uses **Conventional Commits** with Commitizen.
+
+### Git Hooks (Lefthook)
+
+This project uses [lefthook](https://github.com/evilmartians/lefthook) for git hooks:
+
+**Pre-commit:**
+
+- ESLint on staged TypeScript/JavaScript files (auto-fix)
+- stylelint on staged CSS files (auto-fix)
+- Prettier formatting on staged files (auto-fix)
+- TypeScript type checking
+
+**Commit-msg:**
+
+- Commitlint validation (enforces conventional commits)
+
+**Pre-push:**
+
+- Full test suite with coverage check (80% threshold)
+
+**Skip hooks when needed:**
+
+```bash
+git commit --no-verify    # Skip pre-commit and commit-msg hooks
+git push --no-verify      # Skip pre-push hooks
+```
+
+**Manage hooks:**
+
+```bash
+npm run hooks:install     # Install git hooks
+npm run hooks:uninstall   # Remove git hooks
+```
 
 ## Key Components
 
@@ -394,12 +431,13 @@ test.group('Entries Controller', () => {
 
 1. **Create feature branch** from `main`
 2. **Make changes** following code style guidelines
-3. **Run tests**: `npm test`
-4. **Check linting**: `npm run lint`
-5. **Format code**: `npm run format`
-6. **Type check**: `npm run typecheck`
-7. **Commit**
-8. **Push** and create pull request
+3. **Write code** - Git hooks will automatically check your changes on commit
+4. **Run tests**: `npm test` (also runs automatically on pre-push)
+5. **Check linting**: `npm run lint` (also runs automatically on pre-commit for staged files)
+6. **Format code**: `npm run format` (also runs automatically on pre-commit for staged files)
+7. **Type check**: `npm run typecheck` (also runs automatically on pre-commit)
+8. **Commit** - Pre-commit hooks will lint, format, and type-check automatically
+9. **Push** - Pre-push hooks will run full test suite with coverage check
 
 ### CI/CD
 

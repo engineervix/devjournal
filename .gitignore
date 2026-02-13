@@ -38,3 +38,6 @@ coverage.html
 cli/devlog
 cli/coverage.out
 cli/coverage.html
+
+# Lefthook local configuration (user-specific overrides)
+lefthook-local.yml
