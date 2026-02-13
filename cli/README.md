@@ -30,11 +30,22 @@ just build-cli
 
 ## Quick Start
 
+First, on the server, create a token using:
+
+```bash
+node ace make:token user@example.com "Token Name"
+```
+
+> [!NOTE]
+> Copy the token and save it somewhere safe. You'll need it to authenticate with the API.
+
+Then, on your client machine:
+
 ```bash
 # Configure API URL
 devlog-client config set-url https://your-journal.example.com/api/v1
 
-# Login (get token from Settings → API Tokens in web UI)
+# Paste the token when prompted by the following command:
 devlog-client login
 
 # Create entry
