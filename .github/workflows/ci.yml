@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        linter: [lint, format, typecheck]
+        linter: [lint, lint:css, format:check, typecheck]
     steps:
       - uses: actions/checkout@v4
 
