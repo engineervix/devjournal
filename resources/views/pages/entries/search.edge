@@ -6,11 +6,11 @@
         Search Results
       </h1>
       <div class="text-sm text-gray-500 dark:text-gray-400">
-        {{ entries.length }} result{{ entries.length === 1 ? '' : 's' }} for "{{ query }}"
+        {{ entries.getMeta().total }} result{{ entries.getMeta().total === 1 ? '' : 's' }} for "{{ query }}"
       </div>
     </div>
 
-    @if(entries.length > 0)
+    @if(entries.getMeta().total > 0)
       {{-- Search form for refining search --}}
       <form action="{{ route('entries.search') }}" method="GET" class="mb-6">
         <div class="flex gap-2">

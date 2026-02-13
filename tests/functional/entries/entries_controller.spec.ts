@@ -480,17 +480,18 @@ test.group('Entries Controller', (group) => {
   
   test('should show correct search description with results', async ({ client }) => {
     const user = await User.create({ email: 'test@example.com', password: 'password' })
-    await Entry.create({ 
-      userId: user.id, 
-      entryType: 'daily', 
-      title: 'FindMe', 
+    await Entry.create({
+      userId: user.id,
+      entryType: 'daily',
+      title: 'FindMe',
       contentMarkdown: 'content',
       contentPlain: 'content'
     })
-    
+
     const response = await client.get('/entries/search?q=FindMe').loginAs(user)
     response.assertStatus(200)
-    response.assertTextIncludes('Found 1 result for "FindMe"')
+    // Quotes are HTML-escaped in meta tags
+    response.assertTextIncludes('Found 1 result for &quot;FindMe&quot;')
   })
   
   test('should show tag cloud', async ({ client }) => {

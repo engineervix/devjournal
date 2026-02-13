@@ -173,7 +173,7 @@ export default class EntriesController {
       queryParams: queryParams.toString(),
       title: searchQuery ? `Search: ${searchQuery} | DevJournal` : 'Search Entries | DevJournal',
       description: searchQuery
-        ? `Found ${entries.length} result${entries.length === 1 ? '' : 's'} for "${searchQuery}"`
+        ? `Found ${entries.getMeta().total} result${entries.getMeta().total === 1 ? '' : 's'} for "${searchQuery}"`
         : 'Search your development journal entries',
     })
   }
