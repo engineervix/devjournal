@@ -72,4 +72,14 @@ This is a [link](https://example.com) and an image:
     assert.notInclude(result.contentPlain!, 'Alt text')
     assert.include(result.contentPlain!, 'link')
   })
+
+  test('should handle code blocks with unknown language', ({ assert }) => {
+    const service = new ContentProcessorService()
+    const markdown = '```unknown-lang\nconst x = 1;\n```'
+
+    const result = service.processMarkdown(markdown)
+
+    assert.include(result.contentHtml!, 'class="hljs"')
+    assert.include(result.contentHtml!, 'const x = 1;')
+  })
 })

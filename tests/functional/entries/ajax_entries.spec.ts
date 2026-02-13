@@ -481,4 +481,34 @@ console.log("Hello World");
     assert.isFalse(responseBody.success)
     assert.equal(responseBody.message, 'Validation failed')
   })
+
+  test('should handle empty content update via AJAX', async ({ client, assert }) => {
+    const user = await User.create({
+      email: 'test@example.com',
+      password: 'password123',
+    })
+
+    const entry = await Entry.create({
+      userId: user.id,
+      entryType: 'daily',
+      title: 'Original',
+      contentMarkdown: 'Original Content',
+    })
+
+    const response = await client
+      .put(`/entries/${entry.id}/ajax`)
+      .loginAs(user)
+      .withCsrfToken()
+      .header('X-Requested-With', 'XMLHttpRequest')
+      .form({
+        entryType: 'daily',
+        title: 'Original',
+        contentMarkdown: '',
+      })
+
+    response.assertStatus(200)
+    const responseBody = response.body()
+    assert.isTrue(responseBody.success)
+    assert.equal(responseBody.entry.contentMarkdown, '')
+  })
 })

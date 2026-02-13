@@ -42,38 +42,55 @@
     {{-- Turnstile script - show when configured --}}
     @if(env.get('TURNSTILE_SITE_KEY'))
       <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer>
-        
+
       </script>
       <script>
+        // Turnstile callback functions (must be global)
+        function onTurnstileSuccess(token) {
+          const submitButton = document.querySelector('button[type="submit"]');
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="ph ph-sign-in mr-2 group-hover:translate-x-1 transition-transform duration-200"></i>Sign In to DevJournal';
+          }
+        }
+
+        function onTurnstileError(errorCode) {
+          console.error('Turnstile error:', errorCode);
+          const submitButton = document.querySelector('button[type="submit"]');
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = "Security Check Failed - Try Again";
+          }
+          alert('Security challenge failed. Please refresh the page and try again.');
+        }
+
+        function onTurnstileExpired() {
+          const submitButton = document.querySelector('button[type="submit"]');
+          if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = "Completing Security Check...";
+          }
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
           const loginForm = document.getElementById("loginForm");
           const submitButton = loginForm.querySelector('button[type="submit"]');
-          // Function to check if Turnstile response exists
-          function hasTurnstileResponse() {
-            const turnstileResponse = document.querySelector('input[name="cf-turnstile-response"]');
-            return turnstileResponse && turnstileResponse.value && turnstileResponse.value.trim() !== "";
+
+          // Disable submit button initially if Turnstile is configured
+          if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = "Completing Security Check...";
           }
+
           // Prevent form submission without Turnstile response
           loginForm.addEventListener("submit", function(e) {
-            if (!hasTurnstileResponse()) {
+            const turnstileResponse = document.querySelector('input[name="cf-turnstile-response"]');
+            if (!turnstileResponse || !turnstileResponse.value || turnstileResponse.value.trim() === "") {
               e.preventDefault();
               alert("Please complete the security challenge before submitting.");
               return false;
             }
           });
-          // Disable submit button until Turnstile is complete
-          if (submitButton && typeof window.turnstile !== "undefined") {
-            submitButton.disabled = true;
-            submitButton.textContent = "Completing Security Check...";
-            // Check for Turnstile completion periodically
-            const checkInterval = setInterval(function() {
-              if (hasTurnstileResponse()) {
-                submitButton.disabled = false;
-                submitButton.innerHTML = '<i class="ph ph-sign-in mr-2 group-hover:translate-x-1 transition-transform duration-200"></i>Sign In to DevJournal';
-                clearInterval(checkInterval);
-              }
-            }, 500);
-          }
         });
       </script>
     @endif
@@ -368,6 +385,9 @@
                     data-sitekey="{{ env.get('TURNSTILE_SITE_KEY') }}"
                     data-theme="auto"
                     data-size="normal"
+                    data-callback="onTurnstileSuccess"
+                    data-error-callback="onTurnstileError"
+                    data-expired-callback="onTurnstileExpired"
                   >
                   </div>
                 </div>

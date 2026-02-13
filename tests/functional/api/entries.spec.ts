@@ -252,6 +252,66 @@ test.group('Api entries', (group) => {
     assert.equal(entry.contentMarkdown, 'Updated Content')
   })
 
+  test('update entry preserves existing values when fields are missing', async ({ client, assert }) => {
+    const user = await User.create({
+      fullName: 'Test User',
+      email: 'test@example.com',
+      password: 'password',
+    })
+
+    const entry = await Entry.create({ 
+        userId: user.id, 
+        entryType: 'daily', 
+        title: 'Original Title', 
+        contentMarkdown: 'Original Content' 
+    })
+
+    // Only update content, title should be preserved
+    const response = await client
+      .put(`/api/v1/entries/${entry.id}`)
+      .withGuard('api')
+      .loginAs(user)
+      .json({
+        contentMarkdown: 'New Content',
+      })
+
+    response.assertStatus(200)
+    
+    await entry.refresh()
+    assert.equal(entry.title, 'Original Title')
+    assert.equal(entry.contentMarkdown, 'New Content')
+  })
+
+  test('update entry can clear nullable fields', async ({ client, assert }) => {
+    const user = await User.create({
+      fullName: 'Test User',
+      email: 'test@example.com',
+      password: 'password',
+    })
+
+    const entry = await Entry.create({ 
+        userId: user.id, 
+        entryType: 'daily', 
+        title: 'Original Title', 
+        contentMarkdown: 'Original Content' 
+    })
+
+    // Send title as null explicitly
+    const response = await client
+      .put(`/api/v1/entries/${entry.id}`)
+      .withGuard('api')
+      .loginAs(user)
+      .json({
+        title: null,
+      })
+
+    response.assertStatus(200)
+    
+    await entry.refresh()
+    assert.isNull(entry.title)
+    assert.equal(entry.contentMarkdown, 'Original Content')
+  })
+
   test('cannot update entry of another user', async ({ client }) => {
     const user = await User.create({
         fullName: 'Test User',

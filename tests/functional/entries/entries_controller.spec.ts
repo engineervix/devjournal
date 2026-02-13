@@ -430,4 +430,72 @@ test.group('Entries Controller', (group) => {
 
     response.assertStatus(404)
   })
+
+  test('should prevent unauthorized user from updating entry', async ({ client }) => {
+    const user1 = await User.create({ email: 'u1@test.com', password: 'password' })
+    const user2 = await User.create({ email: 'u2@test.com', password: 'password' })
+    
+    const entry = await Entry.create({
+      userId: user1.id,
+      entryType: 'daily',
+      title: 'User 1 Entry',
+      contentMarkdown: 'Content'
+    })
+
+    const response = await client
+      .put(`/entries/${entry.id}`)
+      .loginAs(user2)
+      .withCsrfToken()
+      .form({ title: 'Hacked' })
+
+    // Should redirect to index with error flash
+    response.assertRedirectsTo('/entries')
+  })
+
+  test('should prevent unauthorized user from deleting entry', async ({ client }) => {
+    const user1 = await User.create({ email: 'u1@test.com', password: 'password' })
+    const user2 = await User.create({ email: 'u2@test.com', password: 'password' })
+    
+    const entry = await Entry.create({
+      userId: user1.id,
+      entryType: 'daily',
+      title: 'User 1 Entry',
+      contentMarkdown: 'Content'
+    })
+
+    const response = await client
+      .delete(`/entries/${entry.id}`)
+      .loginAs(user2)
+      .withCsrfToken()
+
+    response.assertRedirectsTo('/entries')
+  })
+
+  test('should show correct search description when no query', async ({ client }) => {
+    const user = await User.create({ email: 'test@example.com', password: 'password' })
+    const response = await client.get('/entries/search').loginAs(user)
+    response.assertStatus(200)
+    response.assertTextIncludes('Search your development journal entries')
+  })
+  
+  test('should show correct search description with results', async ({ client }) => {
+    const user = await User.create({ email: 'test@example.com', password: 'password' })
+    await Entry.create({ 
+      userId: user.id, 
+      entryType: 'daily', 
+      title: 'FindMe', 
+      contentMarkdown: 'content',
+      contentPlain: 'content'
+    })
+    
+    const response = await client.get('/entries/search?q=FindMe').loginAs(user)
+    response.assertStatus(200)
+    response.assertTextIncludes('Found 1 result for "FindMe"')
+  })
+  
+  test('should show tag cloud', async ({ client }) => {
+    const user = await User.create({ email: 'test@example.com', password: 'password' })
+    const response = await client.get('/tags').loginAs(user)
+    response.assertStatus(200)
+  })
 })
