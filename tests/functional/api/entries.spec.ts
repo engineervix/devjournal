@@ -281,7 +281,7 @@ test.group('Api entries', (group) => {
         title: 'Hacked Title',
       })
 
-    response.assertStatus(403)
+    response.assertStatus(404)
   })
 
   test('cannot update non-existent entry', async ({ client }) => {
@@ -359,7 +359,7 @@ test.group('Api entries', (group) => {
       .withGuard('api')
       .loginAs(user)
 
-    response.assertStatus(403)
+    response.assertStatus(404)
   })
 
   test('cannot show non-existent entry', async ({ client }) => {

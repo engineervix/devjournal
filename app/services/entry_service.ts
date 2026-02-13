@@ -106,6 +106,27 @@ export default class EntryService {
   }
 
   /**
+   * Find entry by ID or short slug (prefix)
+   */
+  async findByIdOrSlug(userId: number, idOrSlug: string): Promise<Entry | null> {
+    // If it looks like a full UUID, try finding by ID directly
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug)) {
+      return Entry.query().where('user_id', userId).where('id', idOrSlug).preload('tags').first()
+    }
+
+    // Otherwise treat as a short slug prefix
+    // We limit to 8 chars minimum to avoid too much ambiguity, but for personal use
+    // even 4 chars might be fine. The CLI list shows 8 chars.
+    // Let's allow whatever length the user provides, but warn if ambiguous?
+    // For now, just return the first match.
+    return Entry.query()
+      .where('user_id', userId)
+      .whereRaw('id::text LIKE ?', [`${idOrSlug}%`])
+      .preload('tags')
+      .first()
+  }
+
+  /**
    * Create a new entry
    */
   async createEntry(

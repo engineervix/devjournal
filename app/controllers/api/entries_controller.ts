@@ -2,12 +2,24 @@ import { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
 import vine from '@vinejs/vine'
 import EntryService from '#services/entry_service'
-import Entry from '#models/entry'
 import ContentProcessorService from '#services/content_processor_service'
 
 const entryValidator = vine.compile(
   vine.object({
     entryType: vine.string().trim().in(['daily', 'til', 'snippet', 'debug', 'achievement']),
+    title: vine.string().trim().maxLength(255).nullable().optional(),
+    contentMarkdown: vine.string().trim().maxLength(50000).nullable().optional(),
+    tags: vine
+      .array(vine.string().trim().toLowerCase().minLength(1).maxLength(50))
+      .maxLength(10)
+      .nullable()
+      .optional(),
+  })
+)
+
+const updateEntryValidator = vine.compile(
+  vine.object({
+    entryType: vine.string().trim().in(['daily', 'til', 'snippet', 'debug', 'achievement']).optional(),
     title: vine.string().trim().maxLength(255).nullable().optional(),
     contentMarkdown: vine.string().trim().maxLength(50000).nullable().optional(),
     tags: vine
@@ -91,19 +103,17 @@ export default class EntriesController {
     
     // Check ownership
     // We fetch the entry first to verify it belongs to the authenticated user
-    const entry = await Entry.find(id)
-    if (!entry) {
-        return response.status(404).json({ success: false, message: 'Make sure the entry exists.' })
-    }
+    // Check ownership and existence via service
+    const entry = await this.entryService.findByIdOrSlug(user.id, id)
     
-    if (entry.userId !== user.id) {
-        return response.status(403).json({ success: false, message: 'You are not authorized to update this entry.' })
+    if (!entry) {
+        return response.status(404).json({ success: false, message: 'Entry not found.' })
     }
 
-    const payload = await request.validateUsing(entryValidator)
+    const payload = await request.validateUsing(updateEntryValidator)
 
-    const updatedEntry = await this.entryService.updateEntry(id, {
-      entryType: payload.entryType,
+    const updatedEntry = await this.entryService.updateEntry(entry.id, {
+      entryType: payload.entryType || entry.entryType,
       title: (payload.title !== undefined ? payload.title : entry.title) || undefined,
       contentMarkdown: (payload.contentMarkdown !== undefined ? payload.contentMarkdown : entry.contentMarkdown) || undefined,
       tags: payload.tags || undefined,
@@ -127,13 +137,10 @@ export default class EntriesController {
     const user = await auth.getUserOrFail()
     const { id } = params
 
-    const entry = await Entry.find(id)
+    const entry = await this.entryService.findByIdOrSlug(user.id, id)
+
     if (!entry) {
         return response.status(404).json({ success: false, message: 'Entry not found.' })
-    }
-
-    if (entry.userId !== user.id) {
-        return response.status(403).json({ success: false, message: 'You are not authorized to view this entry.' })
     }
 
     await entry.load('tags')
