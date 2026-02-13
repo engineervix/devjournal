@@ -10,6 +10,7 @@
 
 .EasyMDEContainer .CodeMirror {
   @apply bg-white text-gray-900 font-mono;
+
   font-size: 14px;
   line-height: 1.5;
 }
@@ -28,6 +29,7 @@
 
 .EasyMDEContainer .editor-statusbar {
   @apply bg-gray-50 border-t border-gray-300 text-gray-600;
+
   font-size: 12px;
 }
 
@@ -113,12 +115,12 @@
 }
 
 /* Table button styling */
-.EasyMDEContainer .editor-toolbar .fa-table:before {
+.EasyMDEContainer .editor-toolbar .fa-table::before {
   content: '⊞';
 }
 
 /* Horizontal rule button styling */
-.EasyMDEContainer .editor-toolbar .fa-minus:before {
+.EasyMDEContainer .editor-toolbar .fa-minus::before {
   content: '—';
 }
 

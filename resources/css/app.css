@@ -1,9 +1,9 @@
-@import url('tailwindcss/base');
-@import url('tailwindcss/components');
-@import url('tailwindcss/utilities');
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 /* Import highlight.js theme for code syntax highlighting */
-@import url('highlight.js/styles/github.css');
+@import 'highlight.js/styles/github.css';
 
 /* Import EasyMDE editor styles */
 @import './easymde.css';
@@ -74,6 +74,7 @@
 /* Enhanced components and utilities */
 @layer components {
   /* Note: .transition-theme moved to tailwind.config.js plugin */
+
   /* Note: Line clamping utilities now use Tailwind's built-in .line-clamp-{n} */
 
   /* Enhanced card hover effects */
@@ -84,15 +85,15 @@
   .card-hover:hover {
     transform: translateY(-2px);
     box-shadow:
-      0 10px 25px -3px rgba(0, 0, 0, 0.1),
-      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      0 10px 25px -3px rgb(0 0 0 / 10%),
+      0 4px 6px -2px rgb(0 0 0 / 5%);
   }
 
   /* Dark mode card hover effects */
   .dark .card-hover:hover {
     box-shadow:
-      0 10px 25px -3px rgba(0, 0, 0, 0.3),
-      0 4px 6px -2px rgba(0, 0, 0, 0.2);
+      0 10px 25px -3px rgb(0 0 0 / 30%),
+      0 4px 6px -2px rgb(0 0 0 / 20%);
   }
 
   /* Gradient text utility - using theme gradient */
@@ -124,6 +125,7 @@
 
   .copy-button {
     @apply font-sans;
+
     z-index: 10;
     transition: all 0.2s ease-in-out;
   }
@@ -152,12 +154,14 @@
   /* Keyboard shortcut styling */
   .kbd {
     @apply inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-mono font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded shadow-sm dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600;
+
     min-width: 1.5rem;
     line-height: 1;
   }
 
   .kbd-mac {
     @apply px-1 py-0.5;
+
     font-size: 0.75rem;
   }
 
@@ -197,4 +201,5 @@
 }
 
 /* Note: Custom animations moved to tailwind.config.js theme.extend.animation */
+
 /* Use: animate-fade-in, animate-slide-up, animate-bounce-subtle, animate-pulse-warning */
