@@ -103,7 +103,7 @@ The project follows AdonisJS conventions with additional structure:
   - `tag.ts`: Tag model with usage tracking
   - `user.ts`: User authentication model
 - **`app/services/`**: Business logic layer
-  - `entry_service.ts`: Entry querying, filtering, pagination
+  - `entry_service.ts`: Entry querying, filtering, pagination (User-scoped)
   - `content_processor_service.ts`: Markdown/HTML processing
   - `export_service.ts`: Entry export functionality
   - `tag_service.ts`: Tag management
@@ -160,7 +160,7 @@ curl -X POST http://localhost:3333/api/v1/entries \
 
 ### Key Points
 
-- **Endpoint**: `POST /api/v1/entries` (create entry)
+- **Endpoints**: `GET`, `POST`, `PUT` `/api/v1/entries`
 - **Controller**: `app/controllers/api/entries_controller.ts`
 - **Auth**: Personal Access Tokens (separate from web session auth)
 - **Validation**: Same rules as web routes (VineJS)

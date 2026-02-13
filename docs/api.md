@@ -7,6 +7,8 @@
   - [Endpoints](#endpoints)
     - [Validate Token](#validate-token)
     - [Create Entry](#create-entry)
+    - [List Entries](#list-entries)
+    - [Update Entry](#update-entry)
   - [Examples](#examples)
   - [Limitations](#limitations)
 
@@ -92,6 +94,72 @@ Copy the token immediately - it won't be shown again.
   }
 }
 ```
+
+### List Entries
+
+`GET /api/v1/entries` - List journal entries with pagination and filtering.
+
+**Query Parameters:**
+
+| Parameter     | Description                                               | Default    |
+| ------------- | --------------------------------------------------------- | ---------- |
+| `page`        | Page number                                               | 1          |
+| `perPage`     | Items per page                                            | 10         |
+| `type`        | Filter by type (`daily`, `til`, `snippet`, etc.)          | -          |
+| `sort`        | Sort order: `newest` or `oldest`                          | `newest`   |
+| `period`      | Filter by time period: `today`, `week`, `month`           | -          |
+| `tag`         | Filter by tag name                                        | -          |
+| `searchQuery` | Search term                                               | -          |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "meta": {
+      "total": 1,
+      "per_page": 10,
+      "current_page": 1,
+      "last_page": 1,
+      "first_page": 1,
+      "first_page_url": "/?page=1",
+      "last_page_url": "/?page=1",
+      "next_page_url": null,
+      "previous_page_url": null
+    },
+    "data": [
+      {
+        "id": "uuid",
+        "title": "Entry Title",
+        "entryType": "daily",
+        "contentMarkdown": "...",
+        "tags": [],
+        "createdAt": "2026-02-12T10:00:00Z"
+      }
+    ]
+  }
+}
+```
+
+### Update Entry
+
+`PUT /api/v1/entries/:id` - Update an existing entry. Only the authenticated user's entries can be updated.
+
+**Request:**
+
+Fields are optional; only provided fields will be updated.
+
+```json
+{
+  "title": "Updated Title",
+  "tags": ["new-tag"]
+}
+```
+
+**Response:**
+
+Returns the updated entry (same format as Create Entry).
 
 ## Examples
 
