@@ -225,6 +225,33 @@ test.group('Entries Controller', (group) => {
     assert.isNull(deletedEntry)
   })
 
+  test('should delete entry via POST with method spoofing', async ({ client, assert }) => {
+    const user = await User.create({
+      email: 'test@example.com',
+      password: 'password123',
+    })
+
+    const entry = await Entry.create({
+      userId: user.id,
+      entryType: 'daily',
+      title: 'To Delete via POST',
+      contentMarkdown: 'Content to delete via POST',
+    })
+
+    // Test form submission with method spoofing (simulates real browser behavior)
+    const response = await client
+      .post(`/entries/${entry.id}?_method=DELETE`)
+      .loginAs(user)
+      .withCsrfToken()
+
+    // Check if the request was successful (redirect after deletion)
+    assert.isTrue([200, 302].includes(response.status()))
+
+    // Check if entry was deleted
+    const deletedEntry = await Entry.find(entry.id)
+    assert.isNull(deletedEntry)
+  })
+
   test('should show entries by tag', async ({ client }) => {
     const user = await User.create({
       email: 'test@example.com',
