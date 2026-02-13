@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+build/
+dist/
+coverage/
+
+# Temporary files
+tmp/
+
+# Reference directories
+_references/
+_ref/
+
+# CLI directory (ignore everything except markdown)
+cli/**
+!cli/**/*.md
+
+# Changelog
+CHANGELOG.md
