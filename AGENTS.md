@@ -460,6 +460,14 @@ All checks must pass before merging.
 - Markdown editing uses EasyMDE with live preview
 - Export functionality allows downloading entries as ZIP or single markdown file
 
+## As a pragmatic programmer ...
+
+- When writing code, it's important to keep in mind these core principles:
+  - **DRY (Don't Repeat Yourself)**: Every piece of knowledge should have a single, unambiguous, authoritative representation in the system. Duplication leads to inconsistency and maintenance nightmares.
+  - **ETC (Easier to Change)**: This is the underlying value behind most design principles. Good design is design that's easy to change. When making decisions, ask yourself: "Did the thing I just did make the system easier or harder to change?"
+  - **Orthogonality**: Keep components independent and loosely coupled. Changes in one area shouldn't ripple through unrelated parts of the system. Two components are orthogonal if changing one doesn't affect the other.
+
+
 ## References
 
 The `_references/` directory (should not be in version control) may contain:
