@@ -9,9 +9,7 @@
 }
 
 .EasyMDEContainer .CodeMirror {
-  @apply bg-white text-gray-900;
-  font-family:
-    ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  @apply bg-white text-gray-900 font-mono;
   font-size: 14px;
   line-height: 1.5;
 }
@@ -152,9 +150,7 @@
 
 /* Style the original textarea before EasyMDE transforms it */
 .easymde-wrapper textarea {
-  @apply w-full min-h-64 p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200;
-  font-family:
-    ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  @apply w-full min-h-64 p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 font-mono;
 }
 
 /* Loading state for editor initialization */

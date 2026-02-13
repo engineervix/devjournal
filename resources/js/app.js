@@ -22,6 +22,7 @@ import { easyMDEEditorComponent } from './components/easymde-editor.js'
 import { tagInputComponent } from './components/tag-input.js'
 import { ajaxFormComponent } from './components/ajax-form.js'
 import { clickableCardComponent } from './components/clickable-card.js'
+import dropdownComponent from './components/dropdown.js'
 
 // Import global utilities
 import './utils/globals.js'
@@ -34,6 +35,7 @@ document.addEventListener('alpine:init', () => {
   Alpine.data('tagInput', tagInputComponent)
   Alpine.data('ajaxForm', ajaxFormComponent)
   Alpine.data('clickableCard', clickableCardComponent)
+  Alpine.data('dropdown', dropdownComponent)
 })
 
 // Initialize Alpine.js
@@ -47,4 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeFormShortcuts()
   initializeCodeFeatures()
   initializeUnsavedChangesProtection()
+
+  // Conditionally load login page Turnstile script
+  // Only if we're on the login page and Turnstile is enabled
+  if (document.getElementById('loginForm') && document.querySelector('.cf-turnstile')) {
+    import('./pages/login-turnstile.js').catch((err) => {
+      console.error('Failed to load Turnstile module:', err)
+    })
+  }
 })
