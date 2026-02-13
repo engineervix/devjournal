@@ -101,15 +101,15 @@ Copy the token immediately - it won't be shown again.
 
 **Query Parameters:**
 
-| Parameter     | Description                                               | Default    |
-| ------------- | --------------------------------------------------------- | ---------- |
-| `page`        | Page number                                               | 1          |
-| `perPage`     | Items per page                                            | 10         |
-| `type`        | Filter by type (`daily`, `til`, `snippet`, etc.)          | -          |
-| `sort`        | Sort order: `newest` or `oldest`                          | `newest`   |
-| `period`      | Filter by time period: `today`, `week`, `month`           | -          |
-| `tag`         | Filter by tag name                                        | -          |
-| `searchQuery` | Search term                                               | -          |
+| Parameter     | Description                                      | Default  |
+| ------------- | ------------------------------------------------ | -------- |
+| `page`        | Page number                                      | 1        |
+| `perPage`     | Items per page                                   | 10       |
+| `type`        | Filter by type (`daily`, `til`, `snippet`, etc.) | -        |
+| `sort`        | Sort order: `newest` or `oldest`                 | `newest` |
+| `period`      | Filter by time period: `today`, `week`, `month`  | -        |
+| `tag`         | Filter by tag name                               | -        |
+| `searchQuery` | Search term                                      | -        |
 
 **Response:**
 

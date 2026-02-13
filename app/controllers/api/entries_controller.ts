@@ -19,7 +19,11 @@ const entryValidator = vine.compile(
 
 const updateEntryValidator = vine.compile(
   vine.object({
-    entryType: vine.string().trim().in(['daily', 'til', 'snippet', 'debug', 'achievement']).optional(),
+    entryType: vine
+      .string()
+      .trim()
+      .in(['daily', 'til', 'snippet', 'debug', 'achievement'])
+      .optional(),
     title: vine.string().trim().maxLength(255).nullable().optional(),
     contentMarkdown: vine.string().trim().maxLength(50000).nullable().optional(),
     tags: vine
@@ -64,33 +68,33 @@ export default class EntriesController {
       data: entry,
     })
   }
-  
+
   /**
-    * List entries
-    */
+   * List entries
+   */
   async index({ request, response, auth }: HttpContext) {
     const user = await auth.getUserOrFail()
     const { page, perPage, type, sort, period, tag, searchQuery } = request.qs()
 
-    const filters = { 
-      type, 
-      period, 
-      sort, 
-      tag, 
-      searchQuery 
+    const filters = {
+      type,
+      period,
+      sort,
+      tag,
+      searchQuery,
     }
 
-    const pagination = { 
-      page: page ? Number(page) : 1, 
-      perPage: perPage ? Number(perPage) : 10 
+    const pagination = {
+      page: page ? Number(page) : 1,
+      perPage: perPage ? Number(perPage) : 10,
     }
 
     // Ensure we only get entries for the current user
     const entries = await this.entryService.getEntries(user.id, filters, pagination)
-    
+
     return response.json({
-        success: true, 
-        data: entries 
+      success: true,
+      data: entries,
     })
   }
 
@@ -100,14 +104,14 @@ export default class EntriesController {
   async update({ params, request, response, auth }: HttpContext) {
     const user = await auth.getUserOrFail()
     const { id } = params
-    
+
     // Check ownership
     // We fetch the entry first to verify it belongs to the authenticated user
     // Check ownership and existence via service
     const entry = await this.entryService.findByIdOrSlug(user.id, id)
-    
+
     if (!entry) {
-        return response.status(404).json({ success: false, message: 'Entry not found.' })
+      return response.status(404).json({ success: false, message: 'Entry not found.' })
     }
 
     const payload = await request.validateUsing(updateEntryValidator)
@@ -115,7 +119,9 @@ export default class EntriesController {
     const updatedEntry = await this.entryService.updateEntry(entry.id, {
       entryType: payload.entryType || entry.entryType,
       title: (payload.title !== undefined ? payload.title : entry.title) || undefined,
-      contentMarkdown: (payload.contentMarkdown !== undefined ? payload.contentMarkdown : entry.contentMarkdown) || undefined,
+      contentMarkdown:
+        (payload.contentMarkdown !== undefined ? payload.contentMarkdown : entry.contentMarkdown) ||
+        undefined,
       tags: payload.tags || undefined,
     })
 
@@ -140,14 +146,14 @@ export default class EntriesController {
     const entry = await this.entryService.findByIdOrSlug(user.id, id)
 
     if (!entry) {
-        return response.status(404).json({ success: false, message: 'Entry not found.' })
+      return response.status(404).json({ success: false, message: 'Entry not found.' })
     }
 
     await entry.load('tags')
 
     return response.json({
-        success: true,
-        data: entry
+      success: true,
+      data: entry,
     })
   }
 }

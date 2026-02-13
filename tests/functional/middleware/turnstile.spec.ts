@@ -76,7 +76,7 @@ test.group('Turnstile Middleware', (group) => {
 
     const ctx = new HttpContextFactory().create()
     // Mock session flash
-    ctx.session.flash = (key: string, value: any) => {}
+    ctx.session.flash = (() => {}) as any
     // Mock redirect
     let redirectCalled = false
     ctx.response.redirect = (() => {
@@ -108,10 +108,10 @@ test.group('Turnstile Middleware', (group) => {
     nock('https://challenges.cloudflare.com')
       .post('/turnstile/v0/siteverify')
       .reply(200, {
-        success: false,
+        'success': false,
         'error-codes': ['invalid-input-response'],
-        challenge_ts: '2026-02-13T12:00:00.000Z',
-        hostname: 'localhost',
+        'challenge_ts': '2026-02-13T12:00:00.000Z',
+        'hostname': 'localhost',
       })
 
     const service = new TurnstileService()
@@ -122,9 +122,9 @@ test.group('Turnstile Middleware', (group) => {
 
     // Mock session flash to capture message
     let flashedMessage = ''
-    ctx.session.flash = (key: string, value: any) => {
+    ctx.session.flash = ((key: string, value: any) => {
       if (key === 'error') flashedMessage = value
-    }
+    }) as any
     // Mock redirect
     let redirectCalled = false
     ctx.response.redirect = (() => {
@@ -157,10 +157,10 @@ test.group('Turnstile Middleware', (group) => {
     nock('https://challenges.cloudflare.com')
       .post('/turnstile/v0/siteverify')
       .reply(200, {
-        success: false,
+        'success': false,
         'error-codes': ['invalid-input-secret'],
-        challenge_ts: '2026-02-13T12:00:00.000Z',
-        hostname: 'localhost',
+        'challenge_ts': '2026-02-13T12:00:00.000Z',
+        'hostname': 'localhost',
       })
 
     const service = new TurnstileService()
@@ -171,9 +171,9 @@ test.group('Turnstile Middleware', (group) => {
 
     // Mock session flash to capture message
     let flashedMessage = ''
-    ctx.session.flash = (key: string, value: any) => {
+    ctx.session.flash = ((key: string, value: any) => {
       if (key === 'error') flashedMessage = value
-    }
+    }) as any
     // Mock redirect
     let redirectCalled = false
     ctx.response.redirect = (() => {
@@ -203,14 +203,12 @@ test.group('Turnstile Middleware', (group) => {
     }
 
     // Mock successful validation
-    nock('https://challenges.cloudflare.com')
-      .post('/turnstile/v0/siteverify')
-      .reply(200, {
-        success: true,
-        'error-codes': [],
-        challenge_ts: '2026-02-13T12:00:00.000Z',
-        hostname: 'localhost',
-      })
+    nock('https://challenges.cloudflare.com').post('/turnstile/v0/siteverify').reply(200, {
+      'success': true,
+      'error-codes': [],
+      'challenge_ts': '2026-02-13T12:00:00.000Z',
+      'hostname': 'localhost',
+    })
 
     const service = new TurnstileService()
     const middleware = new TurnstileMiddleware(service)

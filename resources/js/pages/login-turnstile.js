@@ -66,11 +66,7 @@ export function initTurnstile() {
   // Prevent form submission without Turnstile response
   loginForm.addEventListener('submit', function (e) {
     const turnstileResponse = document.querySelector('input[name="cf-turnstile-response"]')
-    if (
-      !turnstileResponse ||
-      !turnstileResponse.value ||
-      turnstileResponse.value.trim() === ''
-    ) {
+    if (!turnstileResponse || !turnstileResponse.value || turnstileResponse.value.trim() === '') {
       e.preventDefault()
       alert('Please complete the security challenge before submitting.')
       return false

@@ -35,15 +35,15 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    */
   async handle(error: unknown, ctx: HttpContext) {
     if (ctx.request.url(true).startsWith('/api/')) {
-        const err = error as any
-        const status = err.status || 500
-        const message = err.message || 'Server Error'
-        return ctx.response.status(status).json({
-            success: false,
-            message: message,
-            stack: this.debug ? err.stack : undefined,
-            code: err.code
-        })
+      const err = error as any
+      const status = err.status || 500
+      const message = err.message || 'Server Error'
+      return ctx.response.status(status).json({
+        success: false,
+        message: message,
+        stack: this.debug ? err.stack : undefined,
+        code: err.code,
+      })
     }
     return super.handle(error, ctx)
   }

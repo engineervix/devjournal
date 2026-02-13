@@ -17,14 +17,12 @@ test.group('Turnstile Service', (group) => {
     }
 
     // Mock successful Cloudflare response
-    nock('https://challenges.cloudflare.com')
-      .post('/turnstile/v0/siteverify')
-      .reply(200, {
-        success: true,
-        'error-codes': [],
-        challenge_ts: '2026-02-13T12:00:00.000Z',
-        hostname: 'localhost',
-      })
+    nock('https://challenges.cloudflare.com').post('/turnstile/v0/siteverify').reply(200, {
+      'success': true,
+      'error-codes': [],
+      'challenge_ts': '2026-02-13T12:00:00.000Z',
+      'hostname': 'localhost',
+    })
 
     const service = new TurnstileService()
     const result = await service.validateToken('valid-test-token')
@@ -48,10 +46,10 @@ test.group('Turnstile Service', (group) => {
         return body.includes('remoteip=192.168.1.100')
       })
       .reply(200, {
-        success: true,
+        'success': true,
         'error-codes': [],
-        challenge_ts: '2026-02-13T12:00:00.000Z',
-        hostname: 'localhost',
+        'challenge_ts': '2026-02-13T12:00:00.000Z',
+        'hostname': 'localhost',
       })
 
     const service = new TurnstileService()
@@ -75,10 +73,10 @@ test.group('Turnstile Service', (group) => {
         return !body.includes('remoteip')
       })
       .reply(200, {
-        success: true,
+        'success': true,
         'error-codes': [],
-        challenge_ts: '2026-02-13T12:00:00.000Z',
-        hostname: 'localhost',
+        'challenge_ts': '2026-02-13T12:00:00.000Z',
+        'hostname': 'localhost',
       })
 
     const service = new TurnstileService()
@@ -99,10 +97,10 @@ test.group('Turnstile Service', (group) => {
     nock('https://challenges.cloudflare.com')
       .post('/turnstile/v0/siteverify')
       .reply(200, {
-        success: false,
+        'success': false,
         'error-codes': ['invalid-input-response'],
-        challenge_ts: '2026-02-13T12:00:00.000Z',
-        hostname: 'localhost',
+        'challenge_ts': '2026-02-13T12:00:00.000Z',
+        'hostname': 'localhost',
       })
 
     const service = new TurnstileService()
@@ -125,10 +123,10 @@ test.group('Turnstile Service', (group) => {
     nock('https://challenges.cloudflare.com')
       .post('/turnstile/v0/siteverify')
       .reply(200, {
-        success: false,
+        'success': false,
         'error-codes': ['timeout-or-duplicate'],
-        challenge_ts: '2026-02-13T12:00:00.000Z',
-        hostname: 'localhost',
+        'challenge_ts': '2026-02-13T12:00:00.000Z',
+        'hostname': 'localhost',
       })
 
     const service = new TurnstileService()
@@ -151,10 +149,10 @@ test.group('Turnstile Service', (group) => {
     nock('https://challenges.cloudflare.com')
       .post('/turnstile/v0/siteverify')
       .reply(200, {
-        success: false,
+        'success': false,
         'error-codes': ['invalid-input-secret'],
-        challenge_ts: '2026-02-13T12:00:00.000Z',
-        hostname: 'localhost',
+        'challenge_ts': '2026-02-13T12:00:00.000Z',
+        'hostname': 'localhost',
       })
 
     const service = new TurnstileService()
@@ -177,10 +175,10 @@ test.group('Turnstile Service', (group) => {
     nock('https://challenges.cloudflare.com')
       .post('/turnstile/v0/siteverify')
       .reply(200, {
-        success: false,
+        'success': false,
         'error-codes': ['internal-error'],
-        challenge_ts: '2026-02-13T12:00:00.000Z',
-        hostname: 'localhost',
+        'challenge_ts': '2026-02-13T12:00:00.000Z',
+        'hostname': 'localhost',
       })
 
     const service = new TurnstileService()
@@ -189,10 +187,7 @@ test.group('Turnstile Service', (group) => {
     assert.isFalse(result.success)
     assert.equal(result.errorCategory, 'system')
     assert.deepEqual(result.errorCodes, ['internal-error'])
-    assert.equal(
-      result.userMessage,
-      'Security check temporarily unavailable. Please try again.'
-    )
+    assert.equal(result.userMessage, 'Security check temporarily unavailable. Please try again.')
   })
 
   test('categorizes network error as system error', async ({ assert }) => {
@@ -213,10 +208,7 @@ test.group('Turnstile Service', (group) => {
     // Should fail closed (return error on network failure)
     assert.isFalse(result.success)
     assert.equal(result.errorCategory, 'system')
-    assert.equal(
-      result.userMessage,
-      'Security check temporarily unavailable. Please try again.'
-    )
+    assert.equal(result.userMessage, 'Security check temporarily unavailable. Please try again.')
   })
 
   test('categorizes malformed response as system error', async ({ assert }) => {

@@ -95,15 +95,15 @@ test.group('API Short UUID and Errors', (group) => {
   })
 
   test('returns JSON error for server error (simulated)', async ({ client }) => {
-     // To simulate a server error we might need to mock something or hit a route that throws.
-     // For now, let's just assume if 404 works as JSON, 500 should too due to our handler logic.
-     // But we can try requests to a non-existent route under /api/v1 which handles 404
-     // The handler has a 404 status page logic we overrode?
-     // Actually our handler override is for ALL errors.
-     
-     // Let's try to pass an invalid JSON payload that might cause parsing error?
-     // Or just a standard 404 for a route that doesn't exist.
-     
+    // To simulate a server error we might need to mock something or hit a route that throws.
+    // For now, let's just assume if 404 works as JSON, 500 should too due to our handler logic.
+    // But we can try requests to a non-existent route under /api/v1 which handles 404
+    // The handler has a 404 status page logic we overrode?
+    // Actually our handler override is for ALL errors.
+
+    // Let's try to pass an invalid JSON payload that might cause parsing error?
+    // Or just a standard 404 for a route that doesn't exist.
+
     const user = await User.create({
       fullName: 'Test User',
       email: 'test@example.com',
@@ -111,12 +111,12 @@ test.group('API Short UUID and Errors', (group) => {
     })
     const token = await User.accessTokens.create(user)
 
-     const response = await client
-       .get('/api/v1/non-existent-route')
-       .header('Authorization', `Bearer ${token.value!.release()}`)
-    
-     // Adonis 404 for missing route usually ends up in handler
-     response.assertStatus(404)
-     response.assertHeader('content-type', 'application/json; charset=utf-8')
+    const response = await client
+      .get('/api/v1/non-existent-route')
+      .header('Authorization', `Bearer ${token.value!.release()}`)
+
+    // Adonis 404 for missing route usually ends up in handler
+    response.assertStatus(404)
+    response.assertHeader('content-type', 'application/json; charset=utf-8')
   })
 })

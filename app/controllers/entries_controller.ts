@@ -190,7 +190,12 @@ export default class EntriesController {
     const pagination = { page: currentPage, perPage: 10 }
 
     const user = await auth.getUserOrFail()
-    const { tag, entries } = await this.entryService.getEntriesByTag(user.id, slug, filters, pagination)
+    const { tag, entries } = await this.entryService.getEntriesByTag(
+      user.id,
+      slug,
+      filters,
+      pagination
+    )
 
     const queryParams = new URLSearchParams(request.qs() as Record<string, string>)
     queryParams.delete('page')

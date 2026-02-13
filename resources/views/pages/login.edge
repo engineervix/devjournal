@@ -23,13 +23,15 @@
         <meta name="robots" content="noindex, nofollow" />
       @end
     @end
-
+    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     {{-- Turnstile script - loaded when configured --}}
     {{-- Callbacks and logic now in resources/js/pages/login-turnstile.js --}}
     @if(env.get('TURNSTILE_SITE_KEY'))
-      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer>
+        
+      </script>
     @endif
   </head>
   <body class="min-h-screen bg-gray-50 dark:bg-gray-900" x-data="{ showPassword: false }">

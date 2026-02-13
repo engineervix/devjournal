@@ -467,7 +467,6 @@ All checks must pass before merging.
   - **ETC (Easier to Change)**: This is the underlying value behind most design principles. Good design is design that's easy to change. When making decisions, ask yourself: "Did the thing I just did make the system easier or harder to change?"
   - **Orthogonality**: Keep components independent and loosely coupled. Changes in one area shouldn't ripple through unrelated parts of the system. Two components are orthogonal if changing one doesn't affect the other.
 
-
 ## References
 
 The `_references/` directory (should not be in version control) may contain:

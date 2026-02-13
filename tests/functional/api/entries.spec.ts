@@ -193,21 +193,14 @@ test.group('Api entries', (group) => {
       { userId: user.id, entryType: 'snippet', title: 'Entry 3', contentMarkdown: 'Content 3' },
     ])
 
-    const response = await client
-      .get('/api/v1/entries')
-      .withGuard('api')
-      .loginAs(user)
+    const response = await client.get('/api/v1/entries').withGuard('api').loginAs(user)
 
     response.assertStatus(200)
     response.assertBodyContains({
       success: true,
       data: {
         meta: { total: 3, perPage: 10, currentPage: 1 },
-        data: [
-            { title: 'Entry 3' },
-            { title: 'Entry 2' },
-            { title: 'Entry 1' },
-        ]
+        data: [{ title: 'Entry 3' }, { title: 'Entry 2' }, { title: 'Entry 1' }],
       },
     })
   })
@@ -219,11 +212,11 @@ test.group('Api entries', (group) => {
       password: 'password',
     })
 
-    const entry = await Entry.create({ 
-        userId: user.id, 
-        entryType: 'daily', 
-        title: 'Original Title', 
-        contentMarkdown: 'Original Content' 
+    const entry = await Entry.create({
+      userId: user.id,
+      entryType: 'daily',
+      title: 'Original Title',
+      contentMarkdown: 'Original Content',
     })
 
     const response = await client
@@ -252,18 +245,21 @@ test.group('Api entries', (group) => {
     assert.equal(entry.contentMarkdown, 'Updated Content')
   })
 
-  test('update entry preserves existing values when fields are missing', async ({ client, assert }) => {
+  test('update entry preserves existing values when fields are missing', async ({
+    client,
+    assert,
+  }) => {
     const user = await User.create({
       fullName: 'Test User',
       email: 'test@example.com',
       password: 'password',
     })
 
-    const entry = await Entry.create({ 
-        userId: user.id, 
-        entryType: 'daily', 
-        title: 'Original Title', 
-        contentMarkdown: 'Original Content' 
+    const entry = await Entry.create({
+      userId: user.id,
+      entryType: 'daily',
+      title: 'Original Title',
+      contentMarkdown: 'Original Content',
     })
 
     // Only update content, title should be preserved
@@ -276,7 +272,7 @@ test.group('Api entries', (group) => {
       })
 
     response.assertStatus(200)
-    
+
     await entry.refresh()
     assert.equal(entry.title, 'Original Title')
     assert.equal(entry.contentMarkdown, 'New Content')
@@ -289,11 +285,11 @@ test.group('Api entries', (group) => {
       password: 'password',
     })
 
-    const entry = await Entry.create({ 
-        userId: user.id, 
-        entryType: 'daily', 
-        title: 'Original Title', 
-        contentMarkdown: 'Original Content' 
+    const entry = await Entry.create({
+      userId: user.id,
+      entryType: 'daily',
+      title: 'Original Title',
+      contentMarkdown: 'Original Content',
     })
 
     // Send title as null explicitly
@@ -306,7 +302,7 @@ test.group('Api entries', (group) => {
       })
 
     response.assertStatus(200)
-    
+
     await entry.refresh()
     assert.isNull(entry.title)
     assert.equal(entry.contentMarkdown, 'Original Content')
@@ -314,22 +310,22 @@ test.group('Api entries', (group) => {
 
   test('cannot update entry of another user', async ({ client }) => {
     const user = await User.create({
-        fullName: 'Test User',
-        email: 'test1@example.com',
-        password: 'password',
+      fullName: 'Test User',
+      email: 'test1@example.com',
+      password: 'password',
     })
 
     const otherUser = await User.create({
-        fullName: 'Other User',
-        email: 'test2@example.com',
-        password: 'password',
+      fullName: 'Other User',
+      email: 'test2@example.com',
+      password: 'password',
     })
 
-    const entry = await Entry.create({ 
-        userId: otherUser.id, 
-        entryType: 'daily', 
-        title: 'Other User Entry', 
-        contentMarkdown: 'Content' 
+    const entry = await Entry.create({
+      userId: otherUser.id,
+      entryType: 'daily',
+      title: 'Other User Entry',
+      contentMarkdown: 'Content',
     })
 
     const response = await client
@@ -346,9 +342,9 @@ test.group('Api entries', (group) => {
 
   test('cannot update non-existent entry', async ({ client }) => {
     const user = await User.create({
-        fullName: 'Test User',
-        email: 'test@example.com',
-        password: 'password',
+      fullName: 'Test User',
+      email: 'test@example.com',
+      password: 'password',
     })
 
     // Use a random UUID
@@ -372,16 +368,13 @@ test.group('Api entries', (group) => {
     })
 
     const entry = await Entry.create({
-        userId: user.id,
-        entryType: 'daily',
-        title: 'Show Test',
-        contentMarkdown: 'Show Content',
+      userId: user.id,
+      entryType: 'daily',
+      title: 'Show Test',
+      contentMarkdown: 'Show Content',
     })
 
-    const response = await client
-      .get(`/api/v1/entries/${entry.id}`)
-      .withGuard('api')
-      .loginAs(user)
+    const response = await client.get(`/api/v1/entries/${entry.id}`).withGuard('api').loginAs(user)
 
     response.assertStatus(200)
     response.assertBodyContains({
@@ -396,37 +389,34 @@ test.group('Api entries', (group) => {
 
   test('cannot show entry of another user', async ({ client }) => {
     const user = await User.create({
-        fullName: 'Test User',
-        email: 'test1@example.com',
-        password: 'password',
+      fullName: 'Test User',
+      email: 'test1@example.com',
+      password: 'password',
     })
 
     const otherUser = await User.create({
-        fullName: 'Other User',
-        email: 'test2@example.com',
-        password: 'password',
+      fullName: 'Other User',
+      email: 'test2@example.com',
+      password: 'password',
     })
 
     const entry = await Entry.create({
-        userId: otherUser.id,
-        entryType: 'daily',
-        title: 'Other User Entry',
-        contentMarkdown: 'Content'
+      userId: otherUser.id,
+      entryType: 'daily',
+      title: 'Other User Entry',
+      contentMarkdown: 'Content',
     })
 
-    const response = await client
-      .get(`/api/v1/entries/${entry.id}`)
-      .withGuard('api')
-      .loginAs(user)
+    const response = await client.get(`/api/v1/entries/${entry.id}`).withGuard('api').loginAs(user)
 
     response.assertStatus(404)
   })
 
   test('cannot show non-existent entry', async ({ client }) => {
     const user = await User.create({
-        fullName: 'Test User',
-        email: 'test@example.com',
-        password: 'password',
+      fullName: 'Test User',
+      email: 'test@example.com',
+      password: 'password',
     })
 
     const response = await client

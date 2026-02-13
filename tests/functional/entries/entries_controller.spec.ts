@@ -434,12 +434,12 @@ test.group('Entries Controller', (group) => {
   test('should prevent unauthorized user from updating entry', async ({ client }) => {
     const user1 = await User.create({ email: 'u1@test.com', password: 'password' })
     const user2 = await User.create({ email: 'u2@test.com', password: 'password' })
-    
+
     const entry = await Entry.create({
       userId: user1.id,
       entryType: 'daily',
       title: 'User 1 Entry',
-      contentMarkdown: 'Content'
+      contentMarkdown: 'Content',
     })
 
     const response = await client
@@ -455,18 +455,15 @@ test.group('Entries Controller', (group) => {
   test('should prevent unauthorized user from deleting entry', async ({ client }) => {
     const user1 = await User.create({ email: 'u1@test.com', password: 'password' })
     const user2 = await User.create({ email: 'u2@test.com', password: 'password' })
-    
+
     const entry = await Entry.create({
       userId: user1.id,
       entryType: 'daily',
       title: 'User 1 Entry',
-      contentMarkdown: 'Content'
+      contentMarkdown: 'Content',
     })
 
-    const response = await client
-      .delete(`/entries/${entry.id}`)
-      .loginAs(user2)
-      .withCsrfToken()
+    const response = await client.delete(`/entries/${entry.id}`).loginAs(user2).withCsrfToken()
 
     response.assertRedirectsTo('/entries')
   })
@@ -477,7 +474,7 @@ test.group('Entries Controller', (group) => {
     response.assertStatus(200)
     response.assertTextIncludes('Search your development journal entries')
   })
-  
+
   test('should show correct search description with results', async ({ client }) => {
     const user = await User.create({ email: 'test@example.com', password: 'password' })
     await Entry.create({
@@ -485,7 +482,7 @@ test.group('Entries Controller', (group) => {
       entryType: 'daily',
       title: 'FindMe',
       contentMarkdown: 'content',
-      contentPlain: 'content'
+      contentPlain: 'content',
     })
 
     const response = await client.get('/entries/search?q=FindMe').loginAs(user)
@@ -493,7 +490,7 @@ test.group('Entries Controller', (group) => {
     // Quotes are HTML-escaped in meta tags
     response.assertTextIncludes('Found 1 result for &quot;FindMe&quot;')
   })
-  
+
   test('should show tag cloud', async ({ client }) => {
     const user = await User.create({ email: 'test@example.com', password: 'password' })
     const response = await client.get('/tags').loginAs(user)

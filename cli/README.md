@@ -67,25 +67,25 @@ View current configuration.
 Authenticate with API token.
 
 ### `list [flags]`
- 
+
 List journal entries.
- 
+
 **Flags:**
- 
+
 - `-p, --page` - Page number (default 1)
 - `-n, --per-page` - Items per page (default 10)
 - `-t, --type` - Filter by entry type
 - `--tag` - Filter by tag
 - `--json` - Output as JSON
- 
+
 ### `update <ID> [flags]`
- 
+
 Update an existing journal entry. If no update flags are provided, opens your editor with current content.
- 
+
 **Flags:**
- 
+
 - `--title` - Update title without opening editor
- 
+
 ### `add [flags] [content]`
 
 Create a journal entry.

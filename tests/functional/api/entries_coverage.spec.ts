@@ -14,9 +14,19 @@ test.group('Api entries coverage', (group) => {
       password: 'password',
     })
 
-    const entry1 = await Entry.create({ userId: user.id, entryType: 'daily', title: 'A Daily', contentMarkdown: 'Content' })
-    await Entry.create({ userId: user.id, entryType: 'til', title: 'A TIL', contentMarkdown: 'Content' })
-    
+    const entry1 = await Entry.create({
+      userId: user.id,
+      entryType: 'daily',
+      title: 'A Daily',
+      contentMarkdown: 'Content',
+    })
+    await Entry.create({
+      userId: user.id,
+      entryType: 'til',
+      title: 'A TIL',
+      contentMarkdown: 'Content',
+    })
+
     // Tag entry1
     const tag = await Tag.create({ name: 'test', slug: 'test', usageCount: 1 })
     await entry1.related('tags').attach([tag.id])
@@ -29,7 +39,7 @@ test.group('Api entries coverage', (group) => {
         sort: 'newest',
         tag: 'test',
         page: 1,
-        perPage: 5
+        perPage: 5,
       })
       .withGuard('api')
       .loginAs(user)
@@ -37,10 +47,10 @@ test.group('Api entries coverage', (group) => {
     response.assertStatus(200)
     response.assertBodyContains({
       data: {
-        data: [{ id: entry1.id }]
-      }
+        data: [{ id: entry1.id }],
+      },
     })
-    
+
     assert.lengthOf(response.body().data.data, 1)
     assert.equal(response.body().data.data[0].id, entry1.id)
   })
@@ -62,7 +72,7 @@ test.group('Api entries coverage', (group) => {
       .loginAs(user)
 
     response.assertStatus(201)
-    
+
     const entry = await Entry.query().where('user_id', user.id).firstOrFail()
     assert.isNull(entry.contentMarkdown)
     // Title should be auto-generated
@@ -82,13 +92,13 @@ test.group('Api entries coverage', (group) => {
         entryType: 'snippet',
         title: 'My Snippet',
         contentMarkdown: 'alert("hello")',
-        tags: ['js', 'alert']
+        tags: ['js', 'alert'],
       })
       .withGuard('api')
       .loginAs(user)
 
     response.assertStatus(201)
-    
+
     const entry = await Entry.query().where('user_id', user.id).preload('tags').firstOrFail()
     assert.equal(entry.title, 'My Snippet')
     assert.equal(entry.contentMarkdown, 'alert("hello")')
@@ -102,13 +112,18 @@ test.group('Api entries coverage', (group) => {
       password: 'password',
     })
 
-    const entry = await Entry.create({ userId: user.id, entryType: 'daily', title: 'Old', contentMarkdown: 'Content' })
+    const entry = await Entry.create({
+      userId: user.id,
+      entryType: 'daily',
+      title: 'Old',
+      contentMarkdown: 'Content',
+    })
 
     const response = await client
       .put(`/api/v1/entries/${entry.id}`)
       .json({
         entryType: 'daily',
-        title: 'New Title'
+        title: 'New Title',
         // contentMarkdown omitted
       })
       .withGuard('api')
@@ -118,7 +133,7 @@ test.group('Api entries coverage', (group) => {
     await entry.refresh()
     assert.equal(entry.title, 'New Title')
     // Should content be null or preserved?
-    // In `updateEntry` service method: 
+    // In `updateEntry` service method:
     // entry.contentMarkdown = data.contentMarkdown || null
     // If it's undefined in payload, validator returns optional().
     // Content should be preserved because we are doing a partial update
@@ -141,7 +156,7 @@ test.group('Api entries coverage', (group) => {
       .json({
         entryType: 'daily',
         title: 'Old',
-        tags: [] // Empty array
+        tags: [], // Empty array
       })
       .withGuard('api')
       .loginAs(user)
@@ -158,13 +173,18 @@ test.group('Api entries coverage', (group) => {
       password: 'password',
     })
 
-    const entry = await Entry.create({ userId: user.id, entryType: 'daily', title: 'Original', contentMarkdown: 'Content' })
+    const entry = await Entry.create({
+      userId: user.id,
+      entryType: 'daily',
+      title: 'Original',
+      contentMarkdown: 'Content',
+    })
 
     const response = await client
       .put(`/api/v1/entries/${entry.id}`)
       .json({
         entryType: 'daily',
-        contentMarkdown: 'New Content'
+        contentMarkdown: 'New Content',
         // title omitted
       })
       .withGuard('api')
