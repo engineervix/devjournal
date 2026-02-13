@@ -139,7 +139,6 @@ A modern developer journal application built with [AdonisJS](https://adonisjs.co
 ```
 ├── app/
 │   ├── controllers/     # HTTP controllers
-│   ├── controllers/    # HTTP controllers
 │   ├── models/         # Database models
 │   ├── services/       # Business logic
 │   ├── middleware/     # HTTP middleware
