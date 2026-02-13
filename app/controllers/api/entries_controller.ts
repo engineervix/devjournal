@@ -119,4 +119,28 @@ export default class EntriesController {
       data: updatedEntry,
     })
   }
+
+  /**
+   * Show entry
+   */
+  async show({ params, response, auth }: HttpContext) {
+    const user = await auth.getUserOrFail()
+    const { id } = params
+
+    const entry = await Entry.find(id)
+    if (!entry) {
+        return response.status(404).json({ success: false, message: 'Entry not found.' })
+    }
+
+    if (entry.userId !== user.id) {
+        return response.status(403).json({ success: false, message: 'You are not authorized to view this entry.' })
+    }
+
+    await entry.load('tags')
+
+    return response.json({
+        success: true,
+        data: entry
+    })
+  }
 }

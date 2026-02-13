@@ -303,4 +303,77 @@ test.group('Api entries', (group) => {
 
     response.assertStatus(404)
   })
+
+  test('show entry', async ({ client }) => {
+    const user = await User.create({
+      fullName: 'Test User',
+      email: 'test@example.com',
+      password: 'password',
+    })
+
+    const entry = await Entry.create({
+        userId: user.id,
+        entryType: 'daily',
+        title: 'Show Test',
+        contentMarkdown: 'Show Content',
+    })
+
+    const response = await client
+      .get(`/api/v1/entries/${entry.id}`)
+      .withGuard('api')
+      .loginAs(user)
+
+    response.assertStatus(200)
+    response.assertBodyContains({
+      success: true,
+      data: {
+        id: entry.id,
+        title: 'Show Test',
+        contentMarkdown: 'Show Content',
+      },
+    })
+  })
+
+  test('cannot show entry of another user', async ({ client }) => {
+    const user = await User.create({
+        fullName: 'Test User',
+        email: 'test1@example.com',
+        password: 'password',
+    })
+
+    const otherUser = await User.create({
+        fullName: 'Other User',
+        email: 'test2@example.com',
+        password: 'password',
+    })
+
+    const entry = await Entry.create({
+        userId: otherUser.id,
+        entryType: 'daily',
+        title: 'Other User Entry',
+        contentMarkdown: 'Content'
+    })
+
+    const response = await client
+      .get(`/api/v1/entries/${entry.id}`)
+      .withGuard('api')
+      .loginAs(user)
+
+    response.assertStatus(403)
+  })
+
+  test('cannot show non-existent entry', async ({ client }) => {
+    const user = await User.create({
+        fullName: 'Test User',
+        email: 'test@example.com',
+        password: 'password',
+    })
+
+    const response = await client
+      .get('/api/v1/entries/00000000-0000-0000-0000-000000000000')
+      .withGuard('api')
+      .loginAs(user)
+
+    response.assertStatus(404)
+  })
 })

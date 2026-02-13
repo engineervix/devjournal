@@ -1,14 +1,13 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"strings"
 
-	"github.com/go-resty/resty/v2"
+	"github.com/engineervix/devjournal/cli/internal/api"
+	"github.com/engineervix/devjournal/cli/internal/editor"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -20,25 +19,6 @@ var (
 	quickMode  bool
 )
 
-// API response structures
-type APIError struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
-type ValidationError struct {
-	Errors []struct {
-		Field   string `json:"field"`
-		Message string `json:"message"`
-	} `json:"errors"`
-}
-
-type APISuccessResponse struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
-}
-
 var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Create a new journal entry",
@@ -48,6 +28,8 @@ var addCmd = &cobra.Command{
 			fmt.Println("Please login first using 'devlog login'")
 			return
 		}
+
+		apiClient := api.NewClient(viper.GetString("api_url"), token)
 
 		// determine content
 		var content string
@@ -74,40 +56,15 @@ var addCmd = &cobra.Command{
 			}
 		} else {
 			// Standard mode: open editor
-			editor := os.Getenv("EDITOR")
-			if editor == "" {
-				editor = "vim"
-			}
-
-			tmpFile, err := os.CreateTemp("", "devlog-*.md")
-			if err != nil {
-				fmt.Println("Error creating temp file:", err)
-				return
-			}
-			defer os.Remove(tmpFile.Name())
-
 			// Add a helpful comment at the top
 			helpText := "<!-- Write your entry below. The first line can be a heading if you wish. -->\n\n"
-			tmpFile.WriteString(helpText)
 
-			tmpFile.Close()
-
-			cmdExec := exec.Command(editor, tmpFile.Name())
-			cmdExec.Stdin = os.Stdin
-			cmdExec.Stdout = os.Stdout
-			cmdExec.Stderr = os.Stderr
-
-			if err := cmdExec.Run(); err != nil {
+			var err error
+			content, err = editor.OpenEditor(helpText, ".md")
+			if err != nil {
 				fmt.Println("Error opening editor:", err)
 				return
 			}
-
-			contentBytes, err := os.ReadFile(tmpFile.Name())
-			if err != nil {
-				fmt.Println("Error reading content:", err)
-				return
-			}
-			content = string(contentBytes)
 
 			// Remove the help comment if it's still there
 			content = strings.Replace(content, "<!-- Write your entry below. The first line can be a heading if you wish. -->\n\n", "", 1)
@@ -119,58 +76,20 @@ var addCmd = &cobra.Command{
 		}
 
 		// API Request
-		client := resty.New()
-		resp, err := client.R().
-			SetAuthToken(token).
-			SetBody(map[string]interface{}{
-				"entryType":       entryType,
-				"title":           entryTitle,
-				"contentMarkdown": content,
-				"tags":            entryTags,
-			}).
-			Post(viper.GetString("api_url") + "/entries")
+		payload := api.CreateEntryPayload{
+			EntryType:       entryType,
+			Title:           entryTitle,
+			ContentMarkdown: content,
+			Tags:            entryTags,
+		}
 
+		entry, err := apiClient.CreateEntry(payload)
 		if err != nil {
-			fmt.Println("✗ Error sending request:", err)
+			fmt.Printf("✗ %s\n", err)
 			return
 		}
 
-		if resp.IsError() {
-			// Try to parse as validation error (422)
-			if resp.StatusCode() == 422 {
-				var validationErr ValidationError
-				if err := json.Unmarshal(resp.Body(), &validationErr); err == nil && len(validationErr.Errors) > 0 {
-					fmt.Println("✗ Validation errors:")
-					for _, e := range validationErr.Errors {
-						fmt.Printf("  • %s: %s\n", e.Field, e.Message)
-					}
-					return
-				}
-			}
-
-			// Try to parse as standard API error
-			var apiErr APIError
-			if err := json.Unmarshal(resp.Body(), &apiErr); err == nil && apiErr.Message != "" {
-				fmt.Printf("✗ Error: %s\n", apiErr.Message)
-				return
-			}
-
-			// Fallback to raw response
-			fmt.Printf("✗ API Error (%s):\n%s\n", resp.Status(), resp.String())
-			return
-		}
-
-		// Parse success response
-		var successResp APISuccessResponse
-		if err := json.Unmarshal(resp.Body(), &successResp); err == nil {
-			if successResp.Message != "" {
-				fmt.Printf("✓ %s\n", successResp.Message)
-			} else {
-				fmt.Println("✓ Entry created successfully!")
-			}
-		} else {
-			fmt.Println("✓ Entry created successfully!")
-		}
+		fmt.Printf("✓ Entry created successfully! (ID: %s)\n", entry.ID)
 	},
 }
 

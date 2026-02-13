@@ -158,6 +158,7 @@ router
     router.get('/me', [() => import('#controllers/api/auth_controller'), 'me'])
     router.get('/entries', [() => import('#controllers/api/entries_controller'), 'index'])
     router.post('/entries', [() => import('#controllers/api/entries_controller'), 'store'])
+    router.get('/entries/:id', [() => import('#controllers/api/entries_controller'), 'show'])
     router.put('/entries/:id', [() => import('#controllers/api/entries_controller'), 'update'])
   })
   .prefix('api/v1')

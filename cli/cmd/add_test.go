@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/engineervix/devjournal/cli/internal/api"
 	"github.com/spf13/viper"
 )
 
@@ -130,7 +131,7 @@ func TestAddCommandErrorParsing(t *testing.T) {
 
 			// Test error parsing logic
 			if tt.statusCode == http.StatusUnprocessableEntity {
-				var validationErr ValidationError
+				var validationErr api.ValidationError
 				if err := json.Unmarshal(tt.responseBody, &validationErr); err != nil {
 					t.Fatalf("Failed to parse validation error: %v", err)
 				}
@@ -138,7 +139,7 @@ func TestAddCommandErrorParsing(t *testing.T) {
 					t.Error("Expected validation errors")
 				}
 			} else if tt.statusCode == http.StatusUnauthorized {
-				var apiErr APIError
+				var apiErr api.APIError
 				if err := json.Unmarshal(tt.responseBody, &apiErr); err != nil {
 					t.Fatalf("Failed to parse API error: %v", err)
 				}
@@ -155,7 +156,7 @@ func TestAddCommandResponseParsing(t *testing.T) {
 	successData := mockEntryData()
 	responseBody := mockSuccessResponse("Entry created successfully.", successData)
 
-	var resp APISuccessResponse
+	var resp api.APISuccessResponse
 	err := json.Unmarshal(responseBody, &resp)
 	if err != nil {
 		t.Fatalf("Failed to parse success response: %v", err)
@@ -183,7 +184,7 @@ func TestValidationErrorParsing(t *testing.T) {
 
 	responseBody := mockValidationErrorResponse(errors)
 
-	var validationErr ValidationError
+	var validationErr api.ValidationError
 	err := json.Unmarshal(responseBody, &validationErr)
 	if err != nil {
 		t.Fatalf("Failed to parse validation error: %v", err)
@@ -202,7 +203,7 @@ func TestAPIErrorParsing(t *testing.T) {
 	// Test parsing generic API errors
 	responseBody := mockErrorResponse("Authentication required.")
 
-	var apiErr APIError
+	var apiErr api.APIError
 	err := json.Unmarshal(responseBody, &apiErr)
 	if err != nil {
 		t.Fatalf("Failed to parse API error: %v", err)
