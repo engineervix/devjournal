@@ -89,7 +89,7 @@
           <i class="ph ph-pencil text-sm"></i>
         </a>
         <form
-          action="{{ route('entries.destroy', { id: entry.id }) }}"
+          action="{{ route('entries.destroy', { id: entry.id }) }}?_method=DELETE"
           method="POST"
           class="inline"
           @click.stop
