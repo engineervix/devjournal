@@ -22,10 +22,11 @@ export default class EntryService {
    * Get entries with filters and pagination
    */
   async getEntries(
+    userId: number,
     filters: EntryFilters = {},
     pagination: PaginationOptions = { page: 1, perPage: 10 }
   ): Promise<ModelPaginatorContract<Entry>> {
-    const query = Entry.query()
+    const query = Entry.query().where('user_id', userId)
 
     this.applyFilters(query, filters)
     this.applySorting(query, filters.sort)
@@ -38,15 +39,16 @@ export default class EntryService {
    * Search entries with full-text search
    */
   async searchEntries(
+    userId: number,
     searchQuery: string,
     filters: EntryFilters = {},
     pagination: PaginationOptions = { page: 1, perPage: 10 }
   ): Promise<ModelPaginatorContract<Entry>> {
     if (!searchQuery.trim()) {
-      return this.getEntries(filters, pagination)
+      return this.getEntries(userId, filters, pagination)
     }
 
-    const query = Entry.query()
+    const query = Entry.query().where('user_id', userId)
 
     // Full-text search
     query.whereRaw(
@@ -65,12 +67,13 @@ export default class EntryService {
    * Get entries by tag
    */
   async getEntriesByTag(
+    userId: number,
     tagSlug: string,
     filters: EntryFilters = {},
     pagination: PaginationOptions = { page: 1, perPage: 10 }
   ): Promise<{ tag: Tag; entries: ModelPaginatorContract<Entry> }> {
     const tag = await Tag.findByOrFail('slug', tagSlug)
-    const query = tag.related('entries').query()
+    const query = tag.related('entries').query().where('user_id', userId)
 
     this.applyFilters(query, filters)
     this.applySorting(query, filters.sort)

@@ -178,4 +178,129 @@ test.group('Api entries', (group) => {
     assert.include(entry.contentHtml, '<h1>')
     assert.include(entry.contentHtml, '<strong>')
   })
+
+  test('list entries', async ({ client }) => {
+    const user = await User.create({
+      fullName: 'Test User',
+      email: 'test@example.com',
+      password: 'password',
+    })
+
+    // Create some entries
+    await Entry.createMany([
+      { userId: user.id, entryType: 'daily', title: 'Entry 1', contentMarkdown: 'Content 1' },
+      { userId: user.id, entryType: 'til', title: 'Entry 2', contentMarkdown: 'Content 2' },
+      { userId: user.id, entryType: 'snippet', title: 'Entry 3', contentMarkdown: 'Content 3' },
+    ])
+
+    const response = await client
+      .get('/api/v1/entries')
+      .withGuard('api')
+      .loginAs(user)
+
+    response.assertStatus(200)
+    response.assertBodyContains({
+      success: true,
+      data: {
+        meta: { total: 3, perPage: 10, currentPage: 1 },
+        data: [
+            { title: 'Entry 3' },
+            { title: 'Entry 2' },
+            { title: 'Entry 1' },
+        ]
+      },
+    })
+  })
+
+  test('update entry', async ({ client, assert }) => {
+    const user = await User.create({
+      fullName: 'Test User',
+      email: 'test@example.com',
+      password: 'password',
+    })
+
+    const entry = await Entry.create({ 
+        userId: user.id, 
+        entryType: 'daily', 
+        title: 'Original Title', 
+        contentMarkdown: 'Original Content' 
+    })
+
+    const response = await client
+      .put(`/api/v1/entries/${entry.id}`)
+      .withGuard('api')
+      .loginAs(user)
+      .json({
+        entryType: 'daily',
+        title: 'Updated Title',
+        contentMarkdown: 'Updated Content',
+      })
+
+    response.assertStatus(200)
+    response.assertBodyContains({
+      success: true,
+      message: 'Entry updated successfully.',
+      data: {
+        id: entry.id,
+        title: 'Updated Title',
+        contentMarkdown: 'Updated Content',
+      },
+    })
+
+    await entry.refresh()
+    assert.equal(entry.title, 'Updated Title')
+    assert.equal(entry.contentMarkdown, 'Updated Content')
+  })
+
+  test('cannot update entry of another user', async ({ client }) => {
+    const user = await User.create({
+        fullName: 'Test User',
+        email: 'test1@example.com',
+        password: 'password',
+    })
+
+    const otherUser = await User.create({
+        fullName: 'Other User',
+        email: 'test2@example.com',
+        password: 'password',
+    })
+
+    const entry = await Entry.create({ 
+        userId: otherUser.id, 
+        entryType: 'daily', 
+        title: 'Other User Entry', 
+        contentMarkdown: 'Content' 
+    })
+
+    const response = await client
+      .put(`/api/v1/entries/${entry.id}`)
+      .withGuard('api')
+      .loginAs(user)
+      .json({
+        entryType: 'daily',
+        title: 'Hacked Title',
+      })
+
+    response.assertStatus(403)
+  })
+
+  test('cannot update non-existent entry', async ({ client }) => {
+    const user = await User.create({
+        fullName: 'Test User',
+        email: 'test@example.com',
+        password: 'password',
+    })
+
+    // Use a random UUID
+    const response = await client
+      .put('/api/v1/entries/00000000-0000-0000-0000-000000000000')
+      .withGuard('api')
+      .loginAs(user)
+      .json({
+        entryType: 'daily',
+        title: 'Updated Title',
+      })
+
+    response.assertStatus(404)
+  })
 })

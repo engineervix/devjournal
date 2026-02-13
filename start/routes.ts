@@ -156,7 +156,9 @@ router
 router
   .group(() => {
     router.get('/me', [() => import('#controllers/api/auth_controller'), 'me'])
+    router.get('/entries', [() => import('#controllers/api/entries_controller'), 'index'])
     router.post('/entries', [() => import('#controllers/api/entries_controller'), 'store'])
+    router.put('/entries/:id', [() => import('#controllers/api/entries_controller'), 'update'])
   })
   .prefix('api/v1')
   .use(middleware.auth({ guards: ['api'] }))

@@ -32,7 +32,7 @@ test.group('Entry Service', (group) => {
     ])
 
     const entryService = new EntryService()
-    const result = await entryService.getEntries()
+    const result = await entryService.getEntries(user.id)
 
     assert.equal(result.length, 2)
     assert.equal(result.currentPage, 1)
@@ -61,7 +61,7 @@ test.group('Entry Service', (group) => {
     ])
 
     const entryService = new EntryService()
-    const result = await entryService.getEntries({ type: 'daily' })
+    const result = await entryService.getEntries(user.id, { type: 'daily' })
 
     assert.equal(result.length, 1)
     assert.equal(result[0].entryType, 'daily')
@@ -93,7 +93,7 @@ test.group('Entry Service', (group) => {
     })
 
     const entryService = new EntryService()
-    const result = await entryService.getEntries({ period: 'today' })
+    const result = await entryService.getEntries(user.id, { period: 'today' })
 
     assert.equal(result.length, 1)
     assert.equal(result[0].title, 'Today Entry')
@@ -123,7 +123,7 @@ test.group('Entry Service', (group) => {
     })
 
     const entryService = new EntryService()
-    const result = await entryService.getEntries({ sort: 'oldest' })
+    const result = await entryService.getEntries(user.id, { sort: 'oldest' })
 
     assert.equal(result.length, 2)
     assert.equal(result[0].title, 'Older Entry')
@@ -154,7 +154,7 @@ test.group('Entry Service', (group) => {
     ])
 
     const entryService = new EntryService()
-    const result = await entryService.searchEntries('JavaScript')
+    const result = await entryService.searchEntries(user.id, 'JavaScript')
 
     assert.equal(result.length, 1)
     assert.equal(result[0].title, 'JavaScript Tutorial')
@@ -182,7 +182,7 @@ test.group('Entry Service', (group) => {
     ])
 
     const entryService = new EntryService()
-    const result = await entryService.searchEntries('')
+    const result = await entryService.searchEntries(user.id, '')
 
     assert.equal(result.length, 2)
   })
@@ -209,7 +209,7 @@ test.group('Entry Service', (group) => {
     await entry.related('tags').attach([tag.id])
 
     const entryService = new EntryService()
-    const result = await entryService.getEntriesByTag('javascript')
+    const result = await entryService.getEntriesByTag(user.id, 'javascript')
 
     assert.equal(result.entries.length, 1)
     assert.equal(result.tag.name, 'javascript')
