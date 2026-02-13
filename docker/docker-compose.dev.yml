@@ -8,6 +8,7 @@ services:
     environment:
       POSTGRES_USER: devjournal
       POSTGRES_PASSWORD: password
+      POSTGRES_DB: devjournal
     healthcheck:
       test: ['CMD', 'pg_isready', '-U', 'devjournal', '-d', 'devjournal']
       interval: 10s

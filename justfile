@@ -6,6 +6,7 @@ default:
 
 # docker-compose up
 up *build:
+    #!/usr/bin/env bash
     if [[ "{{build}}" =~ ^(-b|b|build|--build)$ ]]; then \
         {{DOCKER_COMPOSE_DEV}} up -d --build; \
     elif [[ "{{build}}" = "" ]]; then \
@@ -20,6 +21,7 @@ exec container +command:
 
 # docker-compose logs [container] [-f (Follow log output)]
 logs container *follow:
+    #!/usr/bin/env bash
     if [[ "{{follow}}" =~ ^(-f|f|follow|--follow)$ ]]; then \
         {{DOCKER_COMPOSE_DEV}} logs {{container}} -f; \
     elif [[ "{{follow}}" = "" ]]; then \
@@ -34,6 +36,7 @@ stop:
 
 # docker-compose down [-v]
 down *volumes:
+    #!/usr/bin/env bash
     if [[ "{{volumes}}" =~ ^(-v|v|--vol|vol|volumes|--volumes)$ ]]; then \
         {{DOCKER_COMPOSE_DEV}} down -v; \
     elif [[ "{{volumes}}" = "" ]]; then \
