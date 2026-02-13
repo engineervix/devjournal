@@ -244,8 +244,8 @@ test.group('Entries Controller', (group) => {
       .loginAs(user)
       .withCsrfToken()
 
-    // Check if the request was successful (redirect after deletion)
-    assert.isTrue([200, 302].includes(response.status()))
+    // The controller redirects, but test client may follow redirects (200) or return redirect status (302)
+    response.assertStatus(200)
 
     // Check if entry was deleted
     const deletedEntry = await Entry.find(entry.id)
