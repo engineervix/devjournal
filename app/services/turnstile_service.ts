@@ -93,7 +93,7 @@ export default class TurnstileService {
     // Configuration errors - CRITICAL - Affects all users
     const configErrors = ['missing-input-secret', 'invalid-input-secret']
     if (errorCodes.some((code) => configErrors.includes(code))) {
-      logger.critical('🚨 TURNSTILE CONFIG ERROR - FIX IMMEDIATELY', {
+      logger.fatal('🚨 TURNSTILE CONFIG ERROR - FIX IMMEDIATELY', {
         errors: errorCodes,
         hostname: outcome?.hostname,
         timestamp: outcome?.challenge_ts,
