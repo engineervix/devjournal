@@ -102,7 +102,7 @@ release-notes:
 # Build the CLI tool
 build-cli:
     @mkdir -p dist/cli
-    cd cli && go build -ldflags="-s -w" -o ../dist/cli/devlog-client main.go
+    cd cli && go build -ldflags="-s -w -X main.version=$(git describe --tags --always 2>/dev/null || echo 'dev')-dev -X main.commit=$(git rev-parse --short HEAD) -X main.date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" -o ../dist/cli/devlog-client main.go
 
 # 🧪 Run CLI tests with better output formatting
 test-cli:
