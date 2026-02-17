@@ -27,9 +27,16 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     {{-- Turnstile script - loaded when configured --}}
+    {{-- Turnstile script - loaded when configured --}}
     {{-- Callbacks and logic now in resources/js/pages/login-turnstile.js --}}
     @if(env.get('TURNSTILE_SITE_KEY'))
-      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer>
+      <script>
+        window.onloadTurnstileCallback = function() {
+          window.isTurnstileLoaded = true;
+          if (window.handleTurnstileLoad) window.handleTurnstileLoad();
+        };
+      </script>
+      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback&render=explicit" defer>
         
       </script>
     @endif
@@ -187,13 +194,9 @@
               </label>
                 <div class="flex justify-center">
                   <div
-                    class="cf-turnstile glass-effect rounded-xl p-3"
+                    id="turnstile-container"
+                    class="glass-effect rounded-xl p-3"
                     data-sitekey="{{ env.get('TURNSTILE_SITE_KEY') }}"
-                    data-theme="auto"
-                    data-size="normal"
-                    data-callback="onTurnstileSuccess"
-                    data-error-callback="onTurnstileError"
-                    data-expired-callback="onTurnstileExpired"
                   >
                   </div>
                 </div>

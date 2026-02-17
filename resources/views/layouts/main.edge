@@ -19,18 +19,7 @@
       type: ogType
     })
 
-    {{-- Prevent FOUC by initializing theme immediately --}}
-    <script>
-      // Initialize theme before any content renders to prevent flashing
-      (function() {
-        const storedTheme = localStorage.getItem("theme");
-        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const theme = storedTheme || (systemPrefersDark ? "dark" : "light");
-        if (theme === "dark") {
-          document.documentElement.classList.add("dark");
-        }
-      })();
-    </script>
+    @!component('components/meta/theme_script')
 
     {{-- Vite CSS and JS --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])

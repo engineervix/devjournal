@@ -27,6 +27,9 @@ import dropdownComponent from './components/dropdown.js'
 // Import global utilities
 import './utils/globals.js'
 
+// Import Turnstile logic (handles its own guard clauses)
+import './pages/login-turnstile.js'
+
 // Register Alpine.js components
 document.addEventListener('alpine:init', () => {
   Alpine.data('userMenu', userMenuComponent)
@@ -50,11 +53,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeCodeFeatures()
   initializeUnsavedChangesProtection()
 
-  // Conditionally load login page Turnstile script
-  // Only if we're on the login page and Turnstile is enabled
-  if (document.getElementById('loginForm') && document.querySelector('.cf-turnstile')) {
-    import('./pages/login-turnstile.js').catch((err) => {
-      console.error('Failed to load Turnstile module:', err)
-    })
-  }
+  initializeUnsavedChangesProtection()
 })

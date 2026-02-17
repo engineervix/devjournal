@@ -1,0 +1,20 @@
+{{-- Prevent FOUC by initializing theme immediately --}}
+<script>
+  // Initialize theme before any content renders to prevent flashing
+  (function() {
+    try {
+      const storedTheme = localStorage.getItem("theme");
+      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      // If stored theme is explicitly set, use it
+      // If not, use system preference
+      const theme = storedTheme || (systemPrefersDark ? "dark" : "light");
+      if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    } catch (e) {
+      console.error("Theme initialization failed:", e);
+    }
+  })();
+</script>
