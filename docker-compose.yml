@@ -55,7 +55,7 @@ services:
       traefik.http.routers.devjournal.middlewares: 'secHeaders'
 
   db:
-    image: pgvector/pgvector:0.8.1-pg16
+    image: pgvector/pgvector:0.8.2-pg16
     container_name: devjournal-db
     restart: unless-stopped
     volumes:
