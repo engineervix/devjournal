@@ -3,7 +3,7 @@ module github.com/engineervix/devjournal/cli
 go 1.25.7
 
 require (
-	github.com/go-resty/resty/v2 v2.17.1
+	github.com/go-resty/resty/v2 v2.17.2
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	golang.org/x/term v0.40.0
