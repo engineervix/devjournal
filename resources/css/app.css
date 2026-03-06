@@ -198,6 +198,43 @@
     -ms-user-select: text;
     user-select: text;
   }
+
+  /* oEmbed embedded content styles */
+  .oembed-embed {
+    @apply my-6 mx-auto max-w-full;
+
+    /* Responsive container for embeds */
+    position: relative;
+    width: 100%;
+  }
+
+  /* Make iframe embeds responsive */
+  .oembed-embed iframe {
+    @apply w-full rounded-lg shadow-lg;
+
+    max-width: 100%;
+    height: auto;
+    min-height: 315px; /* Reasonable default for video embeds */
+  }
+
+  /* Dark mode adjustments for embedded content */
+  .dark .oembed-embed iframe {
+    @apply shadow-2xl;
+
+    border: 1px solid theme('colors.gray.700');
+  }
+
+  /* Twitter/X embeds */
+  .oembed-embed blockquote {
+    @apply my-4 border-l-4 border-indigo-500 pl-4 dark:border-indigo-400;
+  }
+
+  /* Loading state for embeds (optional) */
+  .oembed-embed[data-loading="true"] {
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700;
+
+    min-height: 200px;
+  }
 }
 
 /* Note: Custom animations moved to tailwind.config.js theme.extend.animation */

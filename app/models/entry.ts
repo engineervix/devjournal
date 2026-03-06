@@ -48,7 +48,7 @@ export default class Entry extends BaseModel {
   static async processContent(entry: Entry) {
     if (entry.$dirty.contentMarkdown) {
       const contentProcessor = new ContentProcessorService()
-      contentProcessor.updateEntryContent(entry, entry.contentMarkdown)
+      await contentProcessor.updateEntryContent(entry, entry.contentMarkdown)
     }
   }
 }

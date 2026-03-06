@@ -2,11 +2,11 @@ import { test } from '@japa/runner'
 import ContentProcessorService from '#services/content_processor_service'
 
 test.group('ContentProcessorService', () => {
-  test('should process markdown to HTML and plain text', ({ assert }) => {
+  test('should process markdown to HTML and plain text', async ({ assert }) => {
     const service = new ContentProcessorService()
     const markdown = '# Hello World\n\nThis is **bold** text.'
 
-    const result = service.processMarkdown(markdown)
+    const result = await service.processMarkdown(markdown)
 
     assert.isString(result.contentHtml)
     assert.isString(result.contentPlain)
@@ -16,25 +16,25 @@ test.group('ContentProcessorService', () => {
     assert.include(result.contentPlain!, 'bold')
   })
 
-  test('should return null for empty markdown', ({ assert }) => {
+  test('should return null for empty markdown', async ({ assert }) => {
     const service = new ContentProcessorService()
 
-    const result = service.processMarkdown(null)
+    const result = await service.processMarkdown(null)
 
     assert.isNull(result.contentHtml)
     assert.isNull(result.contentPlain)
   })
 
-  test('should return null for empty string markdown', ({ assert }) => {
+  test('should return null for empty string markdown', async ({ assert }) => {
     const service = new ContentProcessorService()
 
-    const result = service.processMarkdown('')
+    const result = await service.processMarkdown('')
 
     assert.isNull(result.contentHtml)
     assert.isNull(result.contentPlain)
   })
 
-  test('should update entry content fields', ({ assert }) => {
+  test('should update entry content fields', async ({ assert }) => {
     const service = new ContentProcessorService()
     const entry = {
       contentHtml: null as string | null,
@@ -42,7 +42,7 @@ test.group('ContentProcessorService', () => {
     }
     const markdown = '## Test Content'
 
-    service.updateEntryContent(entry, markdown)
+    await service.updateEntryContent(entry, markdown)
 
     assert.isString(entry.contentHtml)
     assert.isString(entry.contentPlain)
@@ -50,7 +50,7 @@ test.group('ContentProcessorService', () => {
     assert.include((entry.contentPlain as string).toLowerCase(), 'test content')
   })
 
-  test('should handle complex markdown with links and images', ({ assert }) => {
+  test('should handle complex markdown with links and images', async ({ assert }) => {
     const service = new ContentProcessorService()
     const markdown = `
 # Title
@@ -63,7 +63,7 @@ This is a [link](https://example.com) and an image:
 - List item 2
     `
 
-    const result = service.processMarkdown(markdown)
+    const result = await service.processMarkdown(markdown)
 
     assert.include(result.contentHtml!, '<a href="https://example.com">link</a>')
     assert.include(result.contentHtml!, '<ul>')
@@ -73,13 +73,52 @@ This is a [link](https://example.com) and an image:
     assert.include(result.contentPlain!, 'link')
   })
 
-  test('should handle code blocks with unknown language', ({ assert }) => {
+  test('should handle code blocks with unknown language', async ({ assert }) => {
     const service = new ContentProcessorService()
     const markdown = '```unknown-lang\nconst x = 1;\n```'
 
-    const result = service.processMarkdown(markdown)
+    const result = await service.processMarkdown(markdown)
 
     assert.include(result.contentHtml!, 'class="hljs"')
     assert.include(result.contentHtml!, 'const x = 1;')
+  })
+
+  test('should not process inline URLs', async ({ assert }) => {
+    const service = new ContentProcessorService()
+    const markdown = 'Check out this video https://www.youtube.com/watch?v=dQw4w9WgXcQ on YouTube'
+
+    const result = await service.processMarkdown(markdown)
+
+    // Inline URLs should not be converted to embeds
+    assert.notInclude(result.contentHtml!, 'oembed-embed')
+    assert.include(result.contentHtml!, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+  })
+
+  test('should not process URLs in markdown links', async ({ assert }) => {
+    const service = new ContentProcessorService()
+    const markdown = '[Watch this video](https://www.youtube.com/watch?v=dQw4w9WgXcQ)'
+
+    const result = await service.processMarkdown(markdown)
+
+    // URLs in markdown links should not be converted to embeds
+    assert.notInclude(result.contentHtml!, 'oembed-embed')
+    assert.include(result.contentHtml!, '<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">')
+  })
+
+  test('should handle markdown with multiple paragraphs', async ({ assert }) => {
+    const service = new ContentProcessorService()
+    const markdown = `
+First paragraph with text.
+
+Second paragraph with more text.
+
+Third paragraph.
+    `
+
+    const result = await service.processMarkdown(markdown)
+
+    assert.include(result.contentHtml!, '<p>First paragraph with text.</p>')
+    assert.include(result.contentHtml!, '<p>Second paragraph with more text.</p>')
+    assert.include(result.contentHtml!, '<p>Third paragraph.</p>')
   })
 })

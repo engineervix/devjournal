@@ -2,6 +2,7 @@ import { inject } from '@adonisjs/core'
 import MarkdownIt from 'markdown-it'
 import { htmlToText } from 'html-to-text'
 import hljs from 'highlight.js'
+import OEmbedService from '#services/oembed_service'
 
 export interface ProcessedContent {
   contentHtml: string | null
@@ -11,6 +12,7 @@ export interface ProcessedContent {
 @inject()
 export default class ContentProcessorService {
   private md: MarkdownIt
+  private oembedService: OEmbedService
 
   constructor() {
     this.md = new MarkdownIt({
@@ -32,12 +34,49 @@ export default class ContentProcessorService {
         )
       },
     })
+    this.oembedService = new OEmbedService()
+  }
+
+  /**
+   * Detect standalone URLs in markdown that should be converted to oEmbed
+   * Returns URLs that appear on their own line
+   */
+  private extractStandaloneUrls(markdownContent: string): string[] {
+    const urlRegex = /^(https?:\/\/[^\s]+)$/gm
+    const matches = markdownContent.match(urlRegex)
+    return matches || []
+  }
+
+  /**
+   * Process oEmbed URLs in markdown content
+   * Replaces standalone URLs with oEmbed embeds where available
+   */
+  private async processOEmbedUrls(markdownContent: string): Promise<string> {
+    const urls = this.extractStandaloneUrls(markdownContent)
+
+    if (urls.length === 0) {
+      return markdownContent
+    }
+
+    let processedContent = markdownContent
+
+    // Process each URL and replace with oEmbed HTML if available
+    for (const url of urls) {
+      const embedHtml = await this.oembedService.convertUrlToEmbed(url)
+      if (embedHtml) {
+        // Replace the standalone URL with a marker that won't be processed by markdown
+        // We'll use HTML comment markers that markdown-it will preserve
+        processedContent = processedContent.replace(url, `<!-- oembed:${url} -->\n${embedHtml}\n<!-- /oembed -->`)
+      }
+    }
+
+    return processedContent
   }
 
   /**
    * Process markdown content to HTML and plain text
    */
-  processMarkdown(markdownContent: string | null): ProcessedContent {
+  async processMarkdown(markdownContent: string | null): Promise<ProcessedContent> {
     if (!markdownContent) {
       return {
         contentHtml: null,
@@ -45,10 +84,20 @@ export default class ContentProcessorService {
       }
     }
 
-    const contentHtml = this.md.render(markdownContent)
+    // First, process any oEmbed URLs
+    const processedMarkdown = await this.processOEmbedUrls(markdownContent)
+
+    // Then render markdown to HTML
+    const contentHtml = this.md.render(processedMarkdown)
+
+    // Convert to plain text for search/preview
     const contentPlain = htmlToText(contentHtml, {
       wordwrap: false,
-      selectors: [{ selector: 'img', format: 'skip' }],
+      selectors: [
+        { selector: 'img', format: 'skip' },
+        { selector: 'iframe', format: 'skip' },
+        { selector: '.oembed-embed', format: 'skip' },
+      ],
     })
 
     return {
@@ -60,8 +109,8 @@ export default class ContentProcessorService {
   /**
    * Update content fields on an entry
    */
-  updateEntryContent(entry: any, markdownContent: string | null): void {
-    const processed = this.processMarkdown(markdownContent)
+  async updateEntryContent(entry: any, markdownContent: string | null): Promise<void> {
+    const processed = await this.processMarkdown(markdownContent)
     entry.contentHtml = processed.contentHtml
     entry.contentPlain = processed.contentPlain
   }
