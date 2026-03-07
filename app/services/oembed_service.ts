@@ -138,7 +138,18 @@ export default class OEmbedService {
     // Sanitize the HTML before returning
     const sanitizedHtml = this.sanitizeOEmbedHtml(oembedData.html)
 
+    let extraClass = ''
+    let extraStyle = ''
+
+    if (oembedData.type === 'video') {
+      extraClass = ' oembed-video'
+      if (oembedData.width && oembedData.height) {
+        const ratioText = ((oembedData.height / oembedData.width) * 100).toFixed(4)
+        extraStyle = ` style="padding-bottom: ${ratioText}%;"`
+      }
+    }
+
     // Wrap in a responsive container div
-    return `<div class="oembed-embed">${sanitizedHtml}</div>`
+    return `<div class="oembed-embed${extraClass}"${extraStyle}>${sanitizedHtml}</div>`
   }
 }

@@ -201,20 +201,37 @@
 
   /* oEmbed embedded content styles */
   .oembed-embed {
-    @apply my-6 mx-auto max-w-full;
+    @apply my-6 mx-auto w-full relative;
+  }
 
-    /* Responsive container for embeds */
+  .oembed-video {
+    /* Set a fallback aspect ratio if width/height are not provided by metadata */
     position: relative;
-    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
   }
 
   /* Make iframe embeds responsive */
   .oembed-embed iframe {
-    @apply w-full rounded-lg shadow-lg;
+    @apply shadow-lg rounded-lg;
 
-    max-width: 100%;
-    height: auto;
-    min-height: 315px; /* Reasonable default for video embeds */
+    width: 100% !important;
+  }
+
+  .oembed-video iframe {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border: 0;
+  }
+
+  /* Non-video embeds that might need fixed min heights */
+  .oembed-embed:not(.oembed-video) iframe {
+    height: auto !important;
+    min-height: 315px !important; /* Reasonable default for non-video embeds */
   }
 
   /* Dark mode adjustments for embedded content */

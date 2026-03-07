@@ -3,7 +3,7 @@ const plugin = require('tailwindcss/plugin')
 
 export default {
   darkMode: 'class',
-  content: ['resources/**/*.{edge,js,ts,jsx,tsx,vue}'],
+  content: ['resources/**/*.{edge,js,ts,jsx,tsx,vue}', 'app/**/*.ts'],
   theme: {
     extend: {
       fontFamily: {

@@ -144,4 +144,26 @@ test.group('OEmbedService', () => {
       assert.isFalse(isSupportedUrl(url), `Expected ${url} to be unsupported`)
     }
   })
+
+  test('convertUrlToEmbed should append oembed-video class and padding-bottom aspect ratio for video types', async ({
+    assert,
+  }) => {
+    const service = new OEmbedService()
+
+    // Mock extractOEmbed to return a video type with width and height
+    service.extractOEmbed = async () =>
+      ({
+        html: '<iframe src="https://youtube.com/embed/123"></iframe>',
+        type: 'video',
+        width: 1920,
+        height: 1080,
+      }) as any
+
+    const html = await service.convertUrlToEmbed('https://youtube.com/watch?v=123')
+
+    assert.isNotNull(html)
+    assert.include(html!, 'class="oembed-embed oembed-video"')
+    assert.include(html!, 'style="padding-bottom: 56.2500%;"')
+    assert.include(html!, '<iframe')
+  })
 })
