@@ -15,7 +15,8 @@ test.group('OEmbedService', () => {
 
   test('should preserve safe iframe attributes', ({ assert }) => {
     const service = new OEmbedService()
-    const html = '<iframe src="https://youtube.com/embed/123" width="560" height="315" frameborder="0" allowfullscreen></iframe>'
+    const html =
+      '<iframe src="https://youtube.com/embed/123" width="560" height="315" frameborder="0" allowfullscreen></iframe>'
 
     const sanitized = service.sanitizeOEmbedHtml(html)
 
@@ -62,5 +63,21 @@ test.group('OEmbedService', () => {
 
     assert.include(sanitized, 'data-video-id="123"')
     assert.include(sanitized, 'data-provider="youtube"')
+  })
+
+  test('should not support lookalike domains', async ({ assert }) => {
+    const service = new OEmbedService()
+
+    // These should NOT be treated as supported providers
+    const maliciousUrls = [
+      'https://youtube.com.evil.com/watch?v=abc',
+      'https://notyoutube.com/watch?v=abc',
+      'https://fakevimeo.com/123',
+    ]
+
+    for (const url of maliciousUrls) {
+      const result = await service.extractOEmbed(url)
+      assert.isNull(result, `Expected null for lookalike domain: ${url}`)
+    }
   })
 })

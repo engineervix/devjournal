@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 import ContentProcessorService from '#services/content_processor_service'
+import OEmbedService from '#services/oembed_service'
 
 test.group('ContentProcessorService', () => {
   test('should process markdown to HTML and plain text', async ({ assert }) => {
@@ -81,6 +82,23 @@ This is a [link](https://example.com) and an image:
 
     assert.include(result.contentHtml!, 'class="hljs"')
     assert.include(result.contentHtml!, 'const x = 1;')
+  })
+
+  test('should embed a standalone URL as an oembed-embed container', async ({ assert }) => {
+    const mockOEmbedService = {
+      convertUrlToEmbed: async (_url: string) =>
+        '<div class="oembed-embed"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe></div>',
+    }
+    const service = new ContentProcessorService(mockOEmbedService as OEmbedService)
+    const markdown = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+
+    const result = await service.processMarkdown(markdown)
+
+    assert.include(result.contentHtml!, 'oembed-embed')
+    assert.include(result.contentHtml!, '<iframe')
+    // Embed containers should not appear in plain text
+    assert.notInclude(result.contentPlain!, 'oembed-embed')
+    assert.notInclude(result.contentPlain!, '<iframe')
   })
 
   test('should not process inline URLs', async ({ assert }) => {
