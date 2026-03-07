@@ -31,20 +31,42 @@ export default class OEmbedService {
    */
   private isSupportedUrl(url: string): boolean {
     const supportedDomains = [
+      // Video & Screen Recording
       'youtube.com',
       'youtu.be',
       'vimeo.com',
+      'loom.com',
+      'streamable.com',
+      'ted.com',
+      // Social
       'twitter.com',
       'x.com',
-      'soundcloud.com',
-      'spotify.com',
-      'codepen.io',
-      'slideshare.net',
-      'speakerdeck.com',
-      'flickr.com',
+      'bsky.app',
       'instagram.com',
       'tiktok.com',
       'reddit.com',
+      // Audio
+      'soundcloud.com',
+      'spotify.com',
+      // Code & Playgrounds
+      'codepen.io',
+      'codesandbox.io',
+      'replit.com',
+      'repl.it',
+      'runkit.com',
+      'observablehq.com',
+      'wokwi.com',
+      'marimo.app',
+      // Design & Diagrams
+      'figma.com',
+      'miro.com',
+      'whimsical.com',
+      'overflow.io',
+      // Presentations & Slides
+      'slideshare.net',
+      'speakerdeck.com',
+      // Images & Media
+      'flickr.com',
     ]
 
     try {

@@ -24,30 +24,31 @@ The YouTube URL will be automatically converted to an embedded video player when
 
 The following providers are currently supported:
 
-- **Video**: YouTube, Vimeo
-- **Social Media**: Twitter/X, Instagram, TikTok, Reddit
+- **Video & Screen Recording**: YouTube, Vimeo, Loom, Streamable, TED
+- **Social**: Twitter/X, Bluesky, Instagram, TikTok, Reddit
 - **Audio**: SoundCloud, Spotify
-- **Code**: CodePen
-- **Presentations**: SlideShare, SpeakerDeck
-- **Images**: Flickr
+- **Code & Playgrounds**: CodePen, CodeSandbox, Replit, RunKit, Observable, Wokwi, Marimo
+- **Design & Diagrams**: Figma, Miro, Whimsical, Overflow
+- **Presentations & Slides**: SlideShare, SpeakerDeck
+- **Images & Media**: Flickr
 
 ## Important Notes
 
 ### Only Standalone URLs Are Converted
 
-- ✅ **Will be embedded**: URLs on their own line
+- ✓ **Will be embedded**: URLs on their own line
 
   ```markdown
   https://www.youtube.com/watch?v=abc123
   ```
 
-- ❌ **Will NOT be embedded**: URLs in markdown links
+- ✗ **Will NOT be embedded**: URLs in markdown links
 
   ```markdown
   [Watch this video](https://www.youtube.com/watch?v=abc123)
   ```
 
-- ❌ **Will NOT be embedded**: Inline URLs within text
+- ✗ **Will NOT be embedded**: Inline URLs within text
   ```markdown
   Check out https://www.youtube.com/watch?v=abc123 for more info
   ```

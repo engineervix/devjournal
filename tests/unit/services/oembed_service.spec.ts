@@ -80,4 +80,68 @@ test.group('OEmbedService', () => {
       assert.isNull(result, `Expected null for lookalike domain: ${url}`)
     }
   })
+
+  test('should recognise all supported provider domains', ({ assert }) => {
+    const service = new OEmbedService()
+    const isSupportedUrl = (service as any).isSupportedUrl.bind(service)
+
+    const supportedUrls = [
+      // Video & Screen Recording
+      'https://www.youtube.com/watch?v=abc',
+      'https://youtu.be/abc',
+      'https://vimeo.com/123456',
+      'https://www.loom.com/share/abc123',
+      'https://streamable.com/abc',
+      'https://www.ted.com/talks/abc',
+      // Social
+      'https://twitter.com/user/status/123',
+      'https://x.com/user/status/123',
+      'https://bsky.app/profile/user.bsky.social/post/abc',
+      'https://www.instagram.com/p/abc',
+      'https://www.tiktok.com/@user/video/123',
+      'https://www.reddit.com/r/programming/comments/abc',
+      // Audio
+      'https://soundcloud.com/artist/track',
+      'https://open.spotify.com/track/abc',
+      // Code & Playgrounds
+      'https://codepen.io/user/pen/abc',
+      'https://codesandbox.io/s/new',
+      'https://replit.com/@user/project',
+      'https://repl.it/@user/project',
+      'https://runkit.com/user/notebook',
+      'https://observablehq.com/@user/notebook',
+      'https://wokwi.com/share/abc',
+      'https://marimo.app/l/abc',
+      // Design & Diagrams
+      'https://www.figma.com/file/abc/my-design',
+      'https://miro.com/app/board/abc',
+      'https://whimsical.com/my-diagram-abc',
+      'https://overflow.io/s/abc',
+      // Presentations & Slides
+      'https://www.slideshare.net/user/presentation',
+      'https://speakerdeck.com/user/talk',
+      // Images & Media
+      'https://www.flickr.com/photos/user/123',
+    ]
+
+    for (const url of supportedUrls) {
+      assert.isTrue(isSupportedUrl(url), `Expected ${url} to be supported`)
+    }
+  })
+
+  test('should not support unrecognised domains', ({ assert }) => {
+    const service = new OEmbedService()
+    const isSupportedUrl = (service as any).isSupportedUrl.bind(service)
+
+    const unsupportedUrls = [
+      'https://example.com/video/123',
+      'https://github.com/user/repo',
+      'https://notion.so/page-abc',
+      'not-a-url',
+    ]
+
+    for (const url of unsupportedUrls) {
+      assert.isFalse(isSupportedUrl(url), `Expected ${url} to be unsupported`)
+    }
+  })
 })
