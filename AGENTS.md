@@ -6,203 +6,91 @@ DevJournal is a personal developer journal application built with AdonisJS 6. No
 
 The application helps developers track their learning journey, code snippets, debugging sessions, and achievements through daily logs, TIL entries, and more.
 
-## Dev Environment - Quick Overview
+## Reference Docs
 
-- **Technical Docs** are in the `docs/` directory
-- **Requirements**: Docker Compose (for PostgreSQL), Node.js 22, npm
-- **Database**: PostgreSQL 16 with pgvector, managed via Docker Compose
-- Dev server runs at <http://localhost:3333>
-- **Linting and formatting / code style**:
-  - TypeScript: ESLint with `@adonisjs/eslint-config`
-  - CSS: stylelint with `stylelint-config-standard` and Tailwind support
-  - Code formatting: Prettier with `@adonisjs/prettier-config`
-  - Edge templates: Standard Edge.js syntax
-- **Testing**: Japa test runner with c8 for coverage (80% threshold required)
+- [docs/development.md](docs/development.md) — setup, local workflow, debugging, essential commands
+- [docs/architecture.md](docs/architecture.md) — tech stack, data model, system design
+- [docs/api.md](docs/api.md) — REST API, endpoints, token authentication
+- [docs/deployment.md](docs/deployment.md) — production setup and configuration
+
+## Dev Environment
+
+- Dev server: <http://localhost:3333>
+- **Database**: PostgreSQL 16 + pgvector, managed via Docker Compose
+- **Linting**: ESLint (`@adonisjs/eslint-config`), stylelint, Prettier (`@adonisjs/prettier-config`)
+- **Testing**: Japa test runner + c8 (80% coverage threshold required)
 
 ## Key Commands
 
-Run these commands from the project root.
-
-### Development
-
 ```bash
-npm run dev              # Start dev server with HMR (hot module reload)
+# Development
+npm run dev              # Start dev server with HMR
 npm run build            # Build for production
-npm start                # Start production server
-npm run format           # Format all code with Prettier
-npm run format:check     # Check code formatting without modifying files
-npm run lint             # Run ESLint checks
-npm run lint:css         # Run stylelint on CSS files
-npm run lint:all         # Run all linters (ESLint + stylelint)
-npm run typecheck        # Run TypeScript type checking
-```
+npm run lint             # ESLint
+npm run lint:all         # ESLint + stylelint
+npm run format           # Prettier
+npm run typecheck        # TypeScript type checking
 
-### Testing
-
-```bash
-npm test                 # Run all tests (unit + functional)
-npm run test:coverage    # Run tests with text coverage report
-npm run test:coverage:html   # Generate HTML coverage report in coverage/
-npm run test:coverage:lcov   # Generate LCOV coverage report for CI
-
-# Run specific test suite
+# Testing
+npm test                 # Run all tests
+npm run test:coverage    # Run with coverage report
 node ace test --suite=unit
 node ace test --suite=functional
-
-# Run specific test file
 node ace test tests/unit/services/entry_service.spec.ts
+
+# Database
+node ace migration:run
+node ace migration:rollback
+node ace create:user
+
+# Docker
+just up                  # Start PostgreSQL
+just down                # Stop containers
+# See justfile for the full list
+
+# Git
+npm run commit           # Commitizen (conventional commits)
 ```
 
-**IMPORTANT**: All tests must pass and coverage must meet 80% threshold (lines, functions, branches, statements) before committing.
-
-### Database
-
-```bash
-node ace migration:run       # Run pending migrations
-node ace migration:rollback  # Rollback last batch of migrations
-node ace migration:status    # Check migration status
-node ace create:user         # Create a new user account
-```
-
-### Docker (via just commands)
-
-This project uses [just](https://github.com/casey/just) for common Docker Compose workflows.
-
-```bash
-just up                  # Start PostgreSQL container
-just up build            # Rebuild and start container
-just down                # Stop and remove containers
-just down volumes        # Stop and remove containers + volumes
-just stop                # Stop containers without removing
-just logs db             # View database logs
-just logs db follow      # Follow database logs
-just exec db psql        # Open psql shell in database container
-```
-
-Or use Docker Compose directly:
-
-```bash
-docker compose -f docker/docker-compose.dev.yml up -d
-docker compose -f docker/docker-compose.dev.yml down
-```
-
-### Git Workflow
-
-```bash
-npm run commit           # Interactive commit with Commitizen
-npm run release          # Create new release (bump version, tag, changelog)
-```
-
-This project uses **Conventional Commits** with Commitizen.
+**Tests must pass and coverage must meet 80% threshold before committing.**
 
 ### Git Hooks (Lefthook)
 
-This project uses [lefthook](https://github.com/evilmartians/lefthook) for git hooks:
-
-**Pre-commit:**
-
-- ESLint on staged TypeScript/JavaScript files (auto-fix)
-- stylelint on staged CSS files (auto-fix)
-- Prettier formatting on staged files (auto-fix)
-- TypeScript type checking
-
-**Commit-msg:**
-
-- Commitlint validation (enforces conventional commits)
-
-**Pre-push:**
-
-- Full test suite with coverage check (80% threshold)
-
-**Skip hooks when needed:**
+Pre-commit: ESLint, stylelint, Prettier (auto-fix on staged files) + typecheck
+Commit-msg: Commitlint (conventional commits)
+Pre-push: Full test suite + coverage check
 
 ```bash
-git commit --no-verify    # Skip pre-commit and commit-msg hooks
-git push --no-verify      # Skip pre-push hooks
-```
-
-**Manage hooks:**
-
-```bash
-npm run hooks:install     # Install git hooks
-npm run hooks:uninstall   # Remove git hooks
+git commit --no-verify   # Skip pre-commit and commit-msg hooks
+git push --no-verify     # Skip pre-push hooks
 ```
 
 ## Key Components
 
-The project follows AdonisJS conventions with additional structure:
-
-- **`app/controllers/`**: HTTP request handlers
-  - `entries_controller.ts`: Main controller for journal entries
-  - `api/entries_controller.ts`: API endpoints
-- **`app/models/`**: Lucid ORM models
-  - `entry.ts`: Journal entry model (daily, TIL, snippet, debug, achievement)
-  - `tag.ts`: Tag model with usage tracking
-  - `user.ts`: User authentication model
-- **`app/services/`**: Business logic layer
-  - `entry_service.ts`: Entry querying, filtering, pagination (User-scoped)
-  - `content_processor_service.ts`: Markdown/HTML processing
-  - `export_service.ts`: Entry export functionality
-  - `tag_service.ts`: Tag management
-- **`app/middleware/`**: HTTP middleware
-  - `silent_auth_middleware.ts`: Non-blocking authentication
-  - `guest_middleware.ts`: Guest-only routes
-  - `container_bindings_middleware.ts`: Dependency injection setup
-- **`app/exceptions/`**: Exception handlers
-- **`database/migrations/`**: Database schema migrations
-- **`database/factories/`**: Model factories for testing
-- **`database/seeders/`**: Database seeders
-- **`resources/views/`**: Edge.js templates
-- **`resources/css/`**: Tailwind CSS stylesheets
-- **`resources/js/`**: Frontend JavaScript (Alpine.js components)
-- **`tests/unit/`**: Unit tests (services, utilities)
-- **`tests/functional/`**: Integration tests (HTTP endpoints)
-- **`config/`**: Application configuration files
-- **`start/`**: Application bootstrap files (routes, kernel, view setup)
-
-## Infrastructure
-
-- **Database**: PostgreSQL 16 with pgvector extension for vector search capabilities
-- **ORM**: Lucid (AdonisJS ORM) with TypeScript support
-- **Sessions**: Cookie-based sessions via `@adonisjs/session`
-- **Authentication**: Session-based auth (`web` guard) + Token-based auth (`api` guard)
-- **Validation**: VineJS for request validation
-- **Frontend Build**: Vite with HMR support
-- **Error Tracking**: Sentry integration (`@sentry/node`)
+- **`app/controllers/entries_controller.ts`** — journal entry HTTP handlers
+- **`app/controllers/api/entries_controller.ts`** — API endpoints
+- **`app/models/entry.ts`** — Entry model (daily, TIL, snippet, debug, achievement)
+- **`app/models/tag.ts`** — Tag model with usage tracking
+- **`app/models/user.ts`** — User model
+- **`app/services/entry_service.ts`** — entry querying, filtering, pagination (user-scoped)
+- **`app/services/content_processor_service.ts`** — Markdown/HTML processing
+- **`app/services/export_service.ts`** — entry export
+- **`app/services/tag_service.ts`** — tag management
+- **`app/middleware/`** — auth, guest, silent auth, container bindings
+- **`database/migrations/`** — schema migrations
+- **`database/factories/`** — model factories for testing
+- **`resources/views/`** — Edge.js templates
+- **`start/routes.ts`** — all application routes
 
 ## API & CLI
 
-DevJournal provides a REST API for creating journal entries programmatically. Full documentation in `docs/api.md`.
-
-### CLI Tool
-
-A Go-based command-line client is available in `./cli`. It provides terminal-based entry creation with editor support, quick mode, and configuration management. See `cli/README.md` for installation and usage.
-
-### API Quick Start
-
-**Create an API token:**
+Full API documentation: [docs/api.md](docs/api.md).
 
 ```bash
-node ace make:token user@example.com "Token Name"
+node ace make:token user@example.com "Token Name"   # Create API token
 ```
 
-**Make API requests:**
-
-```bash
-curl -X POST http://localhost:3333/api/v1/entries \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"entryType": "daily", "contentMarkdown": "Your content", "tags": ["tag1"]}'
-```
-
-### Key Points
-
-- **Endpoints**: `GET`, `POST`, `PUT` `/api/v1/entries`
-- **Controller**: `app/controllers/api/entries_controller.ts`
-- **Auth**: Personal Access Tokens (separate from web session auth)
-- **Validation**: Same rules as web routes (VineJS)
-- **No CORS**: Server-side requests only
-- **Routes**: See `start/routes.ts` under `/api/v1` prefix
+A Go-based CLI client is in `./cli`. See `cli/README.md`.
 
 ## Import Aliases
 
@@ -241,214 +129,29 @@ Always use these aliases instead of relative imports for cleaner code.
 
 ### TypeScript Patterns
 
-**Dependency Injection** - Use `@inject()` decorator for services:
+Canonical examples live in the codebase — read these files before adding new code:
 
-```typescript
-import { inject } from '@adonisjs/core'
-
-@inject()
-export default class EntriesController {
-  constructor(
-    private entryService: EntryService,
-    private contentProcessor: ContentProcessorService
-  ) {}
-
-  async index({ view }: HttpContext) {
-    const entries = await this.entryService.getEntries()
-    return view.render('pages/entries/index', { entries })
-  }
-}
-```
-
-**Validation** - Use VineJS with compiled validators:
-
-```typescript
-import vine from '@vinejs/vine'
-
-const entryValidator = vine.compile(
-  vine.object({
-    entryType: vine.string().in(['daily', 'til', 'snippet', 'debug', 'achievement']),
-    title: vine.string().trim().maxLength(255).nullable(),
-    contentMarkdown: vine.string().maxLength(50000).nullable(),
-  })
-)
-
-// In controller
-const data = await request.validateUsing(entryValidator)
-```
-
-**Models** - Use Lucid ORM with decorators:
-
-```typescript
-import { DateTime } from 'luxon'
-import { column, BaseModel } from '@adonisjs/lucid/orm'
-
-export default class Entry extends BaseModel {
-  @column({ isPrimary: true })
-  declare id: string
-
-  @column()
-  declare title: string
-
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-}
-```
-
-**Services** - Keep business logic in service classes:
-
-```typescript
-@inject()
-export default class EntryService {
-  async getEntries(
-    filters: EntryFilters = {},
-    pagination: PaginationOptions = { page: 1, perPage: 10 }
-  ): Promise<ModelPaginatorContract<Entry>> {
-    const query = Entry.query()
-    this.applyFilters(query, filters)
-    return query.paginate(pagination.page, pagination.perPage)
-  }
-}
-```
+- **Dependency injection** (`@inject()` decorator): `app/controllers/entries_controller.ts`
+- **VineJS validation** (compiled validators, `request.validateUsing()`): `app/controllers/entries_controller.ts`
+- **Lucid models** (column decorators, `BaseModel`): `app/models/entry.ts`
+- **Service pattern** (business logic, query building): `app/services/entry_service.ts`
 
 ### Edge.js Templates
 
-Templates are in `resources/views/` using Edge.js syntax:
-
-```edge
-@layout('layouts/main')
-
-  @section('content')
-    <div class="container">
-      @each(entry in entries.all())
-        <article>
-          <h2>
-            {{ entry.title }}
-          </h2>
-          <p>
-            {{{ entry.contentHtml }}}
-          </p>
-        </article>
-      @end
-    </div>
-  @end
-```
-
-- Use `{{ }}` for escaped output
-- Use `{{{ }}}` for raw HTML output
-- Use `@` for directives
+Templates in `resources/views/`. Use `{{ }}` for escaped output, `{{{ }}}` for raw HTML, `@` for directives. See `resources/views/layouts/main.edge` for the base layout and `resources/views/pages/entries/index.edge` for a typical page.
 
 ## Testing Guidelines
 
-### Test Structure
-
-- **Unit tests**: Test individual services, utilities, middleware in isolation
-- **Functional tests**: Test HTTP endpoints end-to-end
-
-### Writing Tests
-
-Use Japa test runner with AdonisJS plugin:
-
-```typescript
-import { test } from '@japa/runner'
-
-test.group('Entry Service', (group) => {
-  test('filters entries by type', async ({ assert }) => {
-    const entryService = new EntryService()
-    const entries = await entryService.getEntries({ type: 'daily' })
-
-    assert.isTrue(entries.all().every((e) => e.entryType === 'daily'))
-  })
-})
-```
-
-For HTTP tests:
-
-```typescript
-import { test } from '@japa/runner'
-
-test.group('Entries Controller', () => {
-  test('GET /entries returns list of entries', async ({ client }) => {
-    const response = await client.get('/entries')
-
-    response.assertStatus(200)
-    response.assertBodyContains({ data: [] })
-  })
-})
-```
-
-### Coverage Requirements
-
-- **Minimum coverage**: 80% for lines, functions, branches, statements
-- Tests should cover happy paths and error cases
-- Coverage report generated with `npm run test:coverage:html`
+- **Unit tests**: `tests/unit/` — test services and utilities in isolation
+- **Functional tests**: `tests/functional/` — test HTTP endpoints end-to-end
+- **Coverage**: 80% minimum for lines, functions, branches, and statements
 - Excluded from coverage: migrations, seeders, factories, config files
+
+See existing tests for canonical patterns. Full testing docs in [docs/development.md](docs/development.md).
 
 ## Workflow & Development
 
-### Local Development Setup
-
-1. **Start PostgreSQL**:
-
-   ```bash
-   just up
-   ```
-
-2. **Install dependencies**:
-
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment**:
-
-   ```bash
-   cp .env.example .env
-   # Edit .env with your settings
-   ```
-
-4. **Run migrations**:
-
-   ```bash
-   node ace migration:run
-   ```
-
-5. **Create user**:
-
-   ```bash
-   node ace create:user
-   ```
-
-6. **Start dev server**:
-
-   ```bash
-   npm run dev
-   ```
-
-7. **Visit**: <http://localhost:3333>
-
-### Making Changes
-
-1. **Create feature branch** from `main`
-2. **Make changes** following code style guidelines
-3. **Write code** - Git hooks will automatically check your changes on commit
-4. **Run tests**: `npm test` (also runs automatically on pre-push)
-5. **Check linting**: `npm run lint` (also runs automatically on pre-commit for staged files)
-6. **Format code**: `npm run format` (also runs automatically on pre-commit for staged files)
-7. **Type check**: `npm run typecheck` (also runs automatically on pre-commit)
-8. **Commit** - Pre-commit hooks will lint, format, and type-check automatically
-9. **Push** - Pre-push hooks will run full test suite with coverage check
-
-### CI/CD
-
-GitHub Actions workflow (`.github/workflows/ci.yml`) runs on every push:
-
-- Linting (`npm run lint`)
-- Type checking (`npm run typecheck`)
-- Tests with coverage (`npm run test:coverage`)
-- Build verification (`npm run build`)
-
-All checks must pass before merging.
+See [docs/development.md](docs/development.md) for full setup, local workflow, and debugging. GitHub Actions (`.github/workflows/ci.yml`) runs lint, typecheck, tests with coverage, and build on every push — all must pass before merging.
 
 ## Boundaries
 
@@ -476,10 +179,11 @@ All checks must pass before merging.
 
 ### 🚫 Never Do
 
-- delete files using `rm` command. Use `gio trash` instead
-- use `grep` command, as it may yield unexpected results, use `rg` instead
-- use `cat` command, as it may yield unexpected results, use `bat` instead
-- use `find` command, as it may yield unexpected results, use `fd` instead
+- delete files using `rm` command. Use `trash` instead
+  <!-- these are commented out as they don't apply on this system -->
+  <!-- - use `grep` command, as it may yield unexpected results, use `rg` instead -->
+  <!-- - use `cat` command, as it may yield unexpected results, use `bat` instead -->
+  <!-- - use `find` command, as it may yield unexpected results, use `fd` instead -->
 - Commit `.env` files or secrets
 - Modify `node_modules/` or `build/` directories
 - Skip tests or lower coverage thresholds
@@ -513,4 +217,4 @@ The `_references/` directory (should not be in version control) may contain:
 - Notes and advice on various issues
 - Various reference including examples from other projects
 
-When in doubt about AdonisJS conventions, refer to official docs at <https://adonisjs.com/>
+When in doubt about AdonisJS conventions, refer to official docs in `_references/docs/adonisjs_docs`.
