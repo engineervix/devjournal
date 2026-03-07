@@ -198,6 +198,60 @@
     -ms-user-select: text;
     user-select: text;
   }
+
+  /* oEmbed embedded content styles */
+  .oembed-embed {
+    @apply my-6 mx-auto w-full relative;
+  }
+
+  .oembed-video {
+    /* Set a fallback aspect ratio if width/height are not provided by metadata */
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+  }
+
+  /* Make iframe embeds responsive */
+  .oembed-embed iframe {
+    @apply shadow-lg rounded-lg;
+
+    width: 100% !important;
+  }
+
+  .oembed-video iframe {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border: 0;
+  }
+
+  /* Non-video embeds that might need fixed min heights */
+  .oembed-embed:not(.oembed-video) iframe {
+    height: auto !important;
+    min-height: 315px !important; /* Reasonable default for non-video embeds */
+  }
+
+  /* Dark mode adjustments for embedded content */
+  .dark .oembed-embed iframe {
+    @apply shadow-2xl;
+
+    border: 1px solid theme('colors.gray.700');
+  }
+
+  /* Twitter/X embeds */
+  .oembed-embed blockquote {
+    @apply my-4 border-l-4 border-indigo-500 pl-4 dark:border-indigo-400;
+  }
+
+  /* Loading state for embeds (optional) */
+  .oembed-embed[data-loading='true'] {
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700;
+
+    min-height: 200px;
+  }
 }
 
 /* Note: Custom animations moved to tailwind.config.js theme.extend.animation */

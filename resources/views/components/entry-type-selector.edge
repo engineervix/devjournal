@@ -103,163 +103,23 @@
   {{-- Entry Templates for different entry types --}}
   {{-- Note: Using insertTemplateWithRetry() to work around EasyMDE timing issue --}}
   {{-- where template insertion sometimes requires two clicks to work properly --}}
-  <div class="mt-4" x-show="selected === 'daily'">
-    <div
-      class="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-100 dark:border-blue-800"
-    >
-      <h4 class="font-medium mb-2 text-blue-800 dark:text-blue-200">
-        Daily Log Template
-      </h4>
-      <pre class="text-sm text-blue-700 dark:text-blue-300">
-        ## Daily Log
-
-### What I did today
-
--
-
-### What's next
-
--
-
-### Blockers/Issues
-
--
-      </pre>
-      <button
-        type="button"
-        @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())"
-        class="mt-2 text-sm text-blue-700 dark:text-blue-300 hover:underline"
-      >
-        Use Template
-      </button>
-    </div>
-  </div>
-
-  <div class="mt-4" x-show="selected === 'til'">
-    <div
-      class="p-4 bg-green-50 dark:bg-green-900/30 rounded-lg border border-green-100 dark:border-green-800"
-    >
-      <h4 class="font-medium mb-2 text-green-800 dark:text-green-200">
-        TIL Template
-      </h4>
-      <pre class="text-sm text-green-700 dark:text-green-300">
-        ## Today I Learned: [Concept/Technology]
-
-### What I learned
-
-### Resources/Links
-
--
-
-### Code example (optional)
-
-```
-code here
-```
-      </pre>
-      <button
-        type="button"
-        @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())"
-        class="mt-2 text-sm text-green-700 dark:text-green-300 hover:underline"
-      >
-        Use Template
-      </button>
-    </div>
-  </div>
-
-  <div class="mt-4" x-show="selected === 'snippet'">
-    <div
-      class="p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg border border-purple-100 dark:border-purple-800"
-    >
-      <h4 class="font-medium mb-2 text-purple-800 dark:text-purple-200">
-        Code Snippet Template
-      </h4>
-      <pre class="text-sm text-purple-700 dark:text-purple-300">
-        ## [Snippet Name]
-
-### Language/Technology
-
--
-
-### Problem it solves
-
-### Code
-
-```
-code here
-```
-
-### Explanation
-      </pre>
-      <button
-        type="button"
-        @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())"
-        class="mt-2 text-sm text-purple-700 dark:text-purple-300 hover:underline"
-      >
-        Use Template
-      </button>
-    </div>
-  </div>
-
-  <div class="mt-4" x-show="selected === 'debug'">
-    <div
-      class="p-4 bg-orange-50 dark:bg-orange-900/30 rounded-lg border border-orange-100 dark:border-orange-800"
-    >
-      <h4 class="font-medium mb-2 text-orange-800 dark:text-orange-200">
-        Debug Session Template
-      </h4>
-      <pre class="text-sm text-orange-700 dark:text-orange-300">
-        ## [Bug/Issue Title]
-
-### Problem description
-
-### What I tried
-
--
-
-### Solution
-
-### Time spent (optional)
-
-### Lessons learned
-      </pre>
-      <button
-        type="button"
-        @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())"
-        class="mt-2 text-sm text-orange-700 dark:text-orange-300 hover:underline"
-      >
-        Use Template
-      </button>
-    </div>
-  </div>
-
-  <div class="mt-4" x-show="selected === 'achievement'">
-    <div
-      class="p-4 bg-pink-50 dark:bg-pink-900/30 rounded-lg border border-pink-100 dark:border-pink-800"
-    >
-      <h4 class="font-medium mb-2 text-pink-800 dark:text-pink-200">
-        Achievement Template
-      </h4>
-      <pre class="text-sm text-pink-700 dark:text-pink-300">
-        ## [Achievement Title]
-
-### What I accomplished
-
-### Impact/Results
-
-### Technologies used
-
--
-
-### Link to PR/ticket (optional)
-      </pre>
-      <button
-        type="button"
-        @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())"
-        class="mt-2 text-sm text-pink-700 dark:text-pink-300 hover:underline"
-      >
-        Use Template
-      </button>
-    </div>
-  </div>
+  @component('components/entry-type-selector/template-block', { entryType: 'daily', title: 'Daily Log Template', containerClass: 'bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800', headingClass: 'text-blue-800 dark:text-blue-200', textClass: 'text-blue-700 dark:text-blue-300' })
+    @include('components/entry-type-selector/templates/daily')
+  @end
+  
+  @component('components/entry-type-selector/template-block', { entryType: 'til', title: 'TIL Template', containerClass: 'bg-green-50 dark:bg-green-900/30 border border-green-100 dark:border-green-800', headingClass: 'text-green-800 dark:text-green-200', textClass: 'text-green-700 dark:text-green-300' })
+    @include('components/entry-type-selector/templates/til')
+  @end
+  
+  @component('components/entry-type-selector/template-block', { entryType: 'snippet', title: 'Code Snippet Template', containerClass: 'bg-purple-50 dark:bg-purple-900/30 border border-purple-100 dark:border-purple-800', headingClass: 'text-purple-800 dark:text-purple-200', textClass: 'text-purple-700 dark:text-purple-300' })
+    @include('components/entry-type-selector/templates/snippet')
+  @end
+  
+  @component('components/entry-type-selector/template-block', { entryType: 'debug', title: 'Debug Session Template', containerClass: 'bg-orange-50 dark:bg-orange-900/30 border border-orange-100 dark:border-orange-800', headingClass: 'text-orange-800 dark:text-orange-200', textClass: 'text-orange-700 dark:text-orange-300' })
+    @include('components/entry-type-selector/templates/debug')
+  @end
+  
+  @component('components/entry-type-selector/template-block', { entryType: 'achievement', title: 'Achievement Template', containerClass: 'bg-pink-50 dark:bg-pink-900/30 border border-pink-100 dark:border-pink-800', headingClass: 'text-pink-800 dark:text-pink-200', textClass: 'text-pink-700 dark:text-pink-300' })
+    @include('components/entry-type-selector/templates/achievement')
+  @end
 </div>
