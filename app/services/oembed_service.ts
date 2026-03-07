@@ -22,7 +22,6 @@ export default class OEmbedService {
   constructor() {
     // Initialize DOMPurify with JSDOM for Node.js environment
     const { window } = new JSDOM('')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.domPurify = DOMPurify(window as any)
   }
 
@@ -70,7 +69,6 @@ export default class OEmbedService {
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const data = await extract(url, {}, { timeout: 5000 } as any)
       return data as OEmbedData
     } catch (error) {

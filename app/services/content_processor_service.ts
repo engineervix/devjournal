@@ -9,12 +9,17 @@ export interface ProcessedContent {
   contentPlain: string | null
 }
 
+interface EntryLike {
+  contentHtml: string | null
+  contentPlain: string | null
+}
+
 @inject()
 export default class ContentProcessorService {
   private md: MarkdownIt
   private oembedService: OEmbedService
 
-  constructor() {
+  constructor(oembedService?: OEmbedService) {
     this.md = new MarkdownIt({
       highlight: function (str, lang) {
         if (lang && hljs.getLanguage(lang)) {
@@ -34,43 +39,34 @@ export default class ContentProcessorService {
         )
       },
     })
-    this.oembedService = new OEmbedService()
+    this.oembedService = oembedService ?? new OEmbedService()
   }
 
   /**
-   * Detect standalone URLs in markdown that should be converted to oEmbed
-   * Returns URLs that appear on their own line
+   * Post-process rendered HTML to replace standalone URL paragraphs with oEmbed embeds.
+   * Standalone URLs in markdown become <p>URL</p> after rendering, which we detect
+   * and replace with embed HTML where the provider supports oEmbed.
    */
-  private extractStandaloneUrls(markdownContent: string): string[] {
-    const urlRegex = /^(https?:\/\/[^\s]+)$/gm
-    const matches = markdownContent.match(urlRegex)
-    return matches || []
-  }
+  private async processOEmbedUrls(html: string): Promise<string> {
+    const urlParagraphRegex = /<p>(https?:\/\/[^\s<]+)<\/p>/g
+    const matches = [...html.matchAll(urlParagraphRegex)]
 
-  /**
-   * Process oEmbed URLs in markdown content
-   * Replaces standalone URLs with oEmbed embeds where available
-   */
-  private async processOEmbedUrls(markdownContent: string): Promise<string> {
-    const urls = this.extractStandaloneUrls(markdownContent)
-
-    if (urls.length === 0) {
-      return markdownContent
+    if (matches.length === 0) {
+      return html
     }
 
-    let processedContent = markdownContent
+    // De-duplicate URLs before fetching
+    const uniqueUrls = [...new Set(matches.map((m) => m[1]))]
+    let result = html
 
-    // Process each URL and replace with oEmbed HTML if available
-    for (const url of urls) {
+    for (const url of uniqueUrls) {
       const embedHtml = await this.oembedService.convertUrlToEmbed(url)
       if (embedHtml) {
-        // Replace the standalone URL with a marker that won't be processed by markdown
-        // We'll use HTML comment markers that markdown-it will preserve
-        processedContent = processedContent.replace(url, `<!-- oembed:${url} -->\n${embedHtml}\n<!-- /oembed -->`)
+        result = result.replaceAll(`<p>${url}</p>`, embedHtml)
       }
     }
 
-    return processedContent
+    return result
   }
 
   /**
@@ -84,11 +80,11 @@ export default class ContentProcessorService {
       }
     }
 
-    // First, process any oEmbed URLs
-    const processedMarkdown = await this.processOEmbedUrls(markdownContent)
+    // Render markdown to HTML first
+    const renderedHtml = this.md.render(markdownContent)
 
-    // Then render markdown to HTML
-    const contentHtml = this.md.render(processedMarkdown)
+    // Then replace standalone URL paragraphs with oEmbed embeds
+    const contentHtml = await this.processOEmbedUrls(renderedHtml)
 
     // Convert to plain text for search/preview
     const contentPlain = htmlToText(contentHtml, {
@@ -109,7 +105,7 @@ export default class ContentProcessorService {
   /**
    * Update content fields on an entry
    */
-  async updateEntryContent(entry: any, markdownContent: string | null): Promise<void> {
+  async updateEntryContent(entry: EntryLike, markdownContent: string | null): Promise<void> {
     const processed = await this.processMarkdown(markdownContent)
     entry.contentHtml = processed.contentHtml
     entry.contentPlain = processed.contentPlain
