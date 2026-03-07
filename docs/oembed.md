@@ -36,11 +36,13 @@ The following providers are currently supported:
 ### Only Standalone URLs Are Converted
 
 - ✅ **Will be embedded**: URLs on their own line
+
   ```markdown
   https://www.youtube.com/watch?v=abc123
   ```
 
 - ❌ **Will NOT be embedded**: URLs in markdown links
+
   ```markdown
   [Watch this video](https://www.youtube.com/watch?v=abc123)
   ```
@@ -67,11 +69,13 @@ oEmbed requests have a 5-second timeout. If a provider doesn't respond within th
 ### Architecture
 
 1. **OEmbedService** (`app/services/oembed_service.ts`)
+
    - Detects supported URLs
    - Fetches oEmbed data from provider endpoints
    - Sanitizes embedded HTML with DOMPurify
 
 2. **ContentProcessorService** (`app/services/content_processor_service.ts`)
+
    - Processes markdown content before HTML conversion
    - Identifies standalone URLs
    - Replaces them with embedded content

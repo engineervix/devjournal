@@ -230,7 +230,7 @@
   }
 
   /* Loading state for embeds (optional) */
-  .oembed-embed[data-loading="true"] {
+  .oembed-embed[data-loading='true'] {
     @apply animate-pulse bg-gray-200 dark:bg-gray-700;
 
     min-height: 200px;
