@@ -1,0 +1,17 @@
+<div class="mt-4" x-show="selected === '{{ entryType }}'">
+  <div class="p-4 rounded-lg {{ containerClass }}">
+    <h4 class="font-medium mb-2 {{ headingClass }}">
+      {{ title }}
+    </h4>
+    <pre class="text-sm {{ textClass }} whitespace-pre-line">
+      {{{ await $slots.main() }}}
+    </pre>
+    <button
+      type="button"
+      @click="window.insertTemplateWithRetry($el.previousElementSibling.textContent.trim())"
+      class="mt-2 text-sm {{ textClass }} hover:underline"
+    >
+      Use Template
+    </button>
+  </div>
+</div>
