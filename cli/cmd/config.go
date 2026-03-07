@@ -18,13 +18,15 @@ var configCmd = &cobra.Command{
 var setURLCmd = &cobra.Command{
 	Use:   "set-url [URL]",
 	Short: "Set the API URL for your DevJournal instance",
-	Args:  cobra.ExactArgs(1),
+	Example: `  devlog-client config set-url http://localhost:3333/api/v1
+  devlog-client config set-url https://journal.my-domain.com/api/v1`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		apiURL := args[0]
 
 		// Basic validation - ensure it's a URL
 		if apiURL == "" {
-			fmt.Println("Error: URL cannot be empty")
+			fmt.Fprintln(os.Stderr, "Error: URL cannot be empty")
 			return
 		}
 
@@ -43,7 +45,7 @@ var setURLCmd = &cobra.Command{
 
 		err = viper.WriteConfigAs(configPath)
 		if err != nil {
-			fmt.Printf("Error saving config: %v\n", err)
+			fmt.Fprintf(os.Stderr, "Error saving config: %v\n", err)
 			return
 		}
 
@@ -53,8 +55,9 @@ var setURLCmd = &cobra.Command{
 }
 
 var viewCmd = &cobra.Command{
-	Use:   "view",
-	Short: "View current configuration",
+	Use:     "view",
+	Short:   "View current configuration",
+	Example: `  devlog-client config view`,
 	Run: func(cmd *cobra.Command, args []string) {
 		apiURL := viper.GetString("api_url")
 		token := viper.GetString("api_token")

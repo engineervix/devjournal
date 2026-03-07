@@ -20,7 +20,7 @@ It allows you to create logs, snippets, and TILs directly from your terminal.`,
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
@@ -36,7 +36,7 @@ func initConfig() {
 	} else {
 		configDir, err := os.UserConfigDir()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 

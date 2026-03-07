@@ -24,10 +24,14 @@ var (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List journal entries",
+	Example: `  devlog-client list
+  devlog-client list --type daily
+  devlog-client list --tag go --page 2 --per-page 20
+  devlog-client list --json`,
 	Run: func(cmd *cobra.Command, args []string) {
 		token := viper.GetString("api_token")
 		if token == "" {
-			fmt.Println("Please login first using 'devlog login'")
+			fmt.Fprintln(os.Stderr, "Error: missing API token. Please login first using 'devlog-client login'")
 			return
 		}
 
@@ -41,7 +45,7 @@ var listCmd = &cobra.Command{
 			JSON:    listJSON,
 		})
 		if err != nil {
-			fmt.Printf("✗ %s\n", err)
+			fmt.Fprintf(os.Stderr, "✗ %v\n", err)
 			return
 		}
 

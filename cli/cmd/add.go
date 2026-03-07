@@ -22,10 +22,13 @@ var (
 var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Create a new journal entry",
+	Example: `  devlog-client add --type til --tags cli,go --title "Learned about Cobra"
+  devlog-client add --quick "This is a quick entry without opening an editor"
+  echo "Piped content" | devlog-client add --quick`,
 	Run: func(cmd *cobra.Command, args []string) {
 		token := viper.GetString("api_token")
 		if token == "" {
-			fmt.Println("Please login first using 'devlog login'")
+			fmt.Fprintln(os.Stderr, "Error: missing API token. Please login first using 'devlog-client login'")
 			return
 		}
 
@@ -41,17 +44,17 @@ var addCmd = &cobra.Command{
 				content = strings.Join(args, " ")
 			} else {
 				// Read from stdin
-				fmt.Println("Reading from stdin... (Press Ctrl+D when done)")
+				fmt.Fprintln(os.Stderr, "Reading from stdin... (Press Ctrl+D when done)")
 				stdinBytes, err := io.ReadAll(os.Stdin)
 				if err != nil {
-					fmt.Println("Error reading from stdin:", err)
+					fmt.Fprintf(os.Stderr, "Error reading from stdin: %v\n", err)
 					return
 				}
 				content = string(stdinBytes)
 			}
 
 			if strings.TrimSpace(content) == "" {
-				fmt.Println("Empty entry, aborting.")
+				fmt.Fprintln(os.Stderr, "Error: empty entry, aborting.")
 				return
 			}
 		} else {
@@ -62,7 +65,7 @@ var addCmd = &cobra.Command{
 			var err error
 			content, err = editor.OpenEditor(helpText, ".md")
 			if err != nil {
-				fmt.Println("Error opening editor:", err)
+				fmt.Fprintf(os.Stderr, "Error opening editor: %v\n", err)
 				return
 			}
 
@@ -85,7 +88,7 @@ var addCmd = &cobra.Command{
 
 		entry, err := apiClient.CreateEntry(payload)
 		if err != nil {
-			fmt.Printf("✗ %s\n", err)
+			fmt.Fprintf(os.Stderr, "✗ %v\n", err)
 			return
 		}
 

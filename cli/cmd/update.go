@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/engineervix/devjournal/cli/internal/api"
@@ -17,11 +18,13 @@ var (
 var updateCmd = &cobra.Command{
 	Use:   "update [SEARCH_QUERY or ID]",
 	Short: "Update a journal entry",
-	Args:  cobra.MinimumNArgs(1),
+	Example: `  devlog-client update 123e4567-e89b-12d3
+  devlog-client update 123e4567-e89b-12d3 --title "Fixed a typo"`,
+	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		token := viper.GetString("api_token")
 		if token == "" {
-			fmt.Println("Please login first using 'devlog login'")
+			fmt.Fprintln(os.Stderr, "Error: missing API token. Please login first using 'devlog-client login'")
 			return
 		}
 
@@ -43,18 +46,18 @@ var updateCmd = &cobra.Command{
 			// Fetch entry first
 			entry, err := apiClient.GetEntry(id)
 			if err != nil {
-				fmt.Printf("✗ Error fetching entry: %s\n", err)
+				fmt.Fprintf(os.Stderr, "✗ Error fetching entry: %v\n", err)
 				return
 			}
 
 			updatedContent, err := editor.OpenEditor(entry.ContentMarkdown, ".md")
 			if err != nil {
-				fmt.Println("Error opening editor:", err)
+				fmt.Fprintf(os.Stderr, "Error opening editor: %v\n", err)
 				return
 			}
 
 			if strings.TrimSpace(updatedContent) == "" {
-				fmt.Println("Empty entry content, aborting update.")
+				fmt.Fprintln(os.Stderr, "Error: empty entry content, aborting update.")
 				return
 			}
 

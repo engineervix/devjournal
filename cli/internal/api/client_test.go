@@ -82,7 +82,7 @@ func TestCreateEntry(t *testing.T) {
 		if r.Method != "POST" {
 			t.Errorf("Expected method POST, got %s", r.Method)
 		}
-		
+
 		var payload CreateEntryPayload
 		json.NewDecoder(r.Body).Decode(&payload)
 		if payload.Title != "New Entry" {

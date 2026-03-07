@@ -14,20 +14,21 @@ import (
 )
 
 var loginCmd = &cobra.Command{
-	Use:   "login",
-	Short: "Authenticate with your DevJournal instance",
+	Use:     "login",
+	Short:   "Authenticate with your DevJournal instance",
+	Example: `  devlog-client login`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Print("Enter your API Token: ")
 		byteToken, err := term.ReadPassword(int(syscall.Stdin))
 		if err != nil {
-			fmt.Println("\nError reading token:", err)
+			fmt.Fprintf(os.Stderr, "\nError reading token: %v\n", err)
 			return
 		}
 		token := strings.TrimSpace(string(byteToken))
 		fmt.Println()
 
 		if token == "" {
-			fmt.Println("Token cannot be empty")
+			fmt.Fprintln(os.Stderr, "Error: Token cannot be empty")
 			return
 		}
 
@@ -43,20 +44,20 @@ var loginCmd = &cobra.Command{
 			Get(apiURL + "/me")
 
 		if err != nil {
-			fmt.Printf("\n✗ Error connecting to API: %v\n", err)
-			fmt.Println("Please check your network connection and API URL.")
-			fmt.Printf("Current API URL: %s\n", apiURL)
-			fmt.Println("You can change it with: devlog-client config set-url <URL>")
+			fmt.Fprintf(os.Stderr, "\n✗ Error connecting to API: %v\n", err)
+			fmt.Fprintln(os.Stderr, "Please check your network connection and API URL.")
+			fmt.Fprintf(os.Stderr, "Current API URL: %s\n", apiURL)
+			fmt.Fprintln(os.Stderr, "You can change it with: devlog-client config set-url <URL>")
 			return
 		}
 
 		if resp.StatusCode() == 401 {
-			fmt.Println("\n✗ Invalid token. Please check your API token and try again.")
+			fmt.Fprintln(os.Stderr, "\n✗ Invalid token. Please check your API token and try again.")
 			return
 		}
 
 		if resp.IsError() {
-			fmt.Printf("\n✗ API error (%s): %s\n", resp.Status(), resp.String())
+			fmt.Fprintf(os.Stderr, "\n✗ API error (%s): %s\n", resp.Status(), resp.String())
 			return
 		}
 
@@ -77,7 +78,7 @@ var loginCmd = &cobra.Command{
 
 		err = viper.WriteConfigAs(configPath)
 		if err != nil {
-			fmt.Printf("Error saving config: %v\n", err)
+			fmt.Fprintf(os.Stderr, "Error saving config: %v\n", err)
 			return
 		}
 

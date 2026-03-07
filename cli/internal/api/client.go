@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -79,6 +80,9 @@ func (c *Client) CreateEntry(payload CreateEntryPayload) (*Entry, error) {
 		Post(c.apiURL + "/entries")
 
 	if err != nil {
+		if strings.Contains(err.Error(), "connection refused") || strings.Contains(err.Error(), "no such host") {
+			return nil, fmt.Errorf("connection failed: %w\nHint: Is the API server running? Check your API URL via 'devlog-client config view'", err)
+		}
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
 
@@ -127,6 +131,9 @@ func (c *Client) GetEntries(opts GetEntriesOptions) ([]Entry, error) {
 
 	resp, err := req.Get(c.apiURL + "/entries")
 	if err != nil {
+		if strings.Contains(err.Error(), "connection refused") || strings.Contains(err.Error(), "no such host") {
+			return nil, fmt.Errorf("connection failed: %w\nHint: Is the API server running? Check your API URL via 'devlog-client config view'", err)
+		}
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
 
@@ -175,6 +182,9 @@ func (c *Client) UpdateEntry(id string, payload UpdateEntryPayload) (*Entry, err
 		Put(c.apiURL + "/entries/" + id)
 
 	if err != nil {
+		if strings.Contains(err.Error(), "connection refused") || strings.Contains(err.Error(), "no such host") {
+			return nil, fmt.Errorf("connection failed: %w\nHint: Is the API server running? Check your API URL via 'devlog-client config view'", err)
+		}
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
 
@@ -199,6 +209,9 @@ func (c *Client) UpdateEntry(id string, payload UpdateEntryPayload) (*Entry, err
 func (c *Client) GetEntry(id string) (*Entry, error) {
 	resp, err := c.restyClient.R().Get(c.apiURL + "/entries/" + id)
 	if err != nil {
+		if strings.Contains(err.Error(), "connection refused") || strings.Contains(err.Error(), "no such host") {
+			return nil, fmt.Errorf("connection failed: %w\nHint: Is the API server running? Check your API URL via 'devlog-client config view'", err)
+		}
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
 
@@ -222,6 +235,10 @@ func (c *Client) GetEntry(id string) (*Entry, error) {
 }
 
 func (c *Client) handleError(resp *resty.Response) error {
+	if resp.StatusCode() == 401 {
+		return fmt.Errorf("API error (401 Unauthorized): Invalid or missing token.\nHint: Run 'devlog-client login' to authenticate.")
+	}
+
 	// Try to parse as validation error (422)
 	if resp.StatusCode() == 422 {
 		var validationErr ValidationError

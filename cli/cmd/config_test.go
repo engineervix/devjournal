@@ -82,10 +82,10 @@ func TestConfigSetURLEmpty(t *testing.T) {
 
 	// Capture output
 	buf := new(bytes.Buffer)
-	originalStdout := os.Stdout
+	originalStderr := os.Stderr
 	r, w, _ := os.Pipe()
-	os.Stdout = w
-	t.Cleanup(func() { os.Stdout = originalStdout })
+	os.Stderr = w
+	t.Cleanup(func() { os.Stderr = originalStderr })
 
 	// Run with empty URL
 	setURLCmd.Run(setURLCmd, []string{""})
