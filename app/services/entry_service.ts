@@ -92,15 +92,6 @@ export default class EntryService {
 
     this.applyFilters(query, filters)
 
-    if (filters.tag) {
-      const tagRecord = await Tag.findBy('slug', filters.tag)
-      if (tagRecord) {
-        query.whereHas('tags', (tagQuery) => {
-          tagQuery.where('tags.id', tagRecord.id)
-        })
-      }
-    }
-
     query.orderBy('createdAt', 'desc').preload('tags')
     return query
   }
@@ -196,12 +187,15 @@ export default class EntryService {
     }
   }
 
-  /**
-   * Apply filters to query
-   */
   private applyFilters(query: any, filters: EntryFilters): void {
     if (filters.type) {
       query.where('entryType', filters.type)
+    }
+
+    if (filters.tag) {
+      query.whereHas('tags', (tagQuery: any) => {
+        tagQuery.where('tags.slug', filters.tag).orWhere('tags.name', filters.tag)
+      })
     }
 
     if (filters.period) {
