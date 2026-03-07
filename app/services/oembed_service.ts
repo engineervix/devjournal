@@ -1,6 +1,7 @@
 import { extract } from '@extractus/oembed-extractor'
-import { createDOMPurify } from 'dompurify'
+import DOMPurify from 'dompurify'
 import { JSDOM } from 'jsdom'
+import logger from '@adonisjs/core/services/logger'
 
 export interface OEmbedData {
   html?: string
@@ -16,12 +17,13 @@ export interface OEmbedData {
 }
 
 export default class OEmbedService {
-  private domPurify: ReturnType<typeof createDOMPurify>
+  private domPurify: ReturnType<typeof DOMPurify>
 
   constructor() {
     // Initialize DOMPurify with JSDOM for Node.js environment
-    const window = new JSDOM('').window
-    this.domPurify = createDOMPurify(window as unknown as Window)
+    const { window } = new JSDOM('')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.domPurify = DOMPurify(window as any)
   }
 
   /**
@@ -48,7 +50,11 @@ export default class OEmbedService {
 
     try {
       const urlObj = new URL(url)
-      return supportedDomains.some((domain) => urlObj.hostname.includes(domain))
+      const hostname = urlObj.hostname.toLowerCase().replace(/^www\./, '')
+      return supportedDomains.some((domain) => {
+        const d = domain.toLowerCase()
+        return hostname === d || hostname.endsWith('.' + d)
+      })
     } catch {
       return false
     }
@@ -64,11 +70,12 @@ export default class OEmbedService {
     }
 
     try {
-      const data = await extract(url, {}, { timeout: 5000 })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const data = await extract(url, {}, { timeout: 5000 } as any)
       return data as OEmbedData
     } catch (error) {
       // If oEmbed extraction fails, just return null and let the original URL remain
-      console.error(`Failed to extract oEmbed data from ${url}:`, error)
+      logger.error({ url, err: error }, 'Failed to extract oEmbed data')
       return null
     }
   }
@@ -78,7 +85,7 @@ export default class OEmbedService {
    */
   sanitizeOEmbedHtml(html: string): string {
     return this.domPurify.sanitize(html, {
-      ALLOWED_TAGS: ['iframe', 'blockquote', 'script', 'a', 'p', 'div', 'span', 'img'],
+      ALLOWED_TAGS: ['iframe', 'blockquote', 'a', 'p', 'div', 'span', 'img'],
       ALLOWED_ATTR: [
         'src',
         'width',
