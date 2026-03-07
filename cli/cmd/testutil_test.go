@@ -16,7 +16,24 @@ func setupTestConfig(t *testing.T) string {
 	t.Helper()
 
 	tmpDir := t.TempDir()
-	configDir := filepath.Join(tmpDir, "devlog-client")
+	
+	// Mock environment variables for os.UserConfigDir()
+	originalXDG := os.Getenv("XDG_CONFIG_HOME")
+	originalHome := os.Getenv("HOME")
+	originalAppData := os.Getenv("AppData")
+	
+	os.Setenv("XDG_CONFIG_HOME", tmpDir)
+	os.Setenv("HOME", tmpDir)
+	os.Setenv("AppData", tmpDir)
+	
+	t.Cleanup(func() {
+		if originalXDG != "" { os.Setenv("XDG_CONFIG_HOME", originalXDG) } else { os.Unsetenv("XDG_CONFIG_HOME") }
+		if originalHome != "" { os.Setenv("HOME", originalHome) } else { os.Unsetenv("HOME") }
+		if originalAppData != "" { os.Setenv("AppData", originalAppData) } else { os.Unsetenv("AppData") }
+	})
+
+	userConfigDir, _ := os.UserConfigDir()
+	configDir := filepath.Join(userConfigDir, "devlog-client")
 	err := os.MkdirAll(configDir, 0700)
 	if err != nil {
 		t.Fatalf("Failed to create test config dir: %v", err)

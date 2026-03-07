@@ -40,25 +40,7 @@ func TestConfigSetURL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup test config
-			tmpDir := t.TempDir()
-			configDir := filepath.Join(tmpDir, "devlog-client")
-			os.MkdirAll(configDir, 0700)
-
-			// Set temporary config directory
-			originalConfigDir := os.Getenv("XDG_CONFIG_HOME")
-			os.Setenv("XDG_CONFIG_HOME", tmpDir)
-			t.Cleanup(func() {
-				if originalConfigDir != "" {
-					os.Setenv("XDG_CONFIG_HOME", originalConfigDir)
-				} else {
-					os.Unsetenv("XDG_CONFIG_HOME")
-				}
-			})
-
-			viper.Reset()
-			viper.AddConfigPath(configDir)
-			viper.SetConfigType("json")
-			viper.SetConfigName("config")
+			configDir := setupTestConfig(t)
 
 			// Capture output
 			buf := new(bytes.Buffer)
@@ -95,24 +77,8 @@ func TestConfigSetURL(t *testing.T) {
 
 func TestConfigSetURLEmpty(t *testing.T) {
 	// This test verifies that empty URLs are rejected
-	tmpDir := t.TempDir()
-	configDir := filepath.Join(tmpDir, "devlog-client")
-	os.MkdirAll(configDir, 0700)
-
-	originalConfigDir := os.Getenv("XDG_CONFIG_HOME")
-	os.Setenv("XDG_CONFIG_HOME", tmpDir)
-	t.Cleanup(func() {
-		if originalConfigDir != "" {
-			os.Setenv("XDG_CONFIG_HOME", originalConfigDir)
-		} else {
-			os.Unsetenv("XDG_CONFIG_HOME")
-		}
-	})
-
-	viper.Reset()
-	viper.AddConfigPath(configDir)
-	viper.SetConfigType("json")
-	viper.SetConfigName("config")
+	// Setup test config
+	setupTestConfig(t)
 
 	// Capture output
 	buf := new(bytes.Buffer)
@@ -144,18 +110,6 @@ func TestConfigView(t *testing.T) {
 	// Save config
 	configPath := filepath.Join(configDir, "config.json")
 	viper.WriteConfigAs(configPath)
-
-	// Mock os.UserConfigDir to return our test directory
-	originalConfigDir := os.Getenv("XDG_CONFIG_HOME")
-	parentDir := filepath.Dir(configDir)
-	os.Setenv("XDG_CONFIG_HOME", parentDir)
-	t.Cleanup(func() {
-		if originalConfigDir != "" {
-			os.Setenv("XDG_CONFIG_HOME", originalConfigDir)
-		} else {
-			os.Unsetenv("XDG_CONFIG_HOME")
-		}
-	})
 
 	// Capture output
 	buf := new(bytes.Buffer)
