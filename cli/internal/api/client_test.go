@@ -31,7 +31,14 @@ func TestGetEntries(t *testing.T) {
 			"success": true,
 			"data": {
 				"data": [
-					{"id": "1", "title": "Test Entry", "contentMarkdown": "Content"}
+					{
+						"id": "1", 
+						"title": "Test Entry", 
+						"contentMarkdown": "Content",
+						"tags": [
+							{"id": 1, "name": "Go", "slug": "go", "usageCount": 5}
+						]
+					}
 				]
 			}
 		}`))
@@ -49,6 +56,15 @@ func TestGetEntries(t *testing.T) {
 	}
 	if entries[0].Title != "Test Entry" {
 		t.Errorf("Expected title 'Test Entry', got '%s'", entries[0].Title)
+	}
+	if len(entries[0].Tags) != 1 {
+		t.Errorf("Expected 1 tag, got %d", len(entries[0].Tags))
+	}
+	if entries[0].Tags[0].ID != 1 {
+		t.Errorf("Expected tag ID 1, got %d", entries[0].Tags[0].ID)
+	}
+	if entries[0].Tags[0].UsageCount != 5 {
+		t.Errorf("Expected usage count 5, got %d", entries[0].Tags[0].UsageCount)
 	}
 }
 

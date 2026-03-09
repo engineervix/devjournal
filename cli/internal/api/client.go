@@ -43,9 +43,10 @@ type Entry struct {
 
 // Tag represents a tag
 type Tag struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	Slug string `json:"slug"`
+	ID         int64  `json:"id"`
+	Name       string `json:"name"`
+	Slug       string `json:"slug"`
+	UsageCount int    `json:"usageCount"`
 }
 
 // Client wraps the resty client
