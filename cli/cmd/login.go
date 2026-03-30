@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -18,6 +19,20 @@ var loginCmd = &cobra.Command{
 	Short:   "Authenticate with your DevJournal instance",
 	Example: `  devlog-client login`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// Prompt for server URL, allowing the user to change it from the current value
+		currentURL := viper.GetString("api_url")
+		fmt.Printf("Server URL [%s]: ", currentURL)
+		reader := bufio.NewReader(os.Stdin)
+		inputURL, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error reading URL: %v\n", err)
+			return
+		}
+		inputURL = strings.TrimSpace(inputURL)
+		if inputURL != "" {
+			viper.Set("api_url", inputURL)
+		}
+
 		fmt.Print("Enter your API Token: ")
 		byteToken, err := term.ReadPassword(int(syscall.Stdin))
 		if err != nil {
