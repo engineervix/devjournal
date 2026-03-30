@@ -1,0 +1,229 @@
+/* Styles for mdit plugin output rendered inside .prose */
+
+/* ------------------------------------------------------------------ */
+
+/* Task lists (@mdit/plugin-tasklist)                                  */
+
+/* ------------------------------------------------------------------ */
+
+.prose {
+  & .task-list-container {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  & .task-list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding-left: 0;
+  }
+
+  /* Push the checkbox down slightly so it aligns with the first line of text */
+  & .task-list-item-checkbox {
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+    accent-color: theme('colors.indigo.600');
+  }
+
+  /* ---------------------------------------------------------------- */
+
+  /* GFM Alerts (@mdit/plugin-alert)                                  */
+
+  /* ---------------------------------------------------------------- */
+
+  & .markdown-alert {
+    padding: 0.75rem 1rem;
+    border-left-width: 4px;
+    border-radius: 0 0.375rem 0.375rem 0;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+
+    & > *:first-child {
+      margin-top: 0;
+    }
+
+    & > *:last-child {
+      margin-bottom: 0;
+    }
+
+    & .markdown-alert-title {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-weight: 600;
+      font-size: 0.875rem;
+      margin-bottom: 0.25rem;
+      text-transform: capitalize;
+    }
+
+    &.markdown-alert-note {
+      background-color: theme('colors.blue.50');
+      border-left-color: theme('colors.blue.500');
+      color: theme('colors.blue.900');
+
+      & .markdown-alert-title {
+        color: theme('colors.blue.700');
+      }
+    }
+
+    &.markdown-alert-tip {
+      background-color: theme('colors.green.50');
+      border-left-color: theme('colors.green.500');
+      color: theme('colors.green.900');
+
+      & .markdown-alert-title {
+        color: theme('colors.green.700');
+      }
+    }
+
+    &.markdown-alert-important {
+      background-color: theme('colors.purple.50');
+      border-left-color: theme('colors.purple.500');
+      color: theme('colors.purple.900');
+
+      & .markdown-alert-title {
+        color: theme('colors.purple.700');
+      }
+    }
+
+    &.markdown-alert-warning {
+      background-color: theme('colors.amber.50');
+      border-left-color: theme('colors.amber.500');
+      color: theme('colors.amber.900');
+
+      & .markdown-alert-title {
+        color: theme('colors.amber.700');
+      }
+    }
+
+    &.markdown-alert-caution {
+      background-color: theme('colors.red.50');
+      border-left-color: theme('colors.red.500');
+      color: theme('colors.red.900');
+
+      & .markdown-alert-title {
+        color: theme('colors.red.700');
+      }
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
+
+  /* Named containers (@mdit/plugin-container)                        */
+
+  /* ---------------------------------------------------------------- */
+
+  & .info,
+  & .tip,
+  & .warning,
+  & .danger {
+    padding: 0.75rem 1rem;
+    border-left-width: 4px;
+    border-radius: 0 0.375rem 0.375rem 0;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+
+    & > *:first-child {
+      margin-top: 0;
+    }
+
+    & > *:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  & .info {
+    background-color: theme('colors.blue.50');
+    border-left-color: theme('colors.blue.500');
+    color: theme('colors.blue.900');
+  }
+
+  & .tip {
+    background-color: theme('colors.green.50');
+    border-left-color: theme('colors.green.500');
+    color: theme('colors.green.900');
+  }
+
+  & .warning {
+    background-color: theme('colors.amber.50');
+    border-left-color: theme('colors.amber.500');
+    color: theme('colors.amber.900');
+  }
+
+  & .danger {
+    background-color: theme('colors.red.50');
+    border-left-color: theme('colors.red.500');
+    color: theme('colors.red.900');
+  }
+}
+
+/* Dark mode */
+.dark .prose {
+  & .markdown-alert {
+    &.markdown-alert-note {
+      background-color: theme('colors.blue.950');
+      color: theme('colors.blue.100');
+
+      & .markdown-alert-title {
+        color: theme('colors.blue.300');
+      }
+    }
+
+    &.markdown-alert-tip {
+      background-color: theme('colors.green.950');
+      color: theme('colors.green.100');
+
+      & .markdown-alert-title {
+        color: theme('colors.green.300');
+      }
+    }
+
+    &.markdown-alert-important {
+      background-color: theme('colors.purple.950');
+      color: theme('colors.purple.100');
+
+      & .markdown-alert-title {
+        color: theme('colors.purple.300');
+      }
+    }
+
+    &.markdown-alert-warning {
+      background-color: theme('colors.amber.950');
+      color: theme('colors.amber.100');
+
+      & .markdown-alert-title {
+        color: theme('colors.amber.300');
+      }
+    }
+
+    &.markdown-alert-caution {
+      background-color: theme('colors.red.950');
+      color: theme('colors.red.100');
+
+      & .markdown-alert-title {
+        color: theme('colors.red.300');
+      }
+    }
+  }
+
+  & .info {
+    background-color: theme('colors.blue.950');
+    color: theme('colors.blue.100');
+  }
+
+  & .tip {
+    background-color: theme('colors.green.950');
+    color: theme('colors.green.100');
+  }
+
+  & .warning {
+    background-color: theme('colors.amber.950');
+    color: theme('colors.amber.100');
+  }
+
+  & .danger {
+    background-color: theme('colors.red.950');
+    color: theme('colors.red.100');
+  }
+}

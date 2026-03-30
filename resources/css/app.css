@@ -11,6 +11,9 @@
 /* Import page-specific styles */
 @import './pages/login.css';
 
+/* Markdown plugin styles (mdit) */
+@import './markdown.css';
+
 /* Prevent flash of unstyled content */
 @layer base {
   /* Ensure smooth transitions for theme changes */
