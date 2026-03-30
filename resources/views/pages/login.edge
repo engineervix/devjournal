@@ -141,6 +141,9 @@
           
           <form action="{{ route('auth.login') }}" method="POST" class="space-y-5" id="loginForm">
             {{ csrfField() }}
+            @if(next)
+              <input type="hidden" name="next" value="{{ next }}" />
+            @endif
             {{-- Email Field --}}
             <div class="space-y-2">
               <label for="email" class="block text-sm font-semibold text-gray-700 dark:text-gray-200">

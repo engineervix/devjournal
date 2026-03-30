@@ -31,19 +31,23 @@ export default class AuthMiddleware {
       const isApiRequest =
         ctx.request.header('Authorization') !== undefined || ctx.request.url().startsWith('/api/')
 
-      // For AJAX or API requests, return JSON response instead of redirect
+      // For AJAX, API, or JSON-accepting requests, return JSON response instead of redirect
+      const acceptsJson = ctx.request.accepts(['html', 'json']) === 'json'
       if (
         ctx.request.ajax() ||
         ctx.request.header('X-Requested-With') === 'XMLHttpRequest' ||
-        isApiRequest
+        isApiRequest ||
+        acceptsJson
       ) {
         return ctx.response.status(401).json({
           success: false,
           message: 'Authentication required.',
         })
       }
-      // For regular requests, let the default behavior handle it (redirect)
-      throw error
+
+      // Redirect to login with ?next= so the user is returned after login
+      const requestUrl = ctx.request.url(true)
+      return ctx.response.redirect(`${this.redirectTo}?next=${encodeURIComponent(requestUrl)}`)
     }
   }
 }

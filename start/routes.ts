@@ -13,19 +13,21 @@ import User from '#models/user'
 const EntriesController = () => import('#controllers/entries_controller')
 
 router
-  .get('/', async ({ view }) => {
-    return view.render('pages/login')
+  .get('/', async ({ view, request }) => {
+    return view.render('pages/login', { next: request.input('next', '') })
   })
   .as('auth.login.show')
   .use(middleware.guest())
 
 router
   .post('/', async ({ request, response, auth, session }) => {
-    const { email, password } = request.only(['email', 'password'])
+    const { email, password, next } = request.only(['email', 'password', 'next'])
     try {
       const user = await User.verifyCredentials(email, password)
       await auth.use('web').login(user)
-      return response.redirect('/home')
+      // Only redirect to `next` if it's a relative path (prevents open redirect)
+      const redirectTo = next && next.startsWith('/') && !next.startsWith('//') ? next : '/home'
+      return response.redirect(redirectTo)
     } catch (error) {
       session.flash('error', 'Invalid credentials')
       return response.redirect().back()
