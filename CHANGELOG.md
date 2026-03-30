@@ -24,6 +24,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 * **auth:** add functional tests for ?next= redirect and open-redirect protection ([a84feaa](https://github.com/engineervix/devjournal/commit/a84feaa77a28ffdf1e4d1ef4ba1f344193895564))
 
+
+## [v1.0.1](https://github.com/engineervix/devjournal/compare/v1.0.0...v1.0.1) (2026-03-09)
+
+
+### 🐛 Bug Fixes
+
+* **cli:** correct Tag ID type to int64 and add UsageCount ([f93733f](https://github.com/engineervix/devjournal/commit/f93733f410c5182df0d5d6fe8945d9584ba3024c))
+
+
 ## 1.0.0 (2026-03-07)
 
 
