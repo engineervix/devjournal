@@ -16,7 +16,7 @@ var (
 )
 
 var updateCmd = &cobra.Command{
-	Use:   "update [SEARCH_QUERY or ID]",
+	Use:   "update <ID>",
 	Short: "Update a journal entry",
 	Example: `  devlog-client update 123e4567-e89b-12d3
   devlog-client update 123e4567-e89b-12d3 --title "Fixed a typo"`,
