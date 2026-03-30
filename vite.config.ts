@@ -1,7 +1,11 @@
+import { createRequire } from 'node:module'
 import { defineConfig } from 'vite'
 import adonisjs from '@adonisjs/vite/client'
 import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
+
+const require = createRequire(import.meta.url)
+const tailwindNesting = require('tailwindcss/nesting')
 
 export default defineConfig({
   plugins: [
@@ -20,7 +24,7 @@ export default defineConfig({
   ],
   css: {
     postcss: {
-      plugins: [tailwindcss, autoprefixer],
+      plugins: [tailwindNesting, tailwindcss, autoprefixer],
     },
   },
   build: {
