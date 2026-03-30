@@ -41,3 +41,6 @@ cli/coverage.html
 
 # Lefthook local configuration (user-specific overrides)
 lefthook-local.yml
+
+# Claude Code local settings (machine-specific permissions)
+.claude/settings.local.json
