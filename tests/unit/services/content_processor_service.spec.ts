@@ -123,6 +123,64 @@ This is a [link](https://example.com) and an image:
     assert.include(result.contentHtml!, '<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">')
   })
 
+  test('should render task lists', async ({ assert }) => {
+    const service = new ContentProcessorService()
+    const markdown = `- [ ] unchecked task\n- [x] checked task`
+
+    const result = await service.processMarkdown(markdown)
+
+    assert.include(result.contentHtml!, 'task-list-container')
+    assert.include(result.contentHtml!, 'type="checkbox"')
+    assert.include(result.contentHtml!, 'checked')
+  })
+
+  test('should render GFM alerts', async ({ assert }) => {
+    const service = new ContentProcessorService()
+    const markdown = `> [!NOTE]\n> This is a note.`
+
+    const result = await service.processMarkdown(markdown)
+
+    assert.include(result.contentHtml!, 'markdown-alert')
+    assert.include(result.contentHtml!, 'This is a note.')
+  })
+
+  test('should render emoji shortcodes', async ({ assert }) => {
+    const service = new ContentProcessorService()
+    const markdown = 'I :heart: coding!'
+
+    const result = await service.processMarkdown(markdown)
+
+    assert.include(result.contentHtml!, '❤')
+  })
+
+  test('should render subscript', async ({ assert }) => {
+    const service = new ContentProcessorService()
+    const markdown = 'H~2~O'
+
+    const result = await service.processMarkdown(markdown)
+
+    assert.include(result.contentHtml!, '<sub>2</sub>')
+  })
+
+  test('should render superscript', async ({ assert }) => {
+    const service = new ContentProcessorService()
+    const markdown = 'E=mc^2^'
+
+    const result = await service.processMarkdown(markdown)
+
+    assert.include(result.contentHtml!, '<sup>2</sup>')
+  })
+
+  test('should render named containers', async ({ assert }) => {
+    const service = new ContentProcessorService()
+    const markdown = `:::warning\nWatch out!\n:::`
+
+    const result = await service.processMarkdown(markdown)
+
+    assert.include(result.contentHtml!, 'class="warning"')
+    assert.include(result.contentHtml!, 'Watch out!')
+  })
+
   test('should handle markdown with multiple paragraphs', async ({ assert }) => {
     const service = new ContentProcessorService()
     const markdown = `

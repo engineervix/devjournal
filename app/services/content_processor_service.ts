@@ -2,6 +2,12 @@ import { inject } from '@adonisjs/core'
 import MarkdownIt from 'markdown-it'
 import { htmlToText } from 'html-to-text'
 import hljs from 'highlight.js'
+import { tasklist } from '@mdit/plugin-tasklist'
+import { container } from '@mdit/plugin-container'
+import { alert } from '@mdit/plugin-alert'
+import { fullEmoji } from '@mdit/plugin-emoji'
+import { sub } from '@mdit/plugin-sub'
+import { sup } from '@mdit/plugin-sup'
 import OEmbedService from '#services/oembed_service'
 
 export interface ProcessedContent {
@@ -39,6 +45,15 @@ export default class ContentProcessorService {
         )
       },
     })
+      .use(tasklist)
+      .use(alert)
+      .use(fullEmoji)
+      .use(sub)
+      .use(sup)
+      .use(container, { name: 'info' })
+      .use(container, { name: 'tip' })
+      .use(container, { name: 'warning' })
+      .use(container, { name: 'danger' })
     this.oembedService = oembedService ?? new OEmbedService()
   }
 
