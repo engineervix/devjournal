@@ -20,10 +20,10 @@
     "lint:all": "npm run lint && npm run lint:css",
     "postinstall": "test \"$CI\" != true && command -v lefthook >/dev/null 2>&1 && lefthook install || true",
     "release": "commit-and-tag-version",
-    "test": "node ace test",
-    "test:coverage": "c8 node ace test",
-    "test:coverage:html": "c8 --reporter=html node ace test",
-    "test:coverage:lcov": "c8 --reporter=lcov node ace test",
+    "test": "HOST=localhost node ace test",
+    "test:coverage": "HOST=localhost c8 node ace test",
+    "test:coverage:html": "HOST=localhost c8 --reporter=html node ace test",
+    "test:coverage:lcov": "HOST=localhost c8 --reporter=lcov node ace test",
     "typecheck": "tsc --noEmit"
   },
   "imports": {
