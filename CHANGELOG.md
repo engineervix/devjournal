@@ -1,37 +1,21 @@
 # Changelog
 
-All notable changes to this project will be documented here.
+All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project attempts to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [v1.1.0](https://github.com/engineervix/devjournal/compare/v1.0.1...v1.1.0) (2026-03-30)
+## [1.2.0](https://github.com/engineervix/devjournal/compare/v1.1.0...v1.2.0) (2026-04-01)
 
 
 ### 🚀 Features
 
-* **auth:** redirect to login with ?next= param for unauthenticated requests ([41f18e0](https://github.com/engineervix/devjournal/commit/41f18e0df2f523c09b00be9b591ed41d823565b2))
-* **claude:** add /devlog custom command for saving conversation notes ([4071c96](https://github.com/engineervix/devjournal/commit/4071c9606b3a056a92fdd2588256e8757fe9c9d4))
-* **cli:** prompt for server URL during login flow ([5ca7d31](https://github.com/engineervix/devjournal/commit/5ca7d318f3dd7abb6a006873f6e8b9e2a3280cee))
+* add CSS styles for mdit plugin output ([65f709f](https://github.com/engineervix/devjournal/commit/65f709ff095cb4b8db5c01bb2575cf47dd45ba41))
+* **cli:** add --type flag to update command ([689d3bc](https://github.com/engineervix/devjournal/commit/689d3bc4214ab71c384165170e075c0bfb3b1358))
+* **cli:** use actual binary name in help and error messages ([b5af735](https://github.com/engineervix/devjournal/commit/b5af7352a3501cdc97756c1f6eb5f3442e69c2e7))
+* extend markdown-it with mdit plugins ([2953fe8](https://github.com/engineervix/devjournal/commit/2953fe86cd86082bb806fa04ea66450fa9e8c49a))
 
 
-### 🐛 Bug Fixes
+### ⚙️ Build System
 
-* **cli:** correct update command usage string to reflect ID-only support ([0e6248c](https://github.com/engineervix/devjournal/commit/0e6248cb11bc33ad0825e120582cbd97147f3ebf))
-* **test:** pin HOST=localhost in test scripts to avoid openSUSE system HOST override ([35824cd](https://github.com/engineervix/devjournal/commit/35824cd30eab2d81713224bdd5f7cfbbfc88d9c3))
-
-
-### ✅ Tests
-
-* **auth:** add functional tests for ?next= redirect and open-redirect protection ([a84feaa](https://github.com/engineervix/devjournal/commit/a84feaa77a28ffdf1e4d1ef4ba1f344193895564))
-
-
-## [v1.0.1](https://github.com/engineervix/devjournal/compare/v1.0.0...v1.0.1) (2026-03-09)
-
-
-### 🐛 Bug Fixes
-
-* **cli:** correct Tag ID type to int64 and add UsageCount ([f93733f](https://github.com/engineervix/devjournal/commit/f93733f410c5182df0d5d6fe8945d9584ba3024c))
-
+* enable tailwindcss/nesting in PostCSS for native CSS nesting support ([d09f58c](https://github.com/engineervix/devjournal/commit/d09f58c367c81344d2c81ee37a5d60b95ffdfa6b))
 
 ## 1.0.0 (2026-03-07)
 
