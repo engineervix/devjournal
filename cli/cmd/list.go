@@ -24,14 +24,10 @@ var (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List journal entries",
-	Example: `  devlog-client list
-  devlog-client list --type daily
-  devlog-client list --tag go --page 2 --per-page 20
-  devlog-client list --json`,
 	Run: func(cmd *cobra.Command, args []string) {
 		token := viper.GetString("api_token")
 		if token == "" {
-			fmt.Fprintln(os.Stderr, "Error: missing API token. Please login first using 'devlog-client login'")
+			fmt.Fprintf(os.Stderr, "Error: missing API token. Please login first using '%s login'\n", binaryName)
 			return
 		}
 
@@ -104,6 +100,10 @@ var listCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(listCmd)
+	listCmd.Example = "  " + binaryName + " list\n" +
+		"  " + binaryName + " list --type daily\n" +
+		"  " + binaryName + " list --tag go --page 2 --per-page 20\n" +
+		"  " + binaryName + " list --json"
 	listCmd.Flags().IntVarP(&listPage, "page", "p", 1, "Page number")
 	listCmd.Flags().IntVarP(&listPerPage, "per-page", "n", 10, "Items per page")
 	listCmd.Flags().StringVarP(&listType, "type", "t", "", "Filter by entry type")

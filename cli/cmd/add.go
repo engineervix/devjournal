@@ -22,13 +22,10 @@ var (
 var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Create a new journal entry",
-	Example: `  devlog-client add --type til --tags cli,go --title "Learned about Cobra"
-  devlog-client add --quick "This is a quick entry without opening an editor"
-  echo "Piped content" | devlog-client add --quick`,
 	Run: func(cmd *cobra.Command, args []string) {
 		token := viper.GetString("api_token")
 		if token == "" {
-			fmt.Fprintln(os.Stderr, "Error: missing API token. Please login first using 'devlog-client login'")
+			fmt.Fprintf(os.Stderr, "Error: missing API token. Please login first using '%s login'\n", binaryName)
 			return
 		}
 
@@ -98,6 +95,9 @@ var addCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(addCmd)
+	addCmd.Example = "  " + binaryName + ` add --type til --tags cli,go --title "Learned about Cobra"` + "\n" +
+		"  " + binaryName + ` add --quick "This is a quick entry without opening an editor"` + "\n" +
+		`  echo "Piped content" | ` + binaryName + " add --quick"
 
 	addCmd.Flags().StringVarP(&entryType, "type", "t", "daily", "Type of entry (daily, til, snippet, debug, achievement)")
 	addCmd.Flags().StringSliceVar(&entryTags, "tags", []string{}, "Comma-separated tags")

@@ -15,9 +15,8 @@ import (
 )
 
 var loginCmd = &cobra.Command{
-	Use:     "login",
-	Short:   "Authenticate with your DevJournal instance",
-	Example: `  devlog-client login`,
+	Use:   "login",
+	Short: "Authenticate with your DevJournal instance",
 	Run: func(cmd *cobra.Command, args []string) {
 		// Prompt for server URL, allowing the user to change it from the current value
 		currentURL := viper.GetString("api_url")
@@ -62,7 +61,7 @@ var loginCmd = &cobra.Command{
 			fmt.Fprintf(os.Stderr, "\n✗ Error connecting to API: %v\n", err)
 			fmt.Fprintln(os.Stderr, "Please check your network connection and API URL.")
 			fmt.Fprintf(os.Stderr, "Current API URL: %s\n", apiURL)
-			fmt.Fprintln(os.Stderr, "You can change it with: devlog-client config set-url <URL>")
+			fmt.Fprintf(os.Stderr, "You can change it with: %s config set-url <URL>\n", binaryName)
 			return
 		}
 
@@ -104,4 +103,5 @@ var loginCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(loginCmd)
+	loginCmd.Example = "  " + binaryName + " login"
 }

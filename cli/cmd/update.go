@@ -19,13 +19,11 @@ var (
 var updateCmd = &cobra.Command{
 	Use:   "update <ID>",
 	Short: "Update a journal entry",
-	Example: `  devlog-client update 123e4567-e89b-12d3
-  devlog-client update 123e4567-e89b-12d3 --title "Fixed a typo"`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		token := viper.GetString("api_token")
 		if token == "" {
-			fmt.Fprintln(os.Stderr, "Error: missing API token. Please login first using 'devlog-client login'")
+			fmt.Fprintf(os.Stderr, "Error: missing API token. Please login first using '%s login'\n", binaryName)
 			return
 		}
 
@@ -106,4 +104,6 @@ func init() {
 	rootCmd.AddCommand(updateCmd)
 	updateCmd.Flags().StringVar(&updateTitle, "title", "", "New title for the entry")
 	updateCmd.Flags().StringVar(&updateType, "type", "", "New entry type (daily, til, snippet, debug, achievement)")
+	updateCmd.Example = "  " + binaryName + " update 123e4567-e89b-12d3\n" +
+		"  " + binaryName + ` update 123e4567-e89b-12d3 --title "Fixed a typo"`
 }

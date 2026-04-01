@@ -11,15 +11,13 @@ import (
 
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "Manage devlog-client configuration",
-	Long:  `View and modify devlog-client configuration settings.`,
+	Short: "Manage configuration",
+	Long:  `View and modify configuration settings.`,
 }
 
 var setURLCmd = &cobra.Command{
 	Use:   "set-url [URL]",
 	Short: "Set the API URL for your DevJournal instance",
-	Example: `  devlog-client config set-url http://localhost:3333/api/v1
-  devlog-client config set-url https://journal.my-domain.com/api/v1`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		apiURL := args[0]
@@ -55,9 +53,8 @@ var setURLCmd = &cobra.Command{
 }
 
 var viewCmd = &cobra.Command{
-	Use:     "view",
-	Short:   "View current configuration",
-	Example: `  devlog-client config view`,
+	Use:   "view",
+	Short: "View current configuration",
 	Run: func(cmd *cobra.Command, args []string) {
 		apiURL := viper.GetString("api_url")
 		token := viper.GetString("api_token")
@@ -71,7 +68,7 @@ var viewCmd = &cobra.Command{
 		if token != "" {
 			fmt.Printf("API Token:   [configured]\n")
 		} else {
-			fmt.Printf("API Token:   [not set - run 'devlog-client login']\n")
+			fmt.Printf("API Token:   [not set - run '%s login']\n", binaryName)
 		}
 		fmt.Printf("Config file: %s\n", configPath)
 	},
@@ -81,4 +78,7 @@ func init() {
 	rootCmd.AddCommand(configCmd)
 	configCmd.AddCommand(setURLCmd)
 	configCmd.AddCommand(viewCmd)
+	setURLCmd.Example = "  " + binaryName + " config set-url http://localhost:3333/api/v1\n" +
+		"  " + binaryName + " config set-url https://journal.my-domain.com/api/v1"
+	viewCmd.Example = "  " + binaryName + " config view"
 }

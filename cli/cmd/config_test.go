@@ -171,7 +171,7 @@ func TestConfigViewNoToken(t *testing.T) {
 	buf.ReadFrom(r)
 	output := buf.String()
 
-	if !strings.Contains(output, "[not set - run 'devlog-client login']") {
+	if !strings.Contains(output, "not set - run '") || !strings.Contains(output, " login']") {
 		t.Error("Output should indicate token is not set")
 	}
 }

@@ -11,8 +11,10 @@ import (
 
 var cfgFile string
 
+var binaryName = filepath.Base(os.Args[0])
+
 var rootCmd = &cobra.Command{
-	Use:   filepath.Base(os.Args[0]),
+	Use:   binaryName,
 	Short: "A CLI for DevJournal",
 	Long: `DevLog Client is a CLI tool to interact with your DevJournal instance.
 It allows you to create logs, snippets, and TILs directly from your terminal.`,
