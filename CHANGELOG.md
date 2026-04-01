@@ -17,6 +17,35 @@ All notable changes to this project will be documented in this file. See [commit
 
 * enable tailwindcss/nesting in PostCSS for native CSS nesting support ([d09f58c](https://github.com/engineervix/devjournal/commit/d09f58c367c81344d2c81ee37a5d60b95ffdfa6b))
 
+## [v1.1.0](https://github.com/engineervix/devjournal/compare/v1.0.1...v1.1.0) (2026-03-30)
+
+
+### 🚀 Features
+
+* **auth:** redirect to login with ?next= param for unauthenticated requests ([41f18e0](https://github.com/engineervix/devjournal/commit/41f18e0df2f523c09b00be9b591ed41d823565b2))
+* **claude:** add /devlog custom command for saving conversation notes ([4071c96](https://github.com/engineervix/devjournal/commit/4071c9606b3a056a92fdd2588256e8757fe9c9d4))
+* **cli:** prompt for server URL during login flow ([5ca7d31](https://github.com/engineervix/devjournal/commit/5ca7d318f3dd7abb6a006873f6e8b9e2a3280cee))
+
+
+### 🐛 Bug Fixes
+
+* **cli:** correct update command usage string to reflect ID-only support ([0e6248c](https://github.com/engineervix/devjournal/commit/0e6248cb11bc33ad0825e120582cbd97147f3ebf))
+* **test:** pin HOST=localhost in test scripts to avoid openSUSE system HOST override ([35824cd](https://github.com/engineervix/devjournal/commit/35824cd30eab2d81713224bdd5f7cfbbfc88d9c3))
+
+
+### ✅ Tests
+
+* **auth:** add functional tests for ?next= redirect and open-redirect protection ([a84feaa](https://github.com/engineervix/devjournal/commit/a84feaa77a28ffdf1e4d1ef4ba1f344193895564))
+
+
+## [v1.0.1](https://github.com/engineervix/devjournal/compare/v1.0.0...v1.0.1) (2026-03-09)
+
+
+### 🐛 Bug Fixes
+
+* **cli:** correct Tag ID type to int64 and add UsageCount ([f93733f](https://github.com/engineervix/devjournal/commit/f93733f410c5182df0d5d6fe8945d9584ba3024c))
+
+
 ## 1.0.0 (2026-03-07)
 
 
