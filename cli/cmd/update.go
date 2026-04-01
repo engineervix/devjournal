@@ -13,6 +13,7 @@ import (
 
 var (
 	updateTitle string
+	updateType  string
 )
 
 var updateCmd = &cobra.Command{
@@ -40,7 +41,7 @@ var updateCmd = &cobra.Command{
 		// Interactive mode if no specific flags that define all needed updates are provided
 		// In this case, if title is provided, we might still want to edit content?
 		// The plan said: "Interactive Mode (Default): If no flags causing updates are provided".
-		interactive := updateTitle == ""
+		interactive := updateTitle == "" && updateType == ""
 
 		if interactive {
 			// Fetch entry first
@@ -70,6 +71,9 @@ var updateCmd = &cobra.Command{
 			if updateTitle != "" {
 				payload.Title = updateTitle
 			}
+			if updateType != "" {
+				payload.EntryType = updateType
+			}
 
 			updatedEntry, err := apiClient.UpdateEntry(id, payload)
 			if err != nil {
@@ -83,6 +87,9 @@ var updateCmd = &cobra.Command{
 			payload := api.UpdateEntryPayload{}
 			if updateTitle != "" {
 				payload.Title = updateTitle
+			}
+			if updateType != "" {
+				payload.EntryType = updateType
 			}
 
 			updatedEntry, err := apiClient.UpdateEntry(id, payload)
@@ -98,4 +105,5 @@ var updateCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(updateCmd)
 	updateCmd.Flags().StringVar(&updateTitle, "title", "", "New title for the entry")
+	updateCmd.Flags().StringVar(&updateType, "type", "", "New entry type (daily, til, snippet, debug, achievement)")
 }
