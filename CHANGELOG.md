@@ -2,6 +2,58 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.3.0](https://github.com/engineervix/devjournal/compare/v1.0.0...v1.3.0) (2026-05-23)
+
+
+### 🚀 Features
+
+* add CSS styles for mdit plugin output ([65f709f](https://github.com/engineervix/devjournal/commit/65f709ff095cb4b8db5c01bb2575cf47dd45ba41))
+* **auth:** redirect to login with ?next= param for unauthenticated requests ([41f18e0](https://github.com/engineervix/devjournal/commit/41f18e0df2f523c09b00be9b591ed41d823565b2))
+* **claude:** add /devlog custom command for saving conversation notes ([4071c96](https://github.com/engineervix/devjournal/commit/4071c9606b3a056a92fdd2588256e8757fe9c9d4))
+* **cli:** add --type flag to update command ([689d3bc](https://github.com/engineervix/devjournal/commit/689d3bc4214ab71c384165170e075c0bfb3b1358))
+* **cli:** prompt for server URL during login flow ([5ca7d31](https://github.com/engineervix/devjournal/commit/5ca7d318f3dd7abb6a006873f6e8b9e2a3280cee))
+* **cli:** use actual binary name in help and error messages ([b5af735](https://github.com/engineervix/devjournal/commit/b5af7352a3501cdc97756c1f6eb5f3442e69c2e7))
+* extend markdown-it with mdit plugins ([2953fe8](https://github.com/engineervix/devjournal/commit/2953fe86cd86082bb806fa04ea66450fa9e8c49a))
+
+
+### 🐛 Bug Fixes
+
+* **cli:** correct Tag ID type to int64 and add UsageCount ([f93733f](https://github.com/engineervix/devjournal/commit/f93733f410c5182df0d5d6fe8945d9584ba3024c))
+* **cli:** correct update command usage string to reflect ID-only support ([0e6248c](https://github.com/engineervix/devjournal/commit/0e6248cb11bc33ad0825e120582cbd97147f3ebf))
+* **test:** pin HOST=localhost in test scripts to avoid openSUSE system HOST override ([35824cd](https://github.com/engineervix/devjournal/commit/35824cd30eab2d81713224bdd5f7cfbbfc88d9c3))
+
+
+### ✅ Tests
+
+* **auth:** add functional tests for ?next= redirect and open-redirect protection ([a84feaa](https://github.com/engineervix/devjournal/commit/a84feaa77a28ffdf1e4d1ef4ba1f344193895564))
+
+
+### ⚙️ Build System
+
+* **deps:** update dependency @adonisjs/session to v7.7.1 ([#63](https://github.com/engineervix/devjournal/issues/63)) ([6cb5a36](https://github.com/engineervix/devjournal/commit/6cb5a3629dc0fb04859e4519ad8ef3b9b61e1102))
+* **deps:** update dependency @japa/api-client to v3.2.1 ([#64](https://github.com/engineervix/devjournal/issues/64)) ([3c43c73](https://github.com/engineervix/devjournal/commit/3c43c73c1df7792628142a6d9174f044d20ffaa6))
+* **deps:** update dependency @mdit/plugin-alert to v0.23.2 ([#72](https://github.com/engineervix/devjournal/issues/72)) ([669be63](https://github.com/engineervix/devjournal/commit/669be63c0395b2833552440e25597b2d11b59774))
+* **deps:** update dependency @mdit/plugin-container to v0.23.2 ([#73](https://github.com/engineervix/devjournal/issues/73)) ([e5a45cb](https://github.com/engineervix/devjournal/commit/e5a45cbc30441dd4e80ec87b16286216a1910bfb))
+* **deps:** update dependency @mdit/plugin-emoji to v0.2.2 ([#74](https://github.com/engineervix/devjournal/issues/74)) ([f344a38](https://github.com/engineervix/devjournal/commit/f344a38f94e5bc97528cf03fac2669d82330277a))
+* **deps:** update dependency @mdit/plugin-sub to v0.24.2 ([#75](https://github.com/engineervix/devjournal/issues/75)) ([d334fc3](https://github.com/engineervix/devjournal/commit/d334fc398ba98222f6dae3631e6f9592557c3e7c))
+* **deps:** update dependency @mdit/plugin-sup to v0.24.2 ([#76](https://github.com/engineervix/devjournal/issues/76)) ([25b6b24](https://github.com/engineervix/devjournal/commit/25b6b249560c77eab6a199fcf4204ab4cbfcbb68))
+* **deps:** update dependency @mdit/plugin-tasklist to v0.23.2 ([#77](https://github.com/engineervix/devjournal/issues/77)) ([c83c67f](https://github.com/engineervix/devjournal/commit/c83c67f9cac8faf1ae9ae0606192ed5193cc2529))
+* **deps:** update dependency @swc/core to v1.15.33 ([#78](https://github.com/engineervix/devjournal/issues/78)) ([392925d](https://github.com/engineervix/devjournal/commit/392925dd97f01f0b6787020dcb7680c6342d0856))
+* **deps:** update dependency @tailwindcss/forms to v0.5.11 ([#66](https://github.com/engineervix/devjournal/issues/66)) ([07e7e60](https://github.com/engineervix/devjournal/commit/07e7e60c3afbda2ac00e5f182642539672f08063))
+* **deps:** update dependency @types/archiver to v6.0.4 ([#67](https://github.com/engineervix/devjournal/issues/67)) ([3c22e69](https://github.com/engineervix/devjournal/commit/3c22e692347b02381b2df845beee415c414acb4b))
+* **deps:** update dependency @types/jsdom to v28.0.3 ([#79](https://github.com/engineervix/devjournal/issues/79)) ([e657d20](https://github.com/engineervix/devjournal/commit/e657d2020a329799d333ea8554d3358e39aa2cdd))
+* **deps:** update dependency @types/node to v22.19.15 ([#68](https://github.com/engineervix/devjournal/issues/68)) ([eefa71b](https://github.com/engineervix/devjournal/commit/eefa71b123ad02ee3f85b5b038ba862b70b11d0b))
+* **deps:** update dependency @types/node to v22.19.18 ([#80](https://github.com/engineervix/devjournal/issues/80)) ([913274c](https://github.com/engineervix/devjournal/commit/913274c0ec1271eef5f56c4f7ed50480d1a59e37))
+* **deps:** update dependency @types/node to v22.19.19 ([#85](https://github.com/engineervix/devjournal/issues/85)) ([fc65420](https://github.com/engineervix/devjournal/commit/fc65420f367622e4331434bd2dd455acf727e72a))
+* **deps:** update dependency autoprefixer to v10.4.27 ([#69](https://github.com/engineervix/devjournal/issues/69)) ([e1b2a55](https://github.com/engineervix/devjournal/commit/e1b2a5570c594351741fe4e9556f767e143ff301))
+* **deps:** update dependency edge.js to v6.5.1 ([#86](https://github.com/engineervix/devjournal/issues/86)) ([d66342c](https://github.com/engineervix/devjournal/commit/d66342c9dad3b601ec2fc6bc69cd1efbe569f2e1))
+* **deps:** update dependency lefthook to v2.1.8 ([#82](https://github.com/engineervix/devjournal/issues/82)) ([7602249](https://github.com/engineervix/devjournal/commit/7602249c05b427f5350a64e47ab4a3d0e91d151c))
+* **deps:** update dependency nock to v14.0.15 ([#83](https://github.com/engineervix/devjournal/issues/83)) ([fda1555](https://github.com/engineervix/devjournal/commit/fda1555961a83533e31e455498ac6ac16e5e16b9))
+* **deps:** update dependency postcss to v8.5.15 ([#84](https://github.com/engineervix/devjournal/issues/84)) ([60b6602](https://github.com/engineervix/devjournal/commit/60b66020df8a6d7d9c3786aa0c0b160049983a63))
+* **deps:** update dependency postcss to v8.5.8 ([#62](https://github.com/engineervix/devjournal/issues/62)) ([34b811c](https://github.com/engineervix/devjournal/commit/34b811c3c4b75d3520d728fe18099f858132d19b))
+* enable tailwindcss/nesting in PostCSS for native CSS nesting support ([d09f58c](https://github.com/engineervix/devjournal/commit/d09f58c367c81344d2c81ee37a5d60b95ffdfa6b))
+* upgrade node 22 -> 24 ([8123dbc](https://github.com/engineervix/devjournal/commit/8123dbcc8da3f622efd9095870a5c238e9c1df14))
+
 ## [1.2.0](https://github.com/engineervix/devjournal/compare/v1.1.0...v1.2.0) (2026-04-01)
 
 
