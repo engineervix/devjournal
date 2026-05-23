@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-DevJournal is a personal developer journal application built with AdonisJS 6. Node.js 22, TypeScript, PostgreSQL 16 with pgvector extension.
+DevJournal is a personal developer journal application built with AdonisJS 6. Node.js 24, TypeScript, PostgreSQL 16 with pgvector extension.
 
 The application helps developers track their learning journey, code snippets, debugging sessions, and achievements through daily logs, TIL entries, and more.
 

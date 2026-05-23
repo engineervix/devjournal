@@ -2,7 +2,7 @@
 
 A modern developer journal application built with [AdonisJS](https://adonisjs.com/), designed to help developers track their learning journey, code snippets, debugging sessions, and achievements.
 
-[![Node v22](https://img.shields.io/badge/Node-v22-teal.svg)](https://nodejs.org/en/blog/release/v22.0.0)
+[![Node v24](https://img.shields.io/badge/Node-v24-teal.svg)](https://nodejs.org/en/blog/release/v24.0.0)
 [![code style: prettier](https://img.shields.io/badge/code%20style-prettier-ff69b4.svg)](https://prettier.io/)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
@@ -61,7 +61,7 @@ A modern developer journal application built with [AdonisJS](https://adonisjs.co
 
 ### Prerequisites
 
-- Node.js 22+
+- Node.js 24+
 - PostgreSQL 16+
 - npm
 

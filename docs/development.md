@@ -31,7 +31,7 @@
 
 **Required:**
 
-- Node.js 22+ ([nvm](https://github.com/nvm-sh/nvm) recommended)
+- Node.js 24+ ([nvm](https://github.com/nvm-sh/nvm) recommended)
 - npm 10+
 - Docker & Docker Compose
 - Git
@@ -43,7 +43,7 @@
 **Verify:**
 
 ```bash
-node --version        # v22.x.x
+node --version        # v24.x.x
 npm --version         # 10.x.x
 docker --version      # 24.x.x+
 docker compose version # v2.x.x+
