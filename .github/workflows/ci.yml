@@ -47,6 +47,7 @@ jobs:
         run: npm run ${{ matrix.linter }}
 
   test:
+    timeout-minutes: 15
     needs: [deps, checks]
     runs-on: ubuntu-latest
     services:
